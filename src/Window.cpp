@@ -2,15 +2,18 @@
 
 // ZEZLUP
 
-GlWindow::GlWindow()
+Window::Window( f32 w, f32 h )
 {
+  width = w;
+  height = h;
+
   // Initialise GLFW
   if ( !glfwInit() ) {
     fprintf( stderr, "Failed to initialize GLFW\n" );
     getchar();
     // return -1;
   }
-  GlWindowSetup();
+  WindowSetup();
 
   glfwWindowHint( GLFW_OPENGL_DEBUG_CONTEXT, true );
 
@@ -45,14 +48,14 @@ GlWindow::GlWindow()
   }
 };
 
-GlWindow::~GlWindow()
+Window::~Window()
 {
   // Close OpenGL window and terminate GLFW
   glfwTerminate();
 };
 
 void
-GlWindow::GlWindowSetup()
+Window::WindowSetup()
 {
   // 4x antialiasing
   glfwWindowHint( GLFW_SAMPLES, 4 );
@@ -70,27 +73,6 @@ GlWindow::GlWindowSetup()
   // Don't use the old OpenGL
   glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
 };
-
-void
-GlWindow::GlRender( Geometry geometries )
-{
-
-  do {
-    glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    geometries.bindVertexArray();
-
-    // Swap buffers
-    glfwSwapBuffers( window );
-    glfwPollEvents();
-
-  } // Check if the ESC key was pressed or the window was closed
-  while ( glfwGetKey( window, GLFW_KEY_ESCAPE ) != GLFW_PRESS &&
-          glfwWindowShouldClose( window ) == 0 );
-};
-
-//  Geometry
 
 void APIENTRY
 glDebugOutput( GLenum source,

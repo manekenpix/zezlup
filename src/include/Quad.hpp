@@ -7,8 +7,16 @@
 #include "Shader.hpp"
 #include "types.hpp"
 
-class Geometry
+class Quad
 {
+  // Position
+  f32 x = 0;
+  f32 y = 0;
+  f32 width = 0;
+  f32 height = 0;
+  f32 screenWidth = 0;
+  f32 screenHeight = 0;
+
   // Textures
   s32 textureWidth, textureHeight;
   u8* textureBuffer;
@@ -28,31 +36,20 @@ class Geometry
   };
   u32 indices[6] = { 0, 1, 3, 1, 2, 3 };
 
-  const f32 width = 1280, height = 960;
-
   // Shader
   Shader* shaders;
-  glm::mat4 projectionMatrix =
-    glm::ortho( 0.0f, (f32)width, (f32)height, 0.0f );
+  glm::mat4 projectionMatrix;
 
 public:
-  Geometry( u8* buffer,
-            s32 tWidth,
-            s32 tHeight,
-            u8 colourType,
-            f32 width,
-            f32 height );
+  Quad( Shader*, f32 w, f32 h, f32 screenW, f32 screenH );
 
-  ~Geometry();
+  ~Quad();
 
-  void loadTexture( u8* buffer,
-                    s32 tWidth,
-                    s32 tHeight,
-                    u8 colourType,
-                    f32 width,
-                    f32 height );
+  void attachTexture( u8* buffer, s32 tWidth, s32 tHeight, u8 colourType );
 
-  void scaleTexture( f32 width, f32 height );
+  void setPosition( f32 x, f32 y );
+  f32 getX() { return x; };
+  f32 getY() { return y; };
 
   void bindVertexArray();
 };

@@ -2,10 +2,10 @@
 #define PNG_H
 
 #include "types.hpp"
-#include <zlib.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <zlib.h>
 
 struct PaletteColour
 {

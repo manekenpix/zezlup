@@ -24,6 +24,28 @@
       ]
     },
     {
+      "name": "(gdb) GL 2 RGB",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/bin/zezlup",
+      "args": [
+        "${workspaceFolder}/data/true_colour/baboon.png",
+        "${workspaceFolder}/data/true_colour/watch.png"
+      ],
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "gdb",
+      "setupCommands": [
+        {
+          "description": "Enable pretty-printing for gdb",
+          "text": "-enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
+    {
       "name": "(gdb) GL RGBA",
       "type": "cppdbg",
       "request": "launch",

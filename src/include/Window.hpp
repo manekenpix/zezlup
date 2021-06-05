@@ -7,24 +7,19 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include "Geometry.hpp"
-#include "Shader.hpp"
 #include "types.hpp"
 
-class GlWindow
+class Window
 {
   // Window
-  GLFWwindow* window;
-  const f32 width = 1280, height = 960;
+  f32 width, height;
 
-  void GlWindowSetup();
+  void WindowSetup();
 
 public:
-  GlWindow();
-  void GlLoadTexture( u8*, s32, s32, u8 );
-  void GlRender( Geometry geometries );
-
-  ~GlWindow();
+  GLFWwindow* window;
+  Window( f32 w, f32 h );
+  ~Window();
 };
 
 void APIENTRY
