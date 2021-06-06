@@ -1,10 +1,10 @@
-#include "include/Png.h"
+#include "include/Png.hpp"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
 #include <iomanip>
 
-PNG::PNG( const char* file )
+Png::Png( const char* file )
 {
   loadFile( file );
   fileIterator = fileBuffer.begin();
@@ -57,7 +57,7 @@ PNG::PNG( const char* file )
 };
 
 void
-PNG::loadFile( const char* file )
+Png::loadFile( const char* file )
 {
   std::ifstream image;
 
@@ -84,7 +84,7 @@ PNG::loadFile( const char* file )
 };
 
 void
-PNG::readIDAT( u8vIt& it, u32 size )
+Png::readIDAT( u8vIt& it, u32 size )
 {
   idatChunks.insert( idatChunks.end(), it, it + size );
   it += size;
@@ -92,7 +92,7 @@ PNG::readIDAT( u8vIt& it, u32 size )
 };
 
 void
-PNG::readIHDR( u8vIt& it )
+Png::readIHDR( u8vIt& it )
 {
   width = readU32( it );
   height = readU32( it );
@@ -122,7 +122,7 @@ PNG::readIHDR( u8vIt& it )
 };
 
 void
-PNG::readPLTE( u8vIt& it, u32 size )
+Png::readPLTE( u8vIt& it, u32 size )
 {
   std::cout << "Number of entries in the palette: " << size / 3 << std::endl;
 
@@ -142,7 +142,7 @@ PNG::readPLTE( u8vIt& it, u32 size )
 }
 
 void
-PNG::applyColoursFromPalette()
+Png::applyColoursFromPalette()
 {
   std::vector<u8> indexedImageBuffer( ( width * height * bytesPerPixel ) +
                                       height );
@@ -168,14 +168,13 @@ PNG::applyColoursFromPalette()
 }
 
 void
-PNG::filter()
+Png::filter()
 {
   processedImage.resize( width * height * bytesPerPixel );
   u8vIt processedImageIt = processedImage.begin();
 
   u8vIt scanlineIt = imageBuffer.begin(), byteIt, endScanline, endFirstPixel,
         processedImageRowIt;
-  u8 rhs;
 
   u32 scanline = ( width * bytesPerPixel );
   u32 filterScanline = scanline + 1;
@@ -255,7 +254,7 @@ PNG::filter()
 };
 
 u32
-PNG::inf()
+Png::inf()
 {
   u32 ret;
   unsigned have;
@@ -272,7 +271,6 @@ PNG::inf()
     return ret;
 
   /* decompress until deflate stream ends or end of file */
-  u8 iterations = idatChunks.size();
   std::vector<u8> t( CHUNK );
   strm.next_in = idatChunks.data();
   strm.avail_in = idatChunks.size();
@@ -306,7 +304,7 @@ PNG::inf()
 
 /* report a zlib or i/o error */
 void
-PNG::zerr( int ret )
+Png::zerr( int ret )
 {
   fputs( "zpipe: ", stderr );
   switch ( ret ) {
@@ -331,7 +329,7 @@ PNG::zerr( int ret )
 }
 
 void
-PNG::printImageInfo()
+Png::printImageInfo()
 {
   std::cout << "Width: " << width << std::endl;
   std::cout << "Height: " << height << std::endl;
@@ -344,7 +342,7 @@ PNG::printImageInfo()
 };
 
 u32
-PNG::readU32( u8vIt& it )
+Png::readU32( u8vIt& it )
 {
   u32 value = 0;
   for ( u8 i = 0; i < 3; ++i, ++it ) {
@@ -356,7 +354,7 @@ PNG::readU32( u8vIt& it )
 };
 
 bool
-PNG::isPNG( u8vIt& it )
+Png::isPNG( u8vIt& it )
 {
   for ( u8 n : PNGSignature )
     if ( n != *it++ )
@@ -366,31 +364,31 @@ PNG::isPNG( u8vIt& it )
 };
 
 u8*
-PNG::getImageBuffer()
+Png::getImageBuffer()
 {
   return processedImage.data();
 };
 
 u32
-PNG::getWidth()
+Png::getWidth()
 {
   return width;
 };
 
 u32
-PNG::getHeight()
+Png::getHeight()
 {
   return height;
 };
 
 u8
-PNG::getColourType()
+Png::getColourType()
 {
   return ( colourType <= 3 ? 0 : 1 );
 };
 
 void
-PNG::printChunkType( u32 chunk )
+Png::printChunkType( u32 chunk )
 {
   std::cout << chunk << ' ';
   for ( s8 i = 3; i > -1; --i ) {

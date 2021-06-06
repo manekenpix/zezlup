@@ -2,10 +2,10 @@
 #define PNG_H
 
 #include "types.hpp"
-#include <zlib.h>
 #include <fstream>
 #include <iostream>
 #include <vector>
+#include <zlib.h>
 
 struct PaletteColour
 {
@@ -16,7 +16,7 @@ struct PaletteColour
 typedef std::vector<PaletteColour>::iterator PaletteIterator;
 typedef std::vector<uint8_t>::iterator u8vIt;
 
-class PNG
+class Png
 {
   const u32 CHUNK = 16384;
   const u8 PNGSignature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
@@ -86,7 +86,7 @@ class PNG
   void printImageInfo();
 
 public:
-  PNG( const char* );
+  Png( const char* );
   u32 getWidth();
   u32 getHeight();
   u8* getImageBuffer();

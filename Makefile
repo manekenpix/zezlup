@@ -1,11 +1,13 @@
 CC = clang++ -v
 CFLAGS = -lGL -lGLEW -lglfw -lz
 SRCDIR = src
+INCLUDEDIR = src/include
 BUILDDIR = build
 TARGET = bin/zezlup
 CCRELEASE = -std=c++17 -O3
 CCDEBUG = -std=c++17 -g
 SRCEXT = cpp
+HDREXT = hpp
 INC = -I include
 
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
@@ -19,7 +21,7 @@ debug: $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	$(CC) -Wall -c -o $@ $<
+	$(CC) $(CCDEBUG) -Wall -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";
