@@ -66,7 +66,7 @@ Game::run()
 {
   do {
 
-    glClearColor( 0.2f, 0.3f, 0.3f, 1.0f );
+    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
     std::for_each( panel.begin(), panel.end(), []( Quad* square ) {
