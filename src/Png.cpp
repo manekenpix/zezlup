@@ -175,7 +175,6 @@ Png::filter()
 
   u8vIt scanlineIt = imageBuffer.begin(), byteIt, endScanline, endFirstPixel,
         processedImageRowIt;
-  u8 rhs;
 
   u32 scanline = ( width * bytesPerPixel );
   u32 filterScanline = scanline + 1;
@@ -272,7 +271,6 @@ Png::inf()
     return ret;
 
   /* decompress until deflate stream ends or end of file */
-  u8 iterations = idatChunks.size();
   std::vector<u8> t( CHUNK );
   strm.next_in = idatChunks.data();
   strm.avail_in = idatChunks.size();
