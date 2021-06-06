@@ -1,12 +1,11 @@
 #include "include/Quad.hpp"
 
 Quad::Quad( Shader* shader, f32 w, f32 h, f32 screenW, f32 screenH )
+  : width{ w }
+  , height{ h }
+  , screenWidth{ screenW }
+  , screenHeight{ screenH }
 {
-  width = w;
-  height = h;
-  screenWidth = screenW;
-  screenHeight = screenH;
-
   projectionMatrix =
     glm::ortho( 0.0f, (f32)screenWidth, (f32)screenHeight, 0.0f );
 
