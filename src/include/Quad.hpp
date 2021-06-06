@@ -1,3 +1,6 @@
+#ifndef QUAD_H
+#define QUAD_H
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
@@ -53,3 +56,5 @@ public:
 
   void bindVertexArray();
 };
+
+#endif

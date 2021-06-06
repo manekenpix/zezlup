@@ -103,7 +103,6 @@ Quad::bindVertexArray()
 
 Quad::~Quad()
 {
-  delete shaders;
   glDeleteVertexArrays( 1, &vertexArray );
   glDeleteBuffers( 1, &vertexBuffer );
   glDeleteBuffers( 1, &elementBufferObject );
