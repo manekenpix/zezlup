@@ -1,13 +1,25 @@
 #include "include/Game.hpp"
 
 Game::Game()
+  : window{ nullptr }
+  , imageBuffer{ nullptr }
+  , squaresPerRow{ 4 }
+  , squaresPerColumn{ 4 }
+  , squareWidth{ 0 }
+  , squareHeight{ 0 }
+  , bytesPerPixel{ 0 }
+  , squareResolution{ 0 }
+  , selected{ 0 }
+  , empty{ 0 }
 {
   window = new Window( screenWidth, screenHeight );
-
-  images.push_back( new Png( "data/true_colour/baboon.png" ) );
+  images.push_back( new Png( "data/true_colour/airplane.png" ) );
 
   shaders.push_back( new Shader( "src/Shaders/vertexShader.vert",
                                  "src/Shaders/fragmentShader.frag" ) );
+
+  shaders.push_back( new Shader( "src/Shaders/vertexShader.vert",
+                                 "src/Shaders/fragmentOutline.frag" ) );
 
   squareWidth = images[0]->getWidth() / squaresPerRow;
   squareHeight = images[0]->getHeight() / squaresPerColumn;
@@ -33,7 +45,7 @@ Game::createPanel()
           squareBuffer[squarePosition] = imageBuffer[positionY + positionX];
         }
       }
-      panel.push_back( new Quad( shaders[0],
+      panel.push_back( new Quad( shaders,
                                  screenWidth / squaresPerRow,
                                  screenHeight / squaresPerColumn,
                                  screenWidth,
@@ -43,6 +55,10 @@ Game::createPanel()
     }
   }
 
+  Quad* last = panel.back();
+  delete last;
+  panel[panel.size() - 1] = nullptr;
+
   // Make a copy of the panel for comparison
   sortedPanel = panel;
 
@@ -50,29 +66,41 @@ Game::createPanel()
 
   for ( u8 j = 0; j < squaresPerColumn; ++j ) {
     for ( u8 k = 0; k < squaresPerRow; ++k ) {
-      panel[( j * squaresPerRow ) + k]->setPosition(
-        ( screenWidth / squaresPerRow ) * k,
-        ( screenHeight / squaresPerColumn ) * j );
+      if ( panel[( j * squaresPerRow ) + k] )
+        panel[( j * squaresPerRow ) + k]->setPosition(
+          ( screenWidth / squaresPerRow ) * k,
+          ( screenHeight / squaresPerColumn ) * j );
     }
   }
-
-  Quad* last = panel.back();
-  delete last;
-  panel[panel.size() - 1] = nullptr;
 };
 
 void
 Game::run()
 {
+  u8 index;
   do {
-
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
-    std::for_each( panel.begin(), panel.end(), []( Quad* square ) {
-      if ( square )
-        square->bindVertexArray();
-    } );
+    if ( glfwGetKey( window->window, GLFW_KEY_RIGHT ) == GLFW_PRESS ) {
+      if ( selected >= 0 && selected < 15 )
+        ++selected;
+    }
+
+    if ( glfwGetKey( window->window, GLFW_KEY_LEFT ) == GLFW_PRESS ) {
+      if ( selected > 0 && selected <= 15 )
+        --selected;
+    }
+
+    index = 0;
+    for ( auto box = panel.begin(); box != panel.end(); ++box ) {
+      if ( *box )
+        ( *box )->draw( selected == index );
+      else
+        empty = index;
+
+      ++index;
+    }
 
     // Swap buffers
     glfwSwapBuffers( window->window );

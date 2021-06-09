@@ -18,21 +18,21 @@ class Game
   // Squares
   std::vector<Quad*> panel;
   std::vector<Quad*> sortedPanel;
-  u8 squaresPerRow = 4;
-  u8 squaresPerColumn = 4;
+  u8 squaresPerRow;
+  u8 squaresPerColumn;
 
-  u32 squareWidth = 0;
-  u32 squareHeight = 0;
+  u32 squareWidth;
+  u32 squareHeight;
 
-  u8 bytesPerPixel = 0;
-  u32 squareResolution = 0;
+  u8 bytesPerPixel;
+  u32 squareResolution;
 
   // Shaders
   std::vector<Shader*> shaders;
 
   // Gameplay
-  u8 selected = 0;
-  u8 empty = 0;
+  u8 selected;
+  u8 empty;
 
   void createPanel();
 
