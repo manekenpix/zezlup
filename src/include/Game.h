@@ -1,7 +1,7 @@
-#include "Png.hpp"
-#include "Quad.hpp"
-#include "Shader.hpp"
-#include "Window.hpp"
+#include "Png.h"
+#include "Quad.h"
+#include "Shader.h"
+#include "Window.h"
 #include <algorithm>
 
 class Game

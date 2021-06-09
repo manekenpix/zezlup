@@ -1,7 +1,7 @@
 #ifndef PNG_H
 #define PNG_H
 
-#include "types.hpp"
+#include "types.h"
 #include <fstream>
 #include <iostream>
 #include <vector>

@@ -1,11 +1,10 @@
 #ifndef WINDOW_HPP
 #define WINDOW_HPP
 
-// #include <GL/glew.h>
-#include "glew.h"
+#include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include "types.hpp"
+#include "types.h"
 
 class Window
 {

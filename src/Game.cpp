@@ -1,4 +1,4 @@
-#include "include/Game.hpp"
+#include "include/Game.h"
 
 Game::Game()
   : window{ nullptr }
@@ -15,11 +15,11 @@ Game::Game()
   window = new Window( screenWidth, screenHeight );
   images.push_back( new Png( "data/true_colour/airplane.png" ) );
 
-  shaders.push_back( new Shader( "src/Shaders/vertexShader.vert",
-                                 "src/Shaders/fragmentShader.frag" ) );
+  shaders.push_back(
+    new Shader( "src/Shaders/common.vert", "src/Shaders/grid.frag" ) );
 
-  shaders.push_back( new Shader( "src/Shaders/vertexShader.vert",
-                                 "src/Shaders/fragmentOutline.frag" ) );
+  shaders.push_back(
+    new Shader( "src/Shaders/common.vert", "src/Shaders/outline.frag" ) );
 
   squareWidth = images[0]->getWidth() / squaresPerRow;
   squareHeight = images[0]->getHeight() / squaresPerColumn;

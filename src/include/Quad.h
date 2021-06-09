@@ -1,8 +1,8 @@
 #ifndef QUAD_H
 #define QUAD_H
 
-#include "Shader.hpp"
-#include "types.hpp"
+#include "Shader.h"
+#include "types.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>

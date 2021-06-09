@@ -1,4 +1,4 @@
-#include "include/Quad.hpp"
+#include "include/Quad.h"
 
 Quad::Quad( std::vector<Shader*> shader,
             f32 w,
