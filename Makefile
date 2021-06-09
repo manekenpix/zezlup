@@ -1,5 +1,6 @@
 CC = clang++ -v
-CFLAGS = -lGL -lGLEW -lglfw -lz
+CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -Wl,-Bdynamic -lGL -lz -pthread
+CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz
 SRCDIR = src
 INCLUDEDIR = src/include
 BUILDDIR = build
@@ -14,10 +15,10 @@ SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
 release: $(OBJECTS)
-	$(CC) $(CCRELEASE) $^ -o $(TARGET) $(CFLAGS)
+	$(CC) $(CCRELEASE) $^ -o $(TARGET) $(CFLAGS_RELEASE)
 
 debug: $(OBJECTS)
-	$(CC) $(CCDEBUG) $^ -o $(TARGET) $(CFLAGS)
+	$(CC) $(CCDEBUG) $^ -o $(TARGET) $(CFLAGS_DEBUG)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
