@@ -1,6 +1,10 @@
 #include "include/Quad.hpp"
 
-Quad::Quad( Shader* shader, f32 w, f32 h, f32 screenW, f32 screenH )
+Quad::Quad( std::vector<Shader*> shader,
+            f32 w,
+            f32 h,
+            f32 screenW,
+            f32 screenH )
   : width{ w }
   , height{ h }
   , screenWidth{ screenW }
@@ -88,14 +92,28 @@ Quad::setPosition( f32 positionX, f32 positionY )
 };
 
 void
-Quad::bindVertexArray()
+Quad::bindBuffer()
 {
-  shaders->use();
-  shaders->setMatrix4fv( "projection", projectionMatrix );
   glBindBuffer( GL_ARRAY_BUFFER, vertexBuffer );
   glBufferData( GL_ARRAY_BUFFER, sizeof( vertices ), vertices, GL_STATIC_DRAW );
+};
+
+void
+Quad::bindTexture()
+{
   glBindTexture( GL_TEXTURE_2D, texture );
   glBindVertexArray( vertexArray );
+};
+
+void
+Quad::draw( bool selected )
+{
+  shaders[selected ? 1 : 0]->use();
+  shaders[selected ? 1 : 0]->setMatrix4fv( "projection", projectionMatrix );
+
+  bindBuffer();
+  bindTexture();
+
   glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
   glBindVertexArray( 0 );
 };
