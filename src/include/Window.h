@@ -6,7 +6,7 @@
 
 #include "types.h"
 
-class Window
+class GameWindow
 {
   // Window
   f32 width, height;
@@ -15,8 +15,8 @@ class Window
 
 public:
   GLFWwindow* window;
-  Window( f32 w, f32 h );
-  ~Window();
+  GameWindow( f32 w, f32 h );
+  ~GameWindow();
 };
 
 void APIENTRY

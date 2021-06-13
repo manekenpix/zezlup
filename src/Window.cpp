@@ -2,7 +2,7 @@
 
 // ZEZLUP
 
-Window::Window( f32 w, f32 h )
+GameWindow::GameWindow( f32 w, f32 h )
 {
   width = w;
   height = h;
@@ -48,14 +48,14 @@ Window::Window( f32 w, f32 h )
   }
 };
 
-Window::~Window()
+GameWindow::~GameWindow()
 {
   // Close OpenGL window and terminate GLFW
   glfwTerminate();
 };
 
 void
-Window::WindowSetup()
+GameWindow::WindowSetup()
 {
   // 4x antialiasing
   glfwWindowHint( GLFW_SAMPLES, 4 );
