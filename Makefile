@@ -1,6 +1,6 @@
 CC = clang++ -v
-CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -Wl,-Bdynamic -lGL -lz -pthread
-CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz
+CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -lX11 -lXrandr -Wl,-Bdynamic -lGL -lz -pthread
+CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz -lX11 -lXrandr
 SRCDIR = src
 INCLUDEDIR = src/include
 BUILDDIR = build
@@ -8,7 +8,7 @@ TARGET = bin/zezlup
 CCRELEASE = -std=c++17 -O3
 CCDEBUG = -std=c++17 -g
 SRCEXT = cpp
-HDREXT = hpp
+HDREXT = h
 INC = -I include
 
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
