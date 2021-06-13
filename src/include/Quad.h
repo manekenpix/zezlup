@@ -1,14 +1,12 @@
 #ifndef QUAD_H
 #define QUAD_H
 
-#include <GL/glew.h>
-#include <GLFW/glfw3.h>
+#include "Shader.h"
+#include "types.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-
-#include "Shader.hpp"
-#include "types.hpp"
+#include <vector>
 
 class Quad
 {
@@ -40,11 +38,14 @@ class Quad
   u32 indices[6] = { 0, 1, 3, 1, 2, 3 };
 
   // Shader
-  Shader* shaders;
+  std::vector<Shader*> shaders;
   glm::mat4 projectionMatrix;
 
+  void bindBuffer();
+  void bindTexture();
+
 public:
-  Quad( Shader*, f32 w, f32 h, f32 screenW, f32 screenH );
+  Quad( std::vector<Shader*>, f32 w, f32 h, f32 screenW, f32 screenH );
 
   ~Quad();
 
@@ -54,7 +55,7 @@ public:
   f32 getX() { return x; };
   f32 getY() { return y; };
 
-  void bindVertexArray();
+  void draw( bool selected = true );
 };
 
 #endif

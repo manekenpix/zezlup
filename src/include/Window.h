@@ -4,12 +4,9 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "types.h"
 
-#include "types.hpp"
-
-class Window
+class GameWindow
 {
   // Window
   f32 width, height;
@@ -18,8 +15,8 @@ class Window
 
 public:
   GLFWwindow* window;
-  Window( f32 w, f32 h );
-  ~Window();
+  GameWindow( f32 w, f32 h );
+  ~GameWindow();
 };
 
 void APIENTRY
