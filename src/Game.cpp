@@ -28,7 +28,8 @@ Game::Game()
 
   squareWidth = images[0]->getWidth() / squaresPerRow;
   squareHeight = images[0]->getHeight() / squaresPerColumn;
-  bytesPerPixel = images[0]->getColourType() ? 4 : 3;
+  bytesPerPixel =
+    images[0]->getColourType() ? BytesPerPixel::RGBA : BytesPerPixel::RGB;
   squareResolution = ( squareWidth * bytesPerPixel ) * squareHeight;
   imageBuffer = images[0]->getImageBuffer();
 
@@ -73,13 +74,16 @@ Game::createPanel()
 
   std::random_shuffle( panel.begin(), panel.end() );
 
+  f32 boxPositionX, boxPositionY;
   for ( u8 j = 0; j < squaresPerColumn; ++j ) {
     for ( u8 k = 0; k < squaresPerRow; ++k ) {
-
-      if ( panel[( j * squaresPerRow ) + k] )
-        panel[( j * squaresPerRow ) + k]->setPosition(
-          ( screenWidth / squaresPerRow ) * k,
-          ( screenHeight / squaresPerColumn ) * j );
+      boxPositionX = ( screenWidth / squaresPerRow ) * k;
+      boxPositionY = ( screenHeight / squaresPerColumn ) * j;
+      coords.push_back( new Vec2( boxPositionX, boxPositionY ) );
+      if ( panel[( j * squaresPerRow ) + k] ) {
+        panel[( j * squaresPerRow ) + k]->setPosition( boxPositionX,
+                                                       boxPositionY );
+      }
     }
   }
 };
@@ -115,9 +119,10 @@ Game::getRefreshRate()
 }
 
 void
-Game::processPressedKey()
+Game::processKeyboardInput()
 {
   // TODO(Josue): Use a map here
+  // Press right arrow
   if ( glfwGetKey( window->window, GLFW_KEY_RIGHT ) == GLFW_PRESS &&
        !isKeyPressed ) {
     if ( selected < squaresPerRow * squaresPerColumn - 1 ) {
@@ -126,6 +131,7 @@ Game::processPressedKey()
       key = GLFW_KEY_RIGHT;
     }
 
+    // Press left arrow
   } else if ( glfwGetKey( window->window, GLFW_KEY_LEFT ) == GLFW_PRESS &&
               !isKeyPressed ) {
     if ( selected > 0 ) {
@@ -134,6 +140,7 @@ Game::processPressedKey()
       key = GLFW_KEY_LEFT;
     }
 
+    // Press down arrow
   } else if ( glfwGetKey( window->window, GLFW_KEY_DOWN ) == GLFW_PRESS &&
               !isKeyPressed ) {
     if ( selected < squaresPerRow * ( squaresPerColumn - 1 ) ) {
@@ -141,6 +148,8 @@ Game::processPressedKey()
       isKeyPressed = true;
       key = GLFW_KEY_DOWN;
     }
+
+    // Press up arrow
   } else if ( glfwGetKey( window->window, GLFW_KEY_UP ) == GLFW_PRESS &&
               !isKeyPressed ) {
     if ( selected > squaresPerRow - 1 ) {
@@ -148,6 +157,23 @@ Game::processPressedKey()
       isKeyPressed = true;
       key = GLFW_KEY_UP;
     }
+
+    // Press 'm'
+  } else if ( glfwGetKey( window->window, GLFW_KEY_M ) == GLFW_PRESS &&
+              !isKeyPressed ) {
+    s8 distanceBetweenBoxes = abs( selected - empty );
+    isKeyPressed = true;
+    key = GLFW_KEY_M;
+
+    if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == squaresPerRow ) {
+      panel[empty] = panel[selected];
+      panel[selected] = nullptr;
+      std::swap( selected, empty );
+
+      panel[selected]->setPosition( coords[selected]->x, coords[selected]->y );
+    }
+
+    // Release pressed key
   } else if ( glfwGetKey( window->window, key ) == GLFW_RELEASE &&
               isKeyPressed ) {
     isKeyPressed = false;
@@ -169,7 +195,7 @@ Game::run()
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
-    processPressedKey();
+    processKeyboardInput();
 
     index = 0;
     for ( auto box = panel.begin(); box != panel.end(); ++box ) {
@@ -200,6 +226,8 @@ Game::~Game()
     shaders.begin(), shaders.end(), []( Shader* shader ) { delete shader; } );
   std::for_each(
     panel.begin(), panel.end(), []( Quad* square ) { delete square; } );
+  std::for_each(
+    coords.begin(), coords.end(), []( Vec2* coord ) { delete coord; } );
 
   delete window;
 };

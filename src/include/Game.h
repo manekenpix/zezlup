@@ -8,6 +8,20 @@
 
 class Game
 {
+  struct Vec2
+  {
+    u32 x;
+    u32 y;
+
+    Vec2( u32 _x, u32 _y )
+    {
+      x = _x;
+      y = _y;
+    };
+  };
+
+  std::vector<Vec2*> coords;
+
   // Window
   const f32 screenWidth = 1000.0;
   const f32 screenHeight = 1000.0;
@@ -38,10 +52,15 @@ class Game
   u8 empty;
   bool isKeyPressed;
   int key;
+  enum BytesPerPixel : u8
+  {
+    RGB = 3,
+    RGBA = 4
+  };
 
   void createPanel();
   void getRefreshRate();
-  void processPressedKey();
+  void processKeyboardInput();
 
 public:
   Game();
