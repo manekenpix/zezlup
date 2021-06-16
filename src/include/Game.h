@@ -61,6 +61,7 @@ class Game
   void createPanel();
   void getRefreshRate();
   void processKeyboardInput();
+  void shuffle();
 
 public:
   Game();

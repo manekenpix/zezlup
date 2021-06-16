@@ -1,4 +1,5 @@
 #include "include/Game.h"
+#include <ctime>
 
 Game::Game()
   : window{ nullptr }
@@ -71,8 +72,7 @@ Game::createPanel()
 
   // Make a copy of the panel for comparison
   sortedPanel = panel;
-
-  std::random_shuffle( panel.begin(), panel.end() );
+  shuffle();
 
   f32 boxPositionX, boxPositionY;
   for ( u8 j = 0; j < squaresPerColumn; ++j ) {
@@ -87,6 +87,122 @@ Game::createPanel()
     }
   }
 };
+
+void
+Game::shuffle()
+{
+  u8 shuffles = 200;
+  u8 position;
+  u8 selected;
+  std::srand( std::time( nullptr ) );
+
+  std::vector<u8> topRow, bottomRow, leftColumn, rightColumn;
+
+  for ( u8 y = 0; y < squaresPerColumn; ++y ) {
+    for ( u8 x = 0; x < squaresPerRow; ++x ) {
+      position = ( y * squaresPerRow ) + x;
+
+      // Top Row
+      if ( position != 0 && position != panel.size() - 1 &&
+           position != panel.size() - squaresPerRow &&
+           position != squaresPerRow - 1 ) {
+
+        // Top Row
+        if ( position < squaresPerRow && position != 0 ) {
+          topRow.push_back( position );
+        }
+
+        // Bottom Row
+        else if ( position > panel.size() - squaresPerRow - 1 ) {
+          bottomRow.push_back( position );
+        }
+
+        // Left Column
+        else if ( ( y * squaresPerRow ) == position ) {
+          leftColumn.push_back( position );
+        }
+
+        // Right Column
+        else if ( ( ( ( y + 1 ) * squaresPerRow ) - 1 ) == position ) {
+          rightColumn.push_back( position );
+        }
+      }
+    }
+  }
+
+  s8 emptyBox = panel.size() - 1;
+  for ( u8 index = 0; index < shuffles; ++index ) {
+    std::vector<u8> options;
+
+    // Top Left
+    if ( emptyBox == 0 ) {
+      options.push_back( 1 );
+      options.push_back( squaresPerRow );
+    }
+
+    // Top Right
+    else if ( emptyBox == squaresPerRow - 1 ) {
+      options.push_back( squaresPerRow - 2 );
+      options.push_back( ( 2 * squaresPerRow ) - 1 );
+    }
+
+    // Botton Left
+    else if ( emptyBox == panel.size() - squaresPerRow ) {
+      options.push_back( panel.size() - squaresPerRow + 1 );
+      options.push_back( panel.size() - ( 2 * squaresPerRow ) );
+    }
+
+    // Bottom Right
+    else if ( emptyBox == panel.size() - 1 ) {
+      options.push_back( panel.size() - 2 );
+      options.push_back( panel.size() - squaresPerRow - 1 );
+    }
+
+    // Top Row
+    else if ( std::find( topRow.begin(), topRow.end(), emptyBox ) !=
+              topRow.end() ) {
+      options.push_back( emptyBox + 1 );
+      options.push_back( emptyBox - 1 );
+      options.push_back( emptyBox + squaresPerRow );
+    }
+
+    // Bottom Row
+    else if ( std::find( bottomRow.begin(), bottomRow.end(), emptyBox ) !=
+              bottomRow.end() ) {
+      options.push_back( emptyBox + 1 );
+      options.push_back( emptyBox - 1 );
+      options.push_back( emptyBox - squaresPerRow );
+    }
+
+    // Left Column
+    else if ( std::find( leftColumn.begin(), leftColumn.end(), emptyBox ) !=
+              leftColumn.end() ) {
+      options.push_back( emptyBox - squaresPerRow );
+      options.push_back( emptyBox + 1 );
+      options.push_back( emptyBox + squaresPerRow );
+    }
+
+    // Right Column
+    else if ( std::find( rightColumn.begin(), rightColumn.end(), emptyBox ) !=
+              rightColumn.end() ) {
+      options.push_back( emptyBox - squaresPerRow );
+      options.push_back( emptyBox - 1 );
+      options.push_back( emptyBox + squaresPerRow );
+    }
+
+    else {
+      options.push_back( emptyBox - squaresPerRow );
+      options.push_back( emptyBox - 1 );
+      options.push_back( emptyBox + squaresPerRow );
+      options.push_back( emptyBox + 1 );
+    }
+
+    selected = options[std::rand() % options.size()];
+    panel[emptyBox] = panel[selected];
+    panel[selected] = nullptr;
+    emptyBox = selected;
+  }
+}
 
 void
 Game::getRefreshRate()
