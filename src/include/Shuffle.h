@@ -17,22 +17,37 @@ class Shuffle
   u8 height;
   u8 moves;
 
+  // Corners
   bool isTopLeft() { return position == 0; };
   bool isTopRight() { return position == width - 1; };
   bool isBottomLeft() { return position == size - width; };
   bool isBottomRight() { return position == size - 1; };
 
-  bool isACorner()
+  // Sides
+  bool isInTopSide() { return position < width; };
+  bool isInBottomSide() { return position > size - width - 1; };
+  bool isInLeftSide( s8 n )
   {
-    return isTopLeft() || isTopRight() || isBottomLeft() || isBottomRight();
+    if ( n < width )
+      return false;
+    while ( n >= width ) {
+      if ( n % width != 0 )
+        return false;
+      n -= width;
+    }
+    return true;
   };
 
-  bool isInTopSide() { return position < width && position != 0; };
-  bool isInBottomSide() { return position > size - width - 1; };
-  bool isInLeftSide( u8 _y ) { return ( _y * width ) == position; };
-  bool isInRightSide( u8 _y )
+  bool isInRightSide( s8 n )
   {
-    return ( ( ( _y + 1 ) * width ) - 1 ) == position;
+    if ( n < width - 1 )
+      return false;
+    while ( ( n + 1 ) >= width ) {
+      if ( ( n + 1 ) % width != 0 )
+        return false;
+      n -= width;
+    }
+    return true;
   };
 
 public:
@@ -52,41 +67,8 @@ public:
   std::vector<T> run()
   {
     u8 selected;
-
-    std::vector<u8> topRow, bottomRow, leftColumn, rightColumn;
-    u8 stride;
-    for ( u8 y = 0; y < height; ++y ) {
-      stride = y * width;
-      for ( u8 x = 0; x < width; ++x ) {
-        position = stride + x;
-
-        // Corners
-        if ( !isACorner() ) {
-
-          // Top Row
-          if ( isInTopSide() ) {
-            topRow.push_back( position );
-          }
-
-          // Bottom Row
-          else if ( isInBottomSide() ) {
-            bottomRow.push_back( position );
-          }
-
-          // Left Column
-          else if ( isInLeftSide( y ) ) {
-            leftColumn.push_back( position );
-          }
-
-          // Right Column
-          else if ( isInRightSide( y ) ) {
-            rightColumn.push_back( position );
-          }
-        }
-      }
-    }
-
     position = start;
+
     for ( u8 index = 0; index < moves; ++index ) {
       std::vector<u8> options;
 
@@ -114,38 +96,35 @@ public:
         options.push_back( size - width - 1 );
       }
 
-      // Top Row
-      else if ( std::find( topRow.begin(), topRow.end(), position ) !=
-                topRow.end() ) {
+      // Top side of the grid
+      else if ( isInTopSide() ) {
         options.push_back( position + 1 );
         options.push_back( position - 1 );
         options.push_back( position + width );
       }
 
-      // Bottom Row
-      else if ( std::find( bottomRow.begin(), bottomRow.end(), position ) !=
-                bottomRow.end() ) {
+      // Bottom side of the grid
+      else if ( isInBottomSide() ) {
         options.push_back( position + 1 );
         options.push_back( position - 1 );
         options.push_back( position - width );
       }
 
-      // Left Column
-      else if ( std::find( leftColumn.begin(), leftColumn.end(), position ) !=
-                leftColumn.end() ) {
+      // Left side of the grid
+      else if ( isInLeftSide( position ) ) {
         options.push_back( position - width );
         options.push_back( position + 1 );
         options.push_back( position + width );
       }
 
-      // Right Column
-      else if ( std::find( rightColumn.begin(), rightColumn.end(), position ) !=
-                rightColumn.end() ) {
+      // Right side of the grid
+      else if ( isInRightSide( position ) ) {
         options.push_back( position - width );
         options.push_back( position - 1 );
         options.push_back( position + width );
       }
 
+      // All the cells that are not in any of the sides
       else {
         options.push_back( position - width );
         options.push_back( position - 1 );
