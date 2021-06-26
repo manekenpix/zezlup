@@ -1,0 +1,20 @@
+{
+  "name": "zezlup",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "serve": "vite preview"
+  },
+  "devDependencies": {
+    "gts": "^3.1.0",
+    "typescript": "^4.3.2",
+    "vite": "^2.3.8"
+  },
+  "prettier": "gts/.prettierrc.json",
+  "eslintConfig": {
+    "extends": "./node_modules/gts",
+    "ignorePatterns": "dist/"
+  },
+  "dependencies": {}
+}
