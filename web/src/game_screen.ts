@@ -5,9 +5,11 @@ export class GameScreen {
   constructor() {
     // set up canvas
     this.#canvas = document.createElement('canvas');
+    this.#canvas.tabIndex = 0;
     this.#canvas.style.display = 'block';
     this.#canvas.style.width = '100%';
     this.#canvas.style.height = '100%';
+    this.#canvas.style.outline = 'none';
 
     // set up webgl context
     const gl = this.#canvas.getContext('webgl2');
@@ -20,11 +22,18 @@ export class GameScreen {
       this.#canvas.width = width;
       this.#canvas.height = height;
       this.#gl.viewport(0, 0, width, height);
+      gl.clearColor(0, 0, 0, 1);
+      gl.clear(gl.COLOR_BUFFER_BIT);
     });
     resizeObserver.observe(this.#canvas);
   }
 
   appendTo(htmlElement: HTMLElement) {
     htmlElement.append(this.#canvas);
+  }
+
+  handleKeyPress(event: KeyboardEvent) {
+    event.stopPropagation();
+    console.log(event.key);
   }
 }
