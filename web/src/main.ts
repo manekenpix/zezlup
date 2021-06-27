@@ -1,9 +1,9 @@
-import {GameScreen} from './game_screen';
+import {Game} from './components/game';
 
-const gameScreen = new GameScreen();
+const game = new Game();
 
-gameScreen.appendTo(document.body);
+game.appendTo(document.body);
 
 document.onkeydown = event => {
-  gameScreen.handleKeyPress(event);
+  game.handleKeyPress(event);
 };

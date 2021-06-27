@@ -1,6 +1,10 @@
-export class GameScreen {
+import {Grid} from './grid';
+
+export class Game {
   readonly #canvas: HTMLCanvasElement;
   readonly #gl: WebGL2RenderingContext;
+
+  readonly #grid: Grid;
 
   constructor() {
     // set up canvas
@@ -26,6 +30,16 @@ export class GameScreen {
       gl.clear(gl.COLOR_BUFFER_BIT);
     });
     resizeObserver.observe(this.#canvas);
+
+    // set up components
+    this.#grid = new Grid(gl, [4, 3]);
+
+    // set up draw loop
+    const drawLoop = () => {
+      this.draw();
+      window.requestAnimationFrame(drawLoop);
+    };
+    drawLoop();
   }
 
   appendTo(htmlElement: HTMLElement) {
@@ -35,5 +49,11 @@ export class GameScreen {
   handleKeyPress(event: KeyboardEvent) {
     event.stopPropagation();
     console.log(event.key);
+  }
+
+  draw() {
+    this.#gl.clearColor(0, 0, 0, 1);
+    this.#gl.clear(this.#gl.COLOR_BUFFER_BIT);
+    this.#grid.draw();
   }
 }
