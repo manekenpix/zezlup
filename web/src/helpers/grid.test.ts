@@ -3,12 +3,12 @@ import {Grid} from './grid';
 test('set grid size', () => {
   const grid = new Grid([3, 4]);
   expect(grid.size).toEqual([3, 4]);
-  expect(grid.numTiles).toBe(3 * 4);
+  expect(grid.tiles.length).toBe(3 * 4);
   expect(grid.blankTile).toBe(3 - 1);
 
   grid.size = [5, 6];
   expect(grid.size).toEqual([5, 6]);
-  expect(grid.numTiles).toBe(5 * 6);
+  expect(grid.tiles.length).toBe(5 * 6);
   expect(grid.blankTile).toBe(5 - 1);
 });
 
