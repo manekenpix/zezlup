@@ -1,9 +1,5 @@
-import {Game} from './components/game';
+import {createApp} from 'vue';
+import {App} from './ui/App';
+import 'virtual:windi.css';
 
-const game = new Game();
-
-game.appendTo(document.body);
-
-document.onkeydown = event => {
-  game.handleKeyPress(event);
-};
+createApp(App).mount(document.body);
