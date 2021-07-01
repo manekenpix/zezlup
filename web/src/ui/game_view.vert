@@ -10,24 +10,23 @@ uniform int tilesByCell[MAX_TILES];
 uniform vec2 vertices[NUM_VERTICES];
 
 flat out int cell;
-out vec2 cellPosition;
-out vec2 imagePosition;
+out vec2 cellCoord;
+out vec2 imageCoord;
 
 void main() {
   cell = gl_InstanceID;
-  int vertexId = gl_VertexID;
 
   int cellX = cell % int(gridSize[0]);
   int cellY = cell / int(gridSize[0]);
   int tileX = tilesByCell[cell] % int(gridSize[0]);
   int tileY = tilesByCell[cell] / int(gridSize[0]);
 
-  vec2 position = vertices[vertexId];
-  cellPosition = position;
-  imagePosition = (position + vec2(tileX, tileY)) / gridSize;
+  cellCoord = vertices[gl_VertexID];
 
-  position += vec2(cellX, cellY); // move to cell position
-  position /= gridSize; // normalize
+  // move to positions and normalize
+  imageCoord = (cellCoord + vec2(tileX, tileY)) / gridSize;
+  vec2 position = (cellCoord + vec2(cellX, cellY)) / gridSize;
+
   position -= 0.5; // centralize
   position *= imageSize; // to image size
 

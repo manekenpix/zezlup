@@ -2,6 +2,7 @@ import {useEffect, useReducer, useRef, useState} from 'react';
 import {Game} from '../helpers/game';
 import {ImageLoader} from '../helpers/image_loader';
 import {GameView} from './game_view';
+import {ControllerBar} from './ControllerBar';
 import defaulImageSource from '../images/win_meme.png';
 
 export const App = () => {
@@ -21,26 +22,7 @@ export const App = () => {
       refresh();
     };
 
-    document.onkeydown = ({key}) => {
-      switch (key) {
-        case 'ArrowDown':
-          game.changeCurrentCell('Bottom');
-          break;
-        case 'ArrowUp':
-          game.changeCurrentCell('Top');
-          break;
-        case 'ArrowLeft':
-          game.changeCurrentCell('Left');
-          break;
-        case 'ArrowRight':
-          game.changeCurrentCell('Right');
-          break;
-        case 'm':
-          game.moveTileAtCurrentCell();
-          break;
-      }
-      return;
-    };
+    document.onkeydown = ({key}) => onKeyDown(game, key);
   }, []);
 
   gameView.draw(
@@ -54,14 +36,27 @@ export const App = () => {
   return (
     <>
       <div className="flex-grow" ref={gameViewRef}></div>
-      <div className="w-40 bg-blue-gray-600">
-        <input
-          type="file"
-          accept="image/*"
-          style={{color: 'transparent', width: '100%'}}
-          onChange={event => imageLoader.load(event.target.files?.[0])}
-        />
-      </div>
+      <ControllerBar game={game} imageLoader={imageLoader} />
     </>
   );
+};
+
+const onKeyDown = (game: Game, key: string) => {
+  switch (key) {
+    case 'ArrowDown':
+      game.changeCurrentCell('Bottom');
+      break;
+    case 'ArrowUp':
+      game.changeCurrentCell('Top');
+      break;
+    case 'ArrowLeft':
+      game.changeCurrentCell('Left');
+      break;
+    case 'ArrowRight':
+      game.changeCurrentCell('Right');
+      break;
+    case 'm':
+      game.moveTileAtCurrentCell();
+      break;
+  }
 };

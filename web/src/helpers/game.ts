@@ -26,6 +26,22 @@ export class Game {
     this.onStateChange?.();
   }
 
+  get gridWidth() {
+    return this.#grid.width;
+  }
+
+  set gridWidth(value) {
+    this.gridSize = [value, this.gridHeight];
+  }
+
+  get gridHeight() {
+    return this.#grid.height;
+  }
+
+  set gridHeight(value) {
+    this.gridSize = [this.gridWidth, value];
+  }
+
   get tilesByCell() {
     return this.#grid.tilesByCell;
   }

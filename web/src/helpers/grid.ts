@@ -10,7 +10,7 @@
  *   is at cell 4, and tile 4 is at cell 5.
  */
 export class Grid {
-  #size!: [number, number];
+  #size!: Vec2;
   #tilesByCell!: number[];
 
   constructor(width = Grid.DEFAULT_WIDTH, height = Grid.DEFAULT_HEIGHT) {
@@ -21,7 +21,9 @@ export class Grid {
     return this.#size;
   }
 
-  set size([width = this.width, height = this.height]) {
+  set size([width, height]) {
+    width = Math.max(Grid.MIN_WIDTH, Math.min(Grid.MAX_WIDTH, width));
+    height = Math.max(Grid.MIN_HEIGHT, Math.min(Grid.MAX_HEIGHT, height));
     this.#size = [width, height];
     this.#tilesByCell = [...Array(width * height).keys()];
   }
@@ -81,6 +83,10 @@ export class Grid {
     this.#tilesByCell[cell2] = tile1;
   }
 
-  static DEFAULT_WIDTH = 3;
-  static DEFAULT_HEIGHT = 2;
+  static MIN_WIDTH = 2;
+  static MIN_HEIGHT = 2;
+  static MAX_WIDTH = 8;
+  static MAX_HEIGHT = 8;
+  static DEFAULT_WIDTH = 4;
+  static DEFAULT_HEIGHT = 4;
 }
