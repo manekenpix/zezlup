@@ -1,7 +1,7 @@
 import {useEffect, useReducer, useRef, useState} from 'react';
 import {Game} from '../helpers/game';
 import {ImageLoader} from '../helpers/image_loader';
-import defaulImageSource from '../images/win_meme.png';
+import defaulImageSource from '../images/eula_soul_of_the_world.jpg';
 import {Direction} from '../types/enum';
 import {ControllerBar} from './ControllerBar';
 import {GameView} from './game_view';
@@ -15,6 +15,8 @@ export const App = () => {
   const [imageLoader] = useState(() => new ImageLoader(defaulImageSource));
 
   useEffect(() => {
+    game.shuffle();
+
     gameView.appendTo(gameViewRef.current!);
     game.onStateChange = refresh;
     gameView.onStateChange = refresh;

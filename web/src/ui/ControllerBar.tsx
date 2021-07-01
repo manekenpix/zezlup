@@ -22,7 +22,8 @@ export const ControllerBar = ({
 
   return (
     <div
-      w="16"
+      w="20"
+      p="l-4"
       display="flex"
       flex="col"
       justify="center"

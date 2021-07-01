@@ -3,7 +3,7 @@ import {Grid} from './grid';
 import {getRandomInt} from './math';
 
 export class Game {
-  readonly #grid = new Grid();
+  readonly #grid = new Grid(5, 3);
   #blankCell!: number;
   #currentCell!: number;
   #prevBlankCell!: number;
@@ -72,7 +72,7 @@ export class Game {
     return this.#grid.isInOrder;
   }
 
-  shuffle(iterations = this.#grid.numTiles * 10) {
+  shuffle(iterations = this.#grid.numTiles * 20) {
     let prevCell = this.#blankCell;
 
     for (let i = 0; i < iterations; ++i) {
