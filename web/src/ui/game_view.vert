@@ -34,7 +34,6 @@ void main() {
   float heightRatio = canvasSize[1] / imageSize[1];
   position *= min(widthRatio, heightRatio); // fit to canvas
   position /= canvasSize; // normalize
-
   position *= CLIP_SPACE_SIZE; // to clip space size
 
   gl_Position = vec4(position, 0, 1);

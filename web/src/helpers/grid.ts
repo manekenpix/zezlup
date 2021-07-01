@@ -81,6 +81,6 @@ export class Grid {
     this.#tilesByCell[cell2] = tile1;
   }
 
-  static DEFAULT_WIDTH = 4;
+  static DEFAULT_WIDTH = 8;
   static DEFAULT_HEIGHT = 4;
 }
