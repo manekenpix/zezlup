@@ -14,5 +14,6 @@ export default defineConfig({
   ],
   esbuild: {
     jsxInject: 'import React from "react";',
+    target: 'es2019',
   },
 });
