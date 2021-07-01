@@ -1,70 +1,66 @@
 import {Grid} from './grid';
 
 export class Game {
-  private _grid = new Grid([5, 3]);
-  private _blankTile!: number;
-  private _blankTileIndex!: number;
-  private _selectedTileIndex!: number;
+  readonly #grid = new Grid();
+  #blankCell!: number;
+  #currentCell!: number;
+
+  onStateChange?: Function;
 
   constructor() {
-    this.setupTiles();
+    this.setupCells();
   }
 
-  private setupTiles() {
-    this._blankTile = this.gridSize[0] - 1; // bottom-right
-    this._blankTileIndex = this._blankTile;
-    this._selectedTileIndex = 0;
+  private setupCells() {
+    this.#blankCell = this.#grid.width - 1; // bottom-right
+    this.#currentCell = this.#blankCell;
   }
 
   get gridSize() {
-    return this._grid.size;
+    return this.#grid.size;
   }
 
   set gridSize(size: Readonly<Vec2>) {
-    this._grid.size = size;
-    this.setupTiles();
+    this.#grid.size = size;
+    this.setupCells();
+    this.onStateChange?.();
   }
 
-  // get imageSize(): Readonly<Vec2> {
-  //   return this._imageSize;
-  // }
-
-  get tiles() {
-    return this._grid.tiles;
+  get tilesByCell() {
+    return this.#grid.tilesByCell;
   }
 
-  get blankTileIndex() {
-    return this._blankTileIndex;
+  get blankCell() {
+    return this.#blankCell;
   }
 
-  get selectedTileIndex() {
-    return this._selectedTileIndex;
+  get currentCell() {
+    return this.#currentCell;
   }
 
   get isCompleted() {
-    return this._grid.isInOrder;
+    return this.#grid.isInOrder;
   }
 
   // return true if tile is moved; false otherwise
-  moveSelectedTile() {
-    const canMoveTile = this._grid.areTilesNeighbors(
-      this._selectedTileIndex,
-      this._blankTileIndex
-    );
-    if (!canMoveTile) return false;
+  moveTileAtCurrentCell() {
+    if (!this.#grid.areCellsNeighbors(this.#currentCell, this.#blankCell))
+      return false;
 
-    this._grid.swapTiles(this._selectedTileIndex, this._blankTileIndex);
-    this._blankTileIndex = this._selectedTileIndex;
+    this.#grid.swapTilesAtCells(this.#currentCell, this.#blankCell);
+    this.#blankCell = this.#currentCell;
+    this.onStateChange?.();
     return true;
   }
 
-  // return true if tile is changed; false otherwise
-  changeSelectedTile(direction: 'Top' | 'Bottom' | 'Left' | 'Right') {
-    const getNeighborMethod = `get${direction}OfIndex` as const;
-    const neighbor = this._grid[getNeighborMethod](this._selectedTileIndex);
-    if (neighbor === null) return false;
+  // return true if cell is changed; false otherwise
+  changeCurrentCell(direction: 'Top' | 'Bottom' | 'Left' | 'Right') {
+    const getNeighborMethod = `get${direction}OfCell` as const;
+    const neighborCell = this.#grid[getNeighborMethod](this.#currentCell);
+    if (neighborCell === null) return false;
 
-    this._selectedTileIndex = neighbor;
+    this.#currentCell = neighborCell;
+    this.onStateChange?.();
     return true;
   }
 }

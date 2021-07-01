@@ -1,64 +1,86 @@
+/**
+ * Example of grid 3x2:
+ *    Cells  |  Tiles
+ *    3 4 5  |  3 2 4
+ *    0 1 2  |  0 1 5
+ * - Cells increase from Left to Right/Bottom to Top
+ *   depending on grid size, and they are fixed.
+ * - Tiles can move around.
+ * - In the example above, tile 5 is at cell 2, tile 2
+ *   is at cell 4, and tile 4 is at cell 5.
+ */
 export class Grid {
-  private _size!: Vec2;
-  private _tiles!: number[];
+  #size!: [number, number];
+  #tilesByCell!: number[];
 
-  constructor(gridSize: Vec2) {
-    this.size = gridSize;
+  constructor(width = Grid.DEFAULT_WIDTH, height = Grid.DEFAULT_HEIGHT) {
+    this.size = [width, height];
   }
 
   get size(): Readonly<Vec2> {
-    return this._size;
+    return this.#size;
   }
 
-  set size([width, height]: Readonly<Vec2>) {
-    this._size = [width, height];
-    this.resetTiles();
+  set size([width = this.width, height = this.height]) {
+    this.#size = [width, height];
+    this.#tilesByCell = [...Array(width * height).keys()];
   }
 
-  get tiles(): Readonly<number[]> {
-    return this._tiles;
+  get width() {
+    return this.size[0];
+  }
+
+  get height() {
+    return this.size[1];
   }
 
   get isInOrder() {
-    return this._tiles.every((tile, index) => tile === index);
+    return this.tilesByCell.every((tile, cell) => tile === cell);
   }
 
-  getLeftOfIndex(index: number) {
-    return index % this._size[0] ? --index : null;
+  get tilesByCell(): Readonly<number[]> {
+    return this.#tilesByCell;
   }
 
-  getRightOfIndex(index: number) {
-    return ++index % this._size[0] ? index : null;
+  get numTiles() {
+    return this.#tilesByCell.length;
   }
 
-  getTopOfIndex(index: number) {
-    return (index += this._size[0]) < this._tiles.length ? index : null;
+  getLeftOfCell(cell: number) {
+    return cell % this.width ? --cell : null;
   }
 
-  getBottomOfIndex(index: number) {
-    return (index -= this._size[0]) >= 0 ? index : null;
+  getRightOfCell(cell: number) {
+    return ++cell % this.width ? cell : null;
   }
 
-  getNeighborsOfIndex(index: number) {
+  getTopOfCell(cell: number) {
+    return (cell += this.width) < this.numTiles ? cell : null;
+  }
+
+  getBottomOfCell(cell: number) {
+    return (cell -= this.width) >= 0 ? cell : null;
+  }
+
+  getNeighborsOfCell(cell: number) {
     return [
-      this.getLeftOfIndex(index),
-      this.getRightOfIndex(index),
-      this.getTopOfIndex(index),
-      this.getBottomOfIndex(index),
-    ].filter(index => index !== null) as number[];
+      this.getLeftOfCell(cell),
+      this.getRightOfCell(cell),
+      this.getTopOfCell(cell),
+      this.getBottomOfCell(cell),
+    ].filter(cell => cell !== null) as number[];
   }
 
-  areTilesNeighbors(index1: number, index2: number) {
-    return this.getNeighborsOfIndex(index1).includes(index2);
+  areCellsNeighbors(cell1: number, cell2: number) {
+    return this.getNeighborsOfCell(cell1).includes(cell2);
   }
 
-  swapTiles(index1: number, index2: number) {
-    const tile1 = this._tiles[index1];
-    this._tiles[index1] = this._tiles[index2];
-    this._tiles[index2] = tile1;
+  swapTilesAtCells(cell1: number, cell2: number) {
+    const tile1 = this.#tilesByCell[cell1];
+    this.#tilesByCell[cell1] = this.#tilesByCell[cell2];
+    this.#tilesByCell[cell2] = tile1;
   }
 
-  resetTiles() {
-    this._tiles = [...Array(this._size[0] * this._size[1]).keys()];
-  }
+  static DEFAULT_WIDTH = 3;
+  static DEFAULT_HEIGHT = 2;
 }

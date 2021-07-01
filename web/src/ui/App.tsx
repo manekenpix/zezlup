@@ -1,25 +1,67 @@
-import {defineComponent, reactive, watchEffect} from 'vue';
+import {useEffect, useReducer, useRef, useState} from 'react';
 import {Game} from '../helpers/game';
-import {GridView} from './grid_view';
+import {ImageLoader} from '../helpers/image_loader';
+import {GameView} from './game_view';
+import defaulImageSource from '../images/win_meme.png';
 
-export const App = defineComponent(() => {
-  const game = reactive(new Game());
-  const canvas = document.createElement('canvas');
-  const gridView = new GridView(game as Game, canvas);
+export const App = () => {
+  const [, refresh] = useReducer(x => ++x, 0);
 
-  game.changeSelectedTile('Right');
-  game.changeSelectedTile('Right');
-  game.changeSelectedTile('Right');
-  // game.changeSelectedTile('Right');
-  console.log(game.moveSelectedTile());
-  game.changeSelectedTile('Left');
+  const [game] = useState(() => new Game());
+  const [gameView] = useState(() => new GameView());
+  const gameViewRef = useRef<HTMLDivElement>(null);
+  const [imageLoader] = useState(() => new ImageLoader(defaulImageSource));
 
-  canvas.style.width = 'calc(100% - 0rem)';
-  canvas.style.height = '100%';
-  document.body.append(canvas);
+  useEffect(() => {
+    gameView.appendTo(gameViewRef.current!);
+    game.onStateChange = refresh;
+    gameView.onStateChange = refresh;
+    imageLoader.onStateChange = () => {
+      gameView.image = imageLoader.image;
+      refresh();
+    };
 
-  setTimeout(() => gridView.draw(), 100);
-  // watchEffect(() => gridView.draw());
+    document.onkeydown = ({key}) => {
+      switch (key) {
+        case 'ArrowDown':
+          game.changeCurrentCell('Bottom');
+          break;
+        case 'ArrowUp':
+          game.changeCurrentCell('Top');
+          break;
+        case 'ArrowLeft':
+          game.changeCurrentCell('Left');
+          break;
+        case 'ArrowRight':
+          game.changeCurrentCell('Right');
+          break;
+        case 'm':
+          game.moveTileAtCurrentCell();
+          break;
+      }
+      return;
+    };
+  }, []);
 
-  return () => <div class="w-0 bg-blue-gray-600"></div>;
-});
+  gameView.draw(
+    game.gridSize,
+    game.tilesByCell,
+    game.blankCell,
+    game.currentCell,
+    imageLoader.imageSize
+  );
+
+  return (
+    <>
+      <div className="flex-grow" ref={gameViewRef}></div>
+      <div className="w-40 bg-blue-gray-600">
+        <input
+          type="file"
+          accept="image/*"
+          style={{color: 'transparent', width: '100%'}}
+          onChange={event => imageLoader.load(event.target.files?.[0])}
+        />
+      </div>
+    </>
+  );
+};
