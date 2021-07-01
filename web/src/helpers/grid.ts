@@ -12,6 +12,7 @@
 export class Grid {
   #size!: Vec2;
   #tilesByCell!: number[];
+  #prevTilesByCell?: number[];
 
   constructor(width = Grid.DEFAULT_WIDTH, height = Grid.DEFAULT_HEIGHT) {
     this.size = [width, height];
@@ -23,7 +24,8 @@ export class Grid {
 
   set size([width, height]) {
     this.#size = [width, height];
-    this.#tilesByCell = [...Array(width * height).keys()];
+    this.reset();
+    this.#prevTilesByCell = undefined;
   }
 
   get width() {
@@ -44,6 +46,18 @@ export class Grid {
 
   get numTiles() {
     return this.#tilesByCell.length;
+  }
+
+  // return true if previous state is saved; false otherwise
+  undoReset() {
+    if (!this.#prevTilesByCell) return false;
+    this.#tilesByCell = this.#prevTilesByCell;
+    return true;
+  }
+
+  reset() {
+    this.#prevTilesByCell = this.#tilesByCell;
+    this.#tilesByCell = [...Array(this.width * this.height).keys()];
   }
 
   getLeftOfCell(cell: number) {

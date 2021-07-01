@@ -29,7 +29,11 @@ export const ControllerBar = ({
       align="items-center"
       bg="black"
     >
-      <ControllerIcon icon="show" onClick={() => {}} />
+      <ControllerIcon
+        icon="show"
+        onMouseDown={() => game.reset()}
+        onMouseUp={() => game.undoReset()}
+      />
       <ControllerIcon icon="shuffle" onClick={() => game.shuffle()} />
       <Divider />
       <ControllerIcon icon="add-row" onClick={() => ++game.gridHeight} />
@@ -43,7 +47,11 @@ export const ControllerBar = ({
   );
 };
 
-const ControllerIcon = (props: {icon: string; onClick: Function}) => {
+const ControllerIcon = (props: {
+  icon: string;
+  onClick?: Function;
+  [k: string]: unknown;
+}) => {
   return (
     <Icon
       w="full"

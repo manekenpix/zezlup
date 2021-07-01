@@ -29,21 +29,21 @@ export class GameView {
     this.#gl = gl;
     this.#program = createProgram(gl, vertexShaderSrc, fragmentShaderSrc);
 
-    this.#canvasSizeLoc = this.getUniformLoc('canvasSize');
-    this.#gridSizeLoc = this.getUniformLoc('gridSize');
-    this.#tilesByCellLoc = this.getUniformLoc('tilesByCell');
-    this.#blankCellLoc = this.getUniformLoc('blankCell');
-    this.#currentCellLoc = this.getUniformLoc('currentCell');
-    this.#verticesLoc = this.getUniformLoc('vertices');
+    this.#canvasSizeLoc = this.#getUniformLoc('canvasSize');
+    this.#gridSizeLoc = this.#getUniformLoc('gridSize');
+    this.#tilesByCellLoc = this.#getUniformLoc('tilesByCell');
+    this.#blankCellLoc = this.#getUniformLoc('blankCell');
+    this.#currentCellLoc = this.#getUniformLoc('currentCell');
+    this.#verticesLoc = this.#getUniformLoc('vertices');
 
     this.#image = gl.createTexture();
-    this.#imageLoc = this.getUniformLoc('image');
-    this.#imageSizeLoc = this.getUniformLoc('imageSize');
+    this.#imageLoc = this.#getUniformLoc('image');
+    this.#imageSizeLoc = this.#getUniformLoc('imageSize');
 
-    this.setupAutoResize();
+    this.#setupAutoResize();
   }
 
-  private setupAutoResize() {
+  #setupAutoResize() {
     this.#canvas.style.width = '100%';
     this.#canvas.style.height = '100%';
 
@@ -57,7 +57,7 @@ export class GameView {
     resizeObserver.observe(this.#canvas);
   }
 
-  private getUniformLoc(uniformName: string) {
+  #getUniformLoc(uniformName: string) {
     return this.#gl.getUniformLocation(this.#program, uniformName);
   }
 

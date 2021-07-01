@@ -6,14 +6,16 @@ export class Game {
   readonly #grid = new Grid();
   #blankCell!: number;
   #currentCell!: number;
+  #prevBlankCell!: number;
+  #prevCurrentCell!: number;
 
   onStateChange?: Function;
 
   constructor() {
-    this.setupCells();
+    this.#setupCells();
   }
 
-  private setupCells() {
+  #setupCells() {
     this.#blankCell = this.#grid.width - 1; // bottom-right
     this.#currentCell = this.#blankCell;
   }
@@ -33,7 +35,7 @@ export class Game {
     }
 
     this.#grid.size = size;
-    this.setupCells();
+    this.#setupCells();
     this.shuffle();
     this.onStateChange?.();
   }
@@ -84,6 +86,21 @@ export class Game {
     }
 
     this.#currentCell = this.#blankCell;
+    this.onStateChange?.();
+  }
+
+  undoReset() {
+    if (!this.#grid.undoReset()) return;
+    this.#blankCell = this.#prevBlankCell;
+    this.#currentCell = this.#prevCurrentCell;
+    this.onStateChange?.();
+  }
+
+  reset() {
+    this.#prevBlankCell = this.#blankCell;
+    this.#prevCurrentCell = this.#currentCell;
+    this.#setupCells();
+    this.#grid.reset();
     this.onStateChange?.();
   }
 
