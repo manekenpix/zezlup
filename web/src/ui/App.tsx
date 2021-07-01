@@ -1,9 +1,10 @@
 import {useEffect, useReducer, useRef, useState} from 'react';
 import {Game} from '../helpers/game';
 import {ImageLoader} from '../helpers/image_loader';
-import {GameView} from './game_view';
-import {ControllerBar} from './ControllerBar';
 import defaulImageSource from '../images/win_meme.png';
+import {Direction} from '../types/enum';
+import {ControllerBar} from './ControllerBar';
+import {GameView} from './game_view';
 
 export const App = () => {
   const [, refresh] = useReducer(x => ++x, 0);
@@ -44,16 +45,16 @@ export const App = () => {
 const onKeyDown = (game: Game, key: string) => {
   switch (key) {
     case 'ArrowDown':
-      game.changeCurrentCell('Bottom');
+      game.changeCurrentCell(Direction.Bottom);
       break;
     case 'ArrowUp':
-      game.changeCurrentCell('Top');
+      game.changeCurrentCell(Direction.Top);
       break;
     case 'ArrowLeft':
-      game.changeCurrentCell('Left');
+      game.changeCurrentCell(Direction.Left);
       break;
     case 'ArrowRight':
-      game.changeCurrentCell('Right');
+      game.changeCurrentCell(Direction.Right);
       break;
     case 'm':
       game.moveTileAtCurrentCell();

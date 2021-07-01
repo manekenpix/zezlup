@@ -18,10 +18,3 @@ declare type Tile = [
   currentX: number,
   currentY: number
 ];
-
-declare enum Direction {
-  Top = 'Top',
-  Bottom = 'Bottom',
-  Left = 'Left',
-  Right = 'Right',
-}

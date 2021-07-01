@@ -1,3 +1,4 @@
+import {Direction} from '../types/enum';
 import {Grid} from './grid';
 import {getRandomInt} from './math';
 
