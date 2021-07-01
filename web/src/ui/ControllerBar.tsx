@@ -30,7 +30,7 @@ export const ControllerBar = ({
       bg="black"
     >
       <ControllerIcon icon="show" onClick={() => {}} />
-      <ControllerIcon icon="shuffle" onClick={() => {}} />
+      <ControllerIcon icon="shuffle" onClick={() => game.shuffle()} />
       <Divider />
       <ControllerIcon icon="add-row" onClick={() => ++game.gridHeight} />
       <ControllerIcon icon="delete-row" onClick={() => --game.gridHeight} />

@@ -22,8 +22,6 @@ export class Grid {
   }
 
   set size([width, height]) {
-    width = Math.max(Grid.MIN_WIDTH, Math.min(Grid.MAX_WIDTH, width));
-    height = Math.max(Grid.MIN_HEIGHT, Math.min(Grid.MAX_HEIGHT, height));
     this.#size = [width, height];
     this.#tilesByCell = [...Array(width * height).keys()];
   }
@@ -83,10 +81,6 @@ export class Grid {
     this.#tilesByCell[cell2] = tile1;
   }
 
-  static MIN_WIDTH = 2;
-  static MIN_HEIGHT = 2;
-  static MAX_WIDTH = 8;
-  static MAX_HEIGHT = 8;
   static DEFAULT_WIDTH = 4;
   static DEFAULT_HEIGHT = 4;
 }

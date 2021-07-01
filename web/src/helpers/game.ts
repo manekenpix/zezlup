@@ -1,4 +1,5 @@
 import {Grid} from './grid';
+import {getRandomInt} from './math';
 
 export class Game {
   readonly #grid = new Grid();
@@ -21,8 +22,18 @@ export class Game {
   }
 
   set gridSize(size: Readonly<Vec2>) {
+    if (
+      size[0] < Game.MIN_GRID_WIDTH ||
+      size[0] > Game.MAX_GRID_WIDTH ||
+      size[1] < Game.MIN_GRID_HEIGHT ||
+      size[1] > Game.MAX_GRID_HEIGHT
+    ) {
+      return;
+    }
+
     this.#grid.size = size;
     this.setupCells();
+    this.shuffle();
     this.onStateChange?.();
   }
 
@@ -58,6 +69,23 @@ export class Game {
     return this.#grid.isInOrder;
   }
 
+  shuffle(iterations = this.#grid.numTiles * 10) {
+    let prevCell = this.#blankCell;
+
+    for (let i = 0; i < iterations; ++i) {
+      const neighbors = this.#grid.getNeighborsOfCell(this.#blankCell);
+      const prevCellIndex = neighbors.findIndex(cell => cell === prevCell);
+      if (prevCellIndex !== -1) neighbors.splice(prevCellIndex, 1);
+
+      prevCell = this.#blankCell;
+      this.#blankCell = neighbors[getRandomInt(neighbors.length)];
+      this.#grid.swapTilesAtCells(prevCell, this.#blankCell);
+    }
+
+    this.#currentCell = this.#blankCell;
+    this.onStateChange?.();
+  }
+
   // return true if tile is moved; false otherwise
   moveTileAtCurrentCell() {
     if (!this.#grid.areCellsNeighbors(this.#currentCell, this.#blankCell))
@@ -70,7 +98,7 @@ export class Game {
   }
 
   // return true if cell is changed; false otherwise
-  changeCurrentCell(direction: 'Top' | 'Bottom' | 'Left' | 'Right') {
+  changeCurrentCell(direction: Direction) {
     const getNeighborMethod = `get${direction}OfCell` as const;
     const neighborCell = this.#grid[getNeighborMethod](this.#currentCell);
     if (neighborCell === null) return false;
@@ -79,4 +107,9 @@ export class Game {
     this.onStateChange?.();
     return true;
   }
+
+  static MIN_GRID_WIDTH = 2;
+  static MIN_GRID_HEIGHT = 2;
+  static MAX_GRID_WIDTH = 8;
+  static MAX_GRID_HEIGHT = 8;
 }
