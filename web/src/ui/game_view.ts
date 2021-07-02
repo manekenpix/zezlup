@@ -63,10 +63,14 @@ export class GameView {
 
   set image(value: HTMLImageElement) {
     const gl = this.#gl;
+    const texture2D = gl.TEXTURE_2D;
+
     gl.activeTexture(gl.TEXTURE0);
-    gl.bindTexture(gl.TEXTURE_2D, this.#image);
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, value);
-    gl.generateMipmap(gl.TEXTURE_2D);
+    gl.bindTexture(texture2D, this.#image);
+    gl.texImage2D(texture2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, value);
+    gl.generateMipmap(texture2D);
+    gl.texParameteri(texture2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(texture2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
 
     this.onStateChange?.();
   }
