@@ -12,20 +12,21 @@ export const App = () => {
   const [game] = useState(() => new Game());
   const [gameView] = useState(() => new GameView());
   const gameViewRef = useRef<HTMLDivElement>(null);
-  const [imageLoader] = useState(() => new ImageLoader(defaulImageSource));
+  const [imageLoader] = useState(() => new ImageLoader());
 
   useEffect(() => {
-    game.shuffle();
-
     gameView.appendTo(gameViewRef.current!);
+
     game.onStateChange = refresh;
     gameView.onStateChange = refresh;
     imageLoader.onStateChange = () => {
       gameView.image = imageLoader.image;
       refresh();
     };
-
     document.onkeydown = ({key}) => onKeyDown(game, key);
+
+    imageLoader.load(defaulImageSource);
+    game.shuffle();
   }, []);
 
   gameView.draw(

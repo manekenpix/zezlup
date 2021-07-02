@@ -70,7 +70,7 @@ export class GameView {
     gl.texImage2D(texture2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, value);
     gl.generateMipmap(texture2D);
     gl.texParameteri(texture2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR_MIPMAP_LINEAR);
-    gl.texParameteri(texture2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR_MIPMAP_LINEAR);
+    gl.texParameteri(texture2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 
     this.onStateChange?.();
   }

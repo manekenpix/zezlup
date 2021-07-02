@@ -2,10 +2,9 @@ export class ImageLoader {
   readonly image: HTMLImageElement;
   onStateChange?: Function;
 
-  constructor(source: string) {
+  constructor() {
     this.image = new Image();
     this.image.onload = () => this.onStateChange?.();
-    this.load(source);
   }
 
   get imageSize(): Vec2 {
