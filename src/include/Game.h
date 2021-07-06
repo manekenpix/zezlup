@@ -4,6 +4,7 @@
 #include "Grid.h"
 #include "Png.h"
 #include "Quad.h"
+#include "Renderer.h"
 #include "Shader.h"
 #include "Shuffle.h"
 #include "Window.h"
@@ -13,11 +14,14 @@
 
 class Game
 {
+  // Renderer
+  Renderer* renderer;
+
   Grid* grid;
 
   // Window
-  const f32 screenWidth = 1000.0;
-  const f32 screenHeight = 1000.0;
+  const f32 screenWidth = 1000.0f;
+  const f32 screenHeight = 1000.0f;
   GameWindow* window = nullptr;
   f32 framerate;
 

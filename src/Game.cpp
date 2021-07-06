@@ -13,6 +13,8 @@ Game::Game()
   window = new GameWindow( screenWidth, screenHeight );
   getRefreshRate();
 
+  renderer = new Renderer( window, screenWidth, screenHeight );
+
   images.push_back( new Png( "data/true_colour/baboon.png" ) );
 
   grid = new Grid( images[0], gridWidth, gridHeight, 1000.0f, 1000.0f, empty );
@@ -136,17 +138,22 @@ Game::run()
 
     index = 0;
     for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
-      if ( *cell )
-        ( *cell )->draw( selected == index );
-      else
+      if ( *cell ) {
+
+        renderer->draw( &( ( *cell )->vertexArray ),
+                        &( ( *cell )->vertexBuffer ),
+                        &( *cell )->vertices,
+                        ( *cell )->tex,
+                        selected == index );
+
+      } else
         empty = index;
 
       ++index;
     }
 
-    // Swap buffers
-    glfwSwapBuffers( window->window );
-    glfwPollEvents();
+    renderer->swapBuffers();
+    renderer->pollEvents();
 
     endSeconds = glfwGetTime();
     startSeconds = glfwGetTime();
