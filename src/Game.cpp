@@ -10,9 +10,6 @@ Game::Game()
   , isKeyPressed{ false }
   , key{ -1 }
 {
-  projectionMatrix =
-    glm::ortho( 0.0f, (f32)screenWidth, (f32)screenHeight, 0.0f );
-
   window = new GameWindow( screenWidth, screenHeight );
   getRefreshRate();
 
