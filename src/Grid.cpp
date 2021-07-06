@@ -10,12 +10,6 @@ Grid::Grid( Png* src,
   , cellsPerColumn{ cellsColumn }
 {
 
-  shaders.push_back(
-    new Shader( "src/Shaders/common.vert", "src/Shaders/grid.frag" ) );
-
-  shaders.push_back(
-    new Shader( "src/Shaders/common.vert", "src/Shaders/outline.frag" ) );
-
   u8* imageBuffer = src->getImageBuffer();
   u32 imageWidth = src->getWidth();
   u32 imageHeight = src->getHeight();
@@ -42,13 +36,10 @@ Grid::Grid( Png* src,
           cellBuffer[cellPosition] = imageBuffer[positionY + positionX];
         }
       }
-      cells.push_back( new Quad( shaders,
-                                 windowW / cellsPerRow,
-                                 windowH / cellsPerColumn,
-                                 windowW,
-                                 windowH ) );
-      cells.back()->attachTexture(
-        cellBuffer, cellWidth, cellHeight, colourType );
+      cells.push_back( new Quad(
+        windowW / cellsPerRow, windowH / cellsPerColumn, windowW, windowH ) );
+      cells.back()->tex =
+        new Texture( cellBuffer, cellWidth, cellHeight, colourType );
 
       // Store cell positions
       cellPositionX = ( windowW / cellsPerRow ) * columns;
@@ -93,8 +84,6 @@ Grid::~Grid()
 {
   std::for_each(
     cells.begin(), cells.end(), []( Quad* cell ) { delete cell; } );
-  std::for_each(
-    shaders.begin(), shaders.end(), []( Shader* shader ) { delete shader; } );
   std::for_each(
     coords.begin(), coords.end(), []( Vec2* coord ) { delete coord; } );
 };

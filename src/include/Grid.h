@@ -14,9 +14,6 @@ class Grid
   u8 bpp;
   u8 colourType;
 
-  // Shaders
-  std::vector<Shader*> shaders;
-
   // Coordinates
   std::vector<Vec2*> coords;
 
