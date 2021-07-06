@@ -10,8 +10,13 @@ Game::Game()
   , isKeyPressed{ false }
   , key{ -1 }
 {
+  projectionMatrix =
+    glm::ortho( 0.0f, (f32)screenWidth, (f32)screenHeight, 0.0f );
+
   window = new GameWindow( screenWidth, screenHeight );
   getRefreshRate();
+
+  renderer = new Renderer( window, screenWidth, screenHeight );
 
   images.push_back( new Png( "data/true_colour/baboon.png" ) );
 
@@ -136,17 +141,22 @@ Game::run()
 
     index = 0;
     for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
-      if ( *cell )
-        ( *cell )->draw( selected == index );
-      else
+      if ( *cell ) {
+
+        renderer->draw( &( ( *cell )->vertexArray ),
+                        &( ( *cell )->vertexBuffer ),
+                        &( *cell )->vertices,
+                        ( *cell )->tex,
+                        selected == index );
+
+      } else
         empty = index;
 
       ++index;
     }
 
-    // Swap buffers
-    glfwSwapBuffers( window->window );
-    glfwPollEvents();
+    renderer->swapBuffers();
+    renderer->pollEvents();
 
     endSeconds = glfwGetTime();
     startSeconds = glfwGetTime();
