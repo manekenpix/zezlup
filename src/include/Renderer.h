@@ -6,22 +6,23 @@
 #include "Window.h"
 #include "types.h"
 
-#include <algorithm>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include <vector>
+#include <string>
+#include <unordered_map>
 
 class Renderer
 {
+
   GameWindow* window = nullptr;
   f32 width = 0;
   f32 height = 0;
 
-public:
   // Shaders
-  std::vector<Shader*> shaders;
+  std::unordered_map<std::string, Shader*> shaders;
   glm::mat4 projectionMatrix;
 
+public:
   Renderer( GameWindow* window, f32 screenW, f32 screenH );
   ~Renderer();
 
@@ -29,10 +30,12 @@ public:
              u32* vertexBuffer,
              Vertices* vertices,
              Texture* texture,
-             bool selected );
+             std::string selectedShader );
 
   void swapBuffers();
   void pollEvents();
+
+  void addShader( std::string key, std::string vShader, std::string fShader );
 };
 
 #endif
