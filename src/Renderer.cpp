@@ -5,11 +5,6 @@ Renderer::Renderer( GameWindow* w, f32 screenW, f32 screenH )
   , width{ screenW }
   , height{ screenH }
 {
-  shaders.push_back(
-    new Shader( "src/Shaders/common.vert", "src/Shaders/grid.frag" ) );
-
-  shaders.push_back(
-    new Shader( "src/Shaders/common.vert", "src/Shaders/outline.frag" ) );
 
   projectionMatrix = glm::ortho( 0.0f, width, height, 0.0f );
 };
@@ -19,10 +14,10 @@ Renderer::draw( u32* vertexArray,
                 u32* vertexBuffer,
                 Vertices* vertices,
                 Texture* texture,
-                bool selected )
+                std::string shader )
 {
-  shaders[selected ? 1 : 0]->use();
-  shaders[selected ? 1 : 0]->setMatrix4fv( "projection", projectionMatrix );
+  shaders[shader]->use();
+  shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
 
   texture->bind();
   glBindVertexArray( *vertexArray );
@@ -45,8 +40,15 @@ Renderer::pollEvents()
   glfwPollEvents();
 };
 
+void
+Renderer::addShader( std::string key, std::string vShader, std::string fShader )
+{
+  shaders.insert( { key, new Shader( vShader.c_str(), fShader.c_str() ) } );
+};
+
 Renderer::~Renderer()
 {
-  std::for_each(
-    shaders.begin(), shaders.end(), []( Shader* shader ) { delete shader; } );
+  for ( const auto& [key, v] : shaders ) {
+    delete v;
+  }
 };

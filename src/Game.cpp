@@ -2,6 +2,7 @@
 
 Game::Game()
   : window{ nullptr }
+  , preview{ nullptr }
   , gridHeight{ 4 }
   , gridWidth{ 4 }
   , selected{ 0 }
@@ -14,6 +15,14 @@ Game::Game()
   getRefreshRate();
 
   renderer = new Renderer( window, screenWidth, screenHeight );
+  renderer->addShader(
+    "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
+
+  renderer->addShader(
+    "Outline", "src/Shaders/common.vert", "src/Shaders/outline.frag" );
+
+  renderer->addShader(
+    "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
 
   images.push_back( new Png( "data/true_colour/baboon.png" ) );
 
@@ -26,6 +35,15 @@ Game::Game()
   grid->setPositions();
 
   empty = shuffle.getEmpty();
+
+  // Create the preview
+  preview = new Quad( previewWidth, previewHeight, screenWidth, screenHeight );
+  preview->tex = new Texture( images[0]->getImageBuffer(),
+                              images[0]->getWidth(),
+                              images[0]->getHeight(),
+                              images[0]->getColourType() );
+
+  preview->setPosition( 100.0f, 100.0f );
 
   glfwSetInputMode( window->window, GLFW_STICKY_KEYS, GLFW_TRUE );
 };
@@ -112,6 +130,12 @@ Game::processKeyboardInput()
       std::swap( selected, empty );
     }
 
+    // Press 'c'
+  } else if ( glfwGetKey( window->window, GLFW_KEY_C ) == GLFW_PRESS &&
+              !isKeyPressed ) {
+    isKeyPressed = true;
+    key = GLFW_KEY_C;
+
     // Release pressed key
   } else if ( glfwGetKey( window->window, key ) == GLFW_RELEASE &&
               isKeyPressed ) {
@@ -130,6 +154,8 @@ Game::run()
   f32 endSeconds = 0.0f;
   f32 targetElapsedTime = 1000.0f / framerate;
 
+  std::string selectedShader;
+
   do {
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
@@ -137,20 +163,33 @@ Game::run()
     processKeyboardInput();
 
     index = 0;
-    for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
+    for ( auto cell = grid->cells.begin(); cell != grid->cells.end();
+          ++cell, ++index ) {
       if ( *cell ) {
+
+        if ( key == GLFW_KEY_C )
+          selectedShader = "Blur";
+        else
+          selectedShader = selected == index ? "Outline" : "Grid";
 
         renderer->draw( &( ( *cell )->vertexArray ),
                         &( ( *cell )->vertexBuffer ),
                         &( *cell )->vertices,
                         ( *cell )->tex,
-                        selected == index );
+                        selectedShader );
 
       } else
         empty = index;
 
-      ++index;
+      // ++index;
     }
+
+    if ( key == GLFW_KEY_C )
+      renderer->draw( &( preview->vertexArray ),
+                      &( preview->vertexBuffer ),
+                      &preview->vertices,
+                      preview->tex,
+                      "Grid" );
 
     renderer->swapBuffers();
     renderer->pollEvents();
@@ -166,5 +205,6 @@ Game::~Game()
 {
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );
+  delete preview;
   delete window;
 };

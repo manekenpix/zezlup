@@ -7,10 +7,12 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Shuffle.h"
+#include "Texture.h"
 #include "Window.h"
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <algorithm>
+#include <string>
 
 class Game
 {
@@ -20,10 +22,15 @@ class Game
   Grid* grid;
 
   // Window
+  GameWindow* window = nullptr;
   const f32 screenWidth = 1000.0f;
   const f32 screenHeight = 1000.0f;
-  GameWindow* window = nullptr;
   f32 framerate;
+
+  // Preview
+  Quad* preview;
+  const f32 previewWidth = 800.0f;
+  const f32 previewHeight = 800.0f;
 
   // Images
   std::vector<Png*> images;
