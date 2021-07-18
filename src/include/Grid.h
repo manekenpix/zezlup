@@ -7,8 +7,6 @@
 
 class Grid
 {
-  u32 cellWidth;
-  u32 cellHeight;
   u8 cellsPerRow;
   u8 cellsPerColumn;
   u8 bpp;
@@ -26,12 +24,7 @@ class Grid
 public:
   std::vector<Quad*> cells;
 
-  Grid( Png* src,
-        u8 cellsRow,
-        u8 cellsColumn,
-        f32 windowW,
-        f32 windowH,
-        u8 empty );
+  Grid( u8 cellsRow, u8 cellsColumn, f32 windowW, f32 windowH, u8 empty );
   ~Grid();
 
   void swapCells( u8 c1, u8 c2 );

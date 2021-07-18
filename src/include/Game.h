@@ -19,12 +19,16 @@ class Game
   // Renderer
   Renderer* renderer;
 
+  // Grid
   Grid* grid;
+  bool loaded;
+  u8 gridWidth;
+  u8 gridHeight;
 
   // Window
   GameWindow* window = nullptr;
-  const f32 screenWidth = 1000.0f;
-  const f32 screenHeight = 1000.0f;
+  const f32 screenWidth = 1024.0f;
+  const f32 screenHeight = 1024.0f;
   f32 framerate;
 
   // Preview
@@ -32,20 +36,39 @@ class Game
   const f32 previewWidth = 800.0f;
   const f32 previewHeight = 800.0f;
 
+  // Menu
+  Quad* background;
+  const f32 backgroundWidth = 1024.0f;
+  const f32 backgroundHeight = 1024.0f;
+
+  // Options
+  std::vector<Quad*> options;
+  const f32 optionWidth = 200.0f;
+  const f32 optionHeight = 200.0f;
+  std::vector<Vec2> optionsCoords;
+
   // Images
+  std::vector<std::string> files;
   std::vector<Png*> images;
 
   // Gameplay
-  u8 gridWidth;
-  u8 gridHeight;
   u8 selected;
+  // .u8 selectedImage;
   u8 empty;
+  u8 optionSelected;
+  bool menuMode;
   bool isKeyPressed;
   int key;
 
   void getRefreshRate();
-  void processKeyboardInput();
+  void processMenuInput();
+  void processGameInput();
+  void loadTextures();
+  void loadGridTextures();
   void shuffle();
+
+  void menu();
+  void play();
 
 public:
   Game();

@@ -2,11 +2,11 @@
 #define QUAD_H
 
 #include "Shader.h"
-#include "Texture.h"
 #include "types.h"
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <string>
 #include <vector>
 
 class Quad
@@ -16,11 +16,13 @@ class Quad
   f32 y = 0;
   f32 width = 0;
   f32 height = 0;
-  f32 screenWidth = 0;
-  f32 screenHeight = 0;
 
 public:
   u32 vertexArray, vertexBuffer, elementBufferObject;
+
+  // Textures
+  std::string textureID;
+
   Vertices vertices = {
 
     // positions      texture coords
@@ -31,10 +33,7 @@ public:
   };
   u32 indices[6] = { 0, 1, 3, 1, 2, 3 };
 
-  Quad( f32 w, f32 h, f32 screenW, f32 screenH );
-  // Textures
-  Texture* tex;
-
+  Quad( f32 w, f32 h );
   ~Quad();
 
   void setPosition( f32 x, f32 y );

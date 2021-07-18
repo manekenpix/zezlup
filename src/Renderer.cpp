@@ -13,13 +13,13 @@ void
 Renderer::draw( u32* vertexArray,
                 u32* vertexBuffer,
                 Vertices* vertices,
-                Texture* texture,
+                std::string texture,
                 std::string shader )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
 
-  texture->bind();
+  textures[texture]->bind();
   glBindVertexArray( *vertexArray );
   glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
   glBufferData(
@@ -46,9 +46,23 @@ Renderer::addShader( std::string key, std::string vShader, std::string fShader )
   shaders.insert( { key, new Shader( vShader.c_str(), fShader.c_str() ) } );
 };
 
+void
+Renderer::addTexture( std::string name,
+                      u8* buffer,
+                      s32 width,
+                      s32 height,
+                      u8 colourType )
+{
+  textures.insert( { name, new Texture( buffer, width, height, colourType ) } );
+};
+
 Renderer::~Renderer()
 {
   for ( const auto& [key, v] : shaders ) {
+    delete v;
+  }
+
+  for ( const auto& [key, v] : textures ) {
     delete v;
   }
 };

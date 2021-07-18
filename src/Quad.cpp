@@ -1,10 +1,8 @@
 #include "include/Quad.h"
 
-Quad::Quad( f32 w, f32 h, f32 screenW, f32 screenH )
+Quad::Quad( f32 w, f32 h )
   : width{ w }
   , height{ h }
-  , screenWidth{ screenW }
-  , screenHeight{ screenH }
 {
   glGenVertexArrays( 1, &vertexArray );
   glGenBuffers( 1, &vertexBuffer );
@@ -54,6 +52,4 @@ Quad::~Quad()
   glDeleteVertexArrays( 1, &vertexArray );
   glDeleteBuffers( 1, &vertexBuffer );
   glDeleteBuffers( 1, &elementBufferObject );
-
-  delete tex;
 };
