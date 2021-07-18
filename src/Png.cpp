@@ -16,7 +16,6 @@ Png::Png( const char* file )
   u32 chunkType = readU32( fileIterator );
 
   while ( chunkType != ChunkType::IEND ) {
-    printChunkType( chunkType );
     switch ( chunkType ) {
       case ChunkType::IHDR:
         readIHDR( fileIterator );

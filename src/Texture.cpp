@@ -1,12 +1,8 @@
 #include "include/Texture.h"
 
-Texture::Texture( u8* tBuffer, s32 tWidth, s32 tHeight, u8 colourType )
+Texture::Texture( u8* buffer, s32 width, s32 height, u8 colourType )
 {
-  if ( tBuffer ) {
-    width = tWidth;
-    height = tHeight;
-    buffer = tBuffer;
-
+  if ( buffer ) {
     glGenTextures( 1, &texture );
     glBindTexture( GL_TEXTURE_2D, texture );
 

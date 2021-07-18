@@ -1,45 +1,17 @@
 #include "include/Grid.h"
 
-Grid::Grid( Png* src,
-            u8 cellsRow,
-            u8 cellsColumn,
-            f32 windowW,
-            f32 windowH,
-            u8 empty )
+Grid::Grid( u8 cellsRow, u8 cellsColumn, f32 windowW, f32 windowH, u8 empty )
   : cellsPerRow{ cellsRow }
   , cellsPerColumn{ cellsColumn }
 {
-
-  u8* imageBuffer = src->getImageBuffer();
-  u32 imageWidth = src->getWidth();
-  u32 imageHeight = src->getHeight();
-  colourType = src->getColourType();
-
-  cellWidth = imageWidth / cellsPerRow;
-  cellHeight = imageHeight / cellsPerColumn;
-  bpp = colourType ? BytesPerPixel::RGBA : BytesPerPixel::RGB;
-
-  u32 cellSize = cellWidth * cellHeight * bpp;
   f32 cellPositionX, cellPositionY;
 
   for ( u8 rows = 0; rows < cellsPerColumn; ++rows ) {
     for ( u8 columns = 0; columns < cellsPerRow; ++columns ) {
 
-      // Extract cells from the source image
-      u8* cellBuffer = (u8*)std::malloc( cellSize );
-      for ( u32 y = 0; y < cellHeight; ++y ) {
-        for ( u32 x = 0; x < cellWidth * bpp; ++x ) {
-
-          u32 positionX = ( columns * cellWidth * bpp ) + x;
-          u32 positionY = ( ( rows * cellHeight ) + y ) * ( imageWidth * bpp );
-          u32 cellPosition = ( cellWidth * bpp * y ) + x;
-          cellBuffer[cellPosition] = imageBuffer[positionY + positionX];
-        }
-      }
-      cells.push_back( new Quad(
-        windowW / cellsPerRow, windowH / cellsPerColumn, windowW, windowH ) );
-      cells.back()->tex =
-        new Texture( cellBuffer, cellWidth, cellHeight, colourType );
+      cells.push_back(
+        new Quad( windowW / cellsPerRow, windowH / cellsPerColumn ) );
+      cells.back()->textureID = std::to_string( rows * cellsPerRow + columns );
 
       // Store cell positions
       cellPositionX = ( windowW / cellsPerRow ) * columns;

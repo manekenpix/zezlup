@@ -1,6 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
+#include "Png.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Window.h"
@@ -20,6 +21,7 @@ class Renderer
 
   // Shaders
   std::unordered_map<std::string, Shader*> shaders;
+  std::unordered_map<std::string, Texture*> textures;
   glm::mat4 projectionMatrix;
 
 public:
@@ -29,13 +31,18 @@ public:
   void draw( u32* vertexArray,
              u32* vertexBuffer,
              Vertices* vertices,
-             Texture* texture,
+             std::string selectedTexture,
              std::string selectedShader );
 
   void swapBuffers();
   void pollEvents();
 
   void addShader( std::string key, std::string vShader, std::string fShader );
+  void addTexture( std::string name,
+                   u8* buffer,
+                   s32 width,
+                   s32 height,
+                   u8 colourType );
 };
 
 #endif
