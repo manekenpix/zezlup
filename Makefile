@@ -4,12 +4,11 @@ CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz -lX11 -lXrandr
 SRCDIR = src
 INCLUDEDIR = src/include
 BUILDDIR = build
-TARGET = bin/zezlup
+TARGET = zezlup
 CCRELEASE = -std=c++17 -O3
 CCDEBUG = -std=c++17 -g
 SRCEXT = cpp
 HDREXT = h
-INC = -I include
 
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))

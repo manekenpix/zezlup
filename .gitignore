@@ -30,7 +30,8 @@
 *.exe
 *.out
 *.app
-bin/
+zezlup
 
 # Editor's files
 project.4coder
+.vscode/
