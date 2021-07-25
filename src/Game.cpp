@@ -1,8 +1,7 @@
 #include "include/Game.h"
 
 Game::Game()
-  : window{ nullptr }
-  , preview{ nullptr }
+  : preview{ nullptr }
   , background{ nullptr }
   , gridHeight{ 4 }
   , gridWidth{ 4 }
@@ -13,15 +12,15 @@ Game::Game()
   , menuMode{ true }
   , isKeyPressed{ false }
   , key{ -1 }
-  , loaded( false )
+  , displayPreview{ false }
 {
   // Files
   files.push_back( "data/lego_small.png" );
-  files.push_back( "data/pieces_small.png" );
-  files.push_back( "data/cards_small.png" );
   files.push_back( "data/cube_small.png" );
+  files.push_back( "data/pieces_small.png" );
   files.push_back( "data/small_windows_small.png" );
   files.push_back( "data/open_window_small.png" );
+  files.push_back( "data/cards_small.png" );
 
   optionsCoords.push_back( Vec2( 100.0f, 200.0f ) );
   optionsCoords.push_back( Vec2( 400.0f, 200.0f ) );
@@ -30,28 +29,17 @@ Game::Game()
   optionsCoords.push_back( Vec2( 400.0f, 600.0f ) );
   optionsCoords.push_back( Vec2( 700.0f, 600.0f ) );
 
-  // Window
-  window = new GameWindow( screenWidth, screenHeight );
-  getRefreshRate();
-
   // Renderer
-  renderer = new Renderer( window, screenWidth, screenHeight );
-  renderer->addShader(
-    "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
+  renderer = new Renderer();
+  renderer->createWindow( windowWidth, windowHeight );
 
-  renderer->addShader(
-    "Outline", "src/Shaders/common.vert", "src/Shaders/outline.frag" );
-
-  renderer->addShader(
-    "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
-
-  background = new Quad( screenWidth, screenHeight );
+  background = new Quad( windowWidth, windowHeight );
   background->setPosition( 0, 0 );
 
   loadTextures();
 
   // Grid
-  grid = new Grid( gridWidth, gridHeight, screenWidth, screenHeight, empty );
+  grid = new Grid( gridWidth, gridHeight, windowWidth, windowHeight, empty );
 
   Shuffle<Quad*> shuffle( grid->cells, gridWidth, gridHeight, empty, 200 );
 
@@ -67,7 +55,14 @@ Game::Game()
 
   preview->setPosition( 100.0f, 100.0f );
 
-  glfwSetInputMode( window->window, GLFW_STICKY_KEYS, GLFW_TRUE );
+  renderer->addShader(
+    "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
+
+  renderer->addShader(
+    "Outline", "src/Shaders/common.vert", "src/Shaders/outline.frag" );
+
+  renderer->addShader(
+    "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
 };
 
 void
@@ -162,131 +157,64 @@ void
 Game::processMenuInput()
 {
   // TODO(Josue): Use a map here
-  // Press right arrow
-  if ( glfwGetKey( window->window, GLFW_KEY_RIGHT ) == GLFW_PRESS &&
-       !isKeyPressed ) {
+  if ( key == "right" ) {
     if ( optionSelected < files.size() - 1 ) {
       ++optionSelected;
-      isKeyPressed = true;
-      key = GLFW_KEY_RIGHT;
     }
 
-    // Press left arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_LEFT ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "left" ) {
     if ( optionSelected > 0 ) {
       --optionSelected;
-      isKeyPressed = true;
-      key = GLFW_KEY_LEFT;
     }
 
-    // Press down arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_DOWN ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "down" ) {
     if ( optionSelected < 3 ) {
       optionSelected += 3;
-      isKeyPressed = true;
-      key = GLFW_KEY_DOWN;
     }
 
-    // Press up arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_UP ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "up" ) {
     if ( optionSelected > 2 ) {
       optionSelected -= 3;
-      isKeyPressed = true;
-      key = GLFW_KEY_UP;
     }
 
-    // Press enter
-  } else if ( glfwGetKey( window->window, GLFW_KEY_ENTER ) == GLFW_PRESS &&
-              !isKeyPressed ) {
-    isKeyPressed = true;
-    key = GLFW_KEY_ENTER;
+  } else if ( key == "enter" ) {
     loadGridTextures();
     menuMode = false;
-
-  } else if ( glfwGetKey( window->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS &&
-              !isKeyPressed ) {
-    isKeyPressed = true;
-    key = GLFW_KEY_ESCAPE;
-
-    // Release pressed key
-  } else if ( glfwGetKey( window->window, key ) == GLFW_RELEASE &&
-              isKeyPressed ) {
-    isKeyPressed = false;
-    key = -1;
   }
 }
 
 void
 Game::processGameInput()
 {
-  // Press right arrow
-  if ( glfwGetKey( window->window, GLFW_KEY_RIGHT ) == GLFW_PRESS &&
-       !isKeyPressed ) {
+  if ( key == "right" ) {
     if ( selected < gridWidth * gridHeight - 1 ) {
       ++selected;
-      isKeyPressed = true;
-      key = GLFW_KEY_RIGHT;
     }
 
-    // Press left arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_LEFT ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "left" ) {
     if ( selected > 0 ) {
       --selected;
-      isKeyPressed = true;
-      key = GLFW_KEY_LEFT;
     }
 
-    // Press down arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_DOWN ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "down" ) {
     if ( selected < gridWidth * ( gridHeight - 1 ) ) {
       selected += gridWidth;
-      isKeyPressed = true;
-      key = GLFW_KEY_DOWN;
     }
 
-    // Press up arrow
-  } else if ( glfwGetKey( window->window, GLFW_KEY_UP ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "up" ) {
     if ( selected > gridWidth - 1 ) {
       selected -= gridWidth;
-      isKeyPressed = true;
-      key = GLFW_KEY_UP;
     }
 
-    // Press 'm'
-  } else if ( glfwGetKey( window->window, GLFW_KEY_M ) == GLFW_PRESS &&
-              !isKeyPressed ) {
+  } else if ( key == "m" ) {
     s8 distanceBetweenBoxes = abs( selected - empty );
-    isKeyPressed = true;
-    key = GLFW_KEY_M;
 
     if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
       grid->swapCells( selected, empty );
       std::swap( selected, empty );
     }
-
-    // Press 'c'
-  } else if ( glfwGetKey( window->window, GLFW_KEY_C ) == GLFW_PRESS &&
-              !isKeyPressed ) {
-    isKeyPressed = true;
-    key = GLFW_KEY_C;
-
-    // Pres esc
-  } else if ( glfwGetKey( window->window, GLFW_KEY_ESCAPE ) == GLFW_PRESS &&
-              !isKeyPressed ) {
-    isKeyPressed = true;
-    key = GLFW_KEY_ESCAPE;
-
-    // Release pressed key
-  } else if ( glfwGetKey( window->window, key ) == GLFW_RELEASE &&
-              isKeyPressed ) {
-    isKeyPressed = false;
-    key = -1;
+  } else if ( key == "c" ) {
+    displayPreview = !displayPreview;
   }
 }
 
@@ -321,7 +249,7 @@ Game::play()
         ++cell, ++index ) {
     if ( *cell ) {
 
-      if ( key == GLFW_KEY_C )
+      if ( displayPreview )
         selectedShader = "Blur";
       else
         selectedShader = selected == index ? "Outline" : "Grid";
@@ -334,7 +262,7 @@ Game::play()
     }
   }
 
-  if ( key == GLFW_KEY_C )
+  if ( displayPreview )
     renderer->draw( &( preview->vertexArray ),
                     &( preview->vertexBuffer ),
                     &preview->vertices,
@@ -353,6 +281,8 @@ Game::run()
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
     glClear( GL_COLOR_BUFFER_BIT );
 
+    key = renderer->getKey();
+
     if ( menuMode ) {
       processMenuInput();
       menu();
@@ -367,7 +297,7 @@ Game::run()
     endSeconds = glfwGetTime();
     startSeconds = glfwGetTime();
 
-  } while ( key != GLFW_KEY_ESCAPE );
+  } while ( key != "esc" );
 }
 
 Game::~Game()
@@ -378,5 +308,4 @@ Game::~Game()
     options.begin(), options.end(), []( Quad* option ) { delete option; } );
   delete preview;
   delete background;
-  delete window;
 };

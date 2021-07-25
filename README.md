@@ -31,7 +31,7 @@ Use the arrow keys and enter to select an image
 ### Controls:
 - `Arrow keys`: move selector.
 - `m`: slide the selected cell into the empty cell.
-- `c` (hold): display the solution of the puzzle.
+- `c` (toggle): display the solution of the puzzle.
 - `Esc`: Exit zezlup.
 
 ![Image](data/zezlup2.png)

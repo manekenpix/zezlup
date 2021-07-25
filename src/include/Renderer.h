@@ -4,7 +4,6 @@
 #include "Png.h"
 #include "Shader.h"
 #include "Texture.h"
-#include "Window.h"
 #include "types.h"
 
 #include <glm/glm.hpp>
@@ -14,8 +13,28 @@
 
 class Renderer
 {
+  typedef struct KeyPair
+  {
+    std::string key;
+    int code;
 
-  GameWindow* window = nullptr;
+    KeyPair( std::string _key, int _code )
+      : key{ _key }
+      , code{ _code } {};
+
+  } KeyPair;
+
+  static const u8 totalKeys = 8;
+  bool isKeyPressed;
+  int pressedKey = -1;
+  const KeyPair keys[totalKeys] = {
+    KeyPair( "right", GLFW_KEY_RIGHT ), KeyPair( "left", GLFW_KEY_LEFT ),
+    KeyPair( "up", GLFW_KEY_UP ),       KeyPair( "down", GLFW_KEY_DOWN ),
+    KeyPair( "enter", GLFW_KEY_ENTER ), KeyPair( "m", GLFW_KEY_M ),
+    KeyPair( "c", GLFW_KEY_C ),         KeyPair( "esc", GLFW_KEY_ESCAPE ),
+  };
+
+  GLFWwindow* window;
   f32 width = 0;
   f32 height = 0;
 
@@ -25,8 +44,10 @@ class Renderer
   glm::mat4 projectionMatrix;
 
 public:
-  Renderer( GameWindow* window, f32 screenW, f32 screenH );
+  Renderer();
   ~Renderer();
+
+  GLFWwindow* createWindow( f32 windowW, f32 windowH );
 
   void draw( u32* vertexArray,
              u32* vertexBuffer,
@@ -43,6 +64,17 @@ public:
                    s32 width,
                    s32 height,
                    u8 colourType );
+
+  std::string getKey();
 };
+
+void APIENTRY
+glDebugOutput( GLenum source,
+               GLenum type,
+               unsigned int id,
+               GLenum severity,
+               GLsizei length,
+               const char* message,
+               const void* userParam );
 
 #endif

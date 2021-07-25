@@ -37,8 +37,6 @@ public:
   ~Quad();
 
   void setPosition( f32 x, f32 y );
-  f32 getX() { return x; };
-  f32 getY() { return y; };
 };
 
 #endif
