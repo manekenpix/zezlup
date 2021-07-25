@@ -18,10 +18,9 @@ typedef struct Vec2
   u32 y;
 
   Vec2( u32 _x, u32 _y )
-  {
-    x = _x;
-    y = _y;
-  };
+    : x{ _x }
+    , y{ _y } {};
+
 } Vec2;
 
 #endif

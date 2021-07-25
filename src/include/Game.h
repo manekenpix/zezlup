@@ -8,7 +8,6 @@
 #include "Shader.h"
 #include "Shuffle.h"
 #include "Texture.h"
-#include "Window.h"
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <algorithm>
@@ -21,18 +20,17 @@ class Game
 
   // Grid
   Grid* grid;
-  bool loaded;
   u8 gridWidth;
   u8 gridHeight;
 
   // Window
-  GameWindow* window = nullptr;
-  const f32 screenWidth = 1024.0f;
-  const f32 screenHeight = 1024.0f;
+  const f32 windowWidth = 1024.0f;
+  const f32 windowHeight = 1024.0f;
   f32 framerate;
 
   // Preview
   Quad* preview;
+  bool displayPreview;
   const f32 previewWidth = 800.0f;
   const f32 previewHeight = 800.0f;
 
@@ -58,7 +56,7 @@ class Game
   u8 optionSelected;
   bool menuMode;
   bool isKeyPressed;
-  int key;
+  std::string key;
 
   void getRefreshRate();
   void processMenuInput();
