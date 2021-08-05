@@ -7,7 +7,7 @@ uniform sampler2D ourTexture;
 
 void main()
 {
-  float borderWidth = 0.03f;
+  float borderWidth = 0.025f;
   vec4 colour = vec4(0.55f, 0.0f, 0.55f, 1.0f);
   
   float maxX  = 1.0f - borderWidth;

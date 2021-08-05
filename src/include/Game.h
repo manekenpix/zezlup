@@ -7,11 +7,15 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Shuffle.h"
+#include "Text.h"
 #include "Texture.h"
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <algorithm>
 #include <string>
+
+#include <ft2build.h>
+#include FT_FREETYPE_H
 
 class Game
 {
@@ -34,6 +38,11 @@ class Game
   const f32 previewWidth = 800.0f;
   const f32 previewHeight = 800.0f;
 
+  // Fonts
+  FT_Library ft;
+  FT_Face face;
+  std::vector<Text*> font;
+
   // Menu
   Quad* background;
   const f32 backgroundWidth = 1024.0f;
@@ -46,7 +55,7 @@ class Game
   std::vector<Vec2> optionsCoords;
 
   // Images
-  std::vector<std::string> files;
+  std::vector<std::string> assets;
   std::vector<Png*> images;
 
   // Gameplay
@@ -62,6 +71,10 @@ class Game
   void processMenuInput();
   void processGameInput();
   void loadTextures();
+  void loadShaders();
+  void loadAssets();
+  void loadCoordinates();
+  void loadFont();
   void loadGridTextures();
   void shuffle();
 

@@ -11,50 +11,93 @@ Game::Game()
   , framerate{ 0 }
   , menuMode{ true }
   , isKeyPressed{ false }
-  , key{ -1 }
+  , key{ "" }
   , displayPreview{ false }
 {
-  // Files
-  files.push_back( "data/lego_small.png" );
-  files.push_back( "data/cube_small.png" );
-  files.push_back( "data/pieces_small.png" );
-  files.push_back( "data/small_windows_small.png" );
-  files.push_back( "data/open_window_small.png" );
-  files.push_back( "data/cards_small.png" );
+  // Renderer
+  renderer = new Renderer();
+  renderer->createWindow( windowWidth, windowHeight );
 
+  loadAssets();
+  loadCoordinates();
+  loadFont();
+  loadTextures();
+  loadShaders();
+
+  // Create a background
+  background = new Quad( windowWidth, windowHeight );
+  background->setPosition( 0, 0 );
+
+  // Preview
+  preview = new Quad( previewWidth, previewHeight );
+  preview->setPosition( 100.0f, 100.0f );
+
+  // Grid
+  grid = new Grid( gridWidth, gridHeight, windowWidth, windowHeight, empty );
+  Shuffle<Quad*> shuffle( grid->cells, gridWidth, gridHeight, empty, 1000 );
+  grid->cells = shuffle.run();
+  grid->setPositions();
+  empty = shuffle.getEmpty();
+};
+
+void
+Game::loadCoordinates()
+{
   optionsCoords.push_back( Vec2( 100.0f, 200.0f ) );
   optionsCoords.push_back( Vec2( 400.0f, 200.0f ) );
   optionsCoords.push_back( Vec2( 700.0f, 200.0f ) );
   optionsCoords.push_back( Vec2( 100.0f, 600.0f ) );
   optionsCoords.push_back( Vec2( 400.0f, 600.0f ) );
   optionsCoords.push_back( Vec2( 700.0f, 600.0f ) );
+};
 
-  // Renderer
-  renderer = new Renderer();
-  renderer->createWindow( windowWidth, windowHeight );
+void
+Game::loadFont()
+{
+  // Fonts
+  if ( FT_Init_FreeType( &ft ) ) {
+    std::cout << "ERROR::FREETYPE: Could not init FreeType Library"
+              << std::endl;
+  }
 
-  background = new Quad( windowWidth, windowHeight );
-  background->setPosition( 0, 0 );
+  if ( FT_New_Face( ft, "data/fonts/SpaceGrotesk-Regular.ttf", 0, &face ) ) {
+    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+  }
 
-  loadTextures();
+  FT_Set_Pixel_Sizes( face, 0, 20 );
 
-  // Grid
-  grid = new Grid( gridWidth, gridHeight, windowWidth, windowHeight, empty );
+  u32 xCoord = 10;
+  for ( u8 c = 65; c < 123; ++c ) {
+    if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
+      std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+    }
 
-  Shuffle<Quad*> shuffle( grid->cells, gridWidth, gridHeight, empty, 200 );
+    font.push_back(
+      new Text( face->glyph->bitmap.width, face->glyph->bitmap.rows ) );
+    font.back()->setPosition( xCoord, 950 - face->glyph->bitmap_top );
+    font.back()->textureID = std::string( 1, c );
+    renderer->addTexture( std::string( 1, c ),
+                          face->glyph->bitmap.buffer,
+                          face->glyph->bitmap.width,
+                          face->glyph->bitmap.rows );
+    xCoord += ( face->glyph->advance.x ) >> 6;
+  }
+};
 
-  grid->cells = shuffle.run();
+void
+Game::loadAssets()
+{
+  assets.push_back( "data/lego_small.png" );
+  assets.push_back( "data/cube_small.png" );
+  assets.push_back( "data/pieces_small.png" );
+  assets.push_back( "data/small_windows_small.png" );
+  assets.push_back( "data/open_window_small.png" );
+  assets.push_back( "data/cards_small.png" );
+};
 
-  grid->setPositions();
-
-  empty = shuffle.getEmpty();
-
-  // Preview
-  preview = new Quad( previewWidth, previewHeight );
-  preview->textureID = "baboon";
-
-  preview->setPosition( 100.0f, 100.0f );
-
+void
+Game::loadShaders()
+{
   renderer->addShader(
     "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
 
@@ -63,21 +106,24 @@ Game::Game()
 
   renderer->addShader(
     "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
+
+  renderer->addShader(
+    "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
 };
 
 void
 Game::loadTextures()
 {
   u8 index = 0;
-  for ( auto file = files.begin(); file != files.end(); ++file, ++index ) {
-    images.push_back( new Png( file->c_str() ) );
+  for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
+    images.push_back( new Png( asset->c_str() ) );
 
     options.push_back( new Quad( optionWidth, optionHeight ) );
     options.back()->setPosition( optionsCoords[index].x,
                                  optionsCoords[index].y );
-    options.back()->textureID = *file;
+    options.back()->textureID = *asset;
 
-    renderer->addTexture( *file,
+    renderer->addTexture( *asset,
                           images[index]->getImageBuffer(),
                           images[index]->getWidth(),
                           images[index]->getHeight(),
@@ -120,7 +166,7 @@ Game::loadGridTextures()
                             colourType );
     }
   }
-  preview->textureID = files[optionSelected];
+  preview->textureID = assets[optionSelected];
 };
 
 void
@@ -158,7 +204,7 @@ Game::processMenuInput()
 {
   // TODO(Josue): Use a map here
   if ( key == "right" ) {
-    if ( optionSelected < files.size() - 1 ) {
+    if ( optionSelected < assets.size() - 1 ) {
       ++optionSelected;
     }
 
@@ -224,7 +270,7 @@ Game::menu()
   renderer->draw( &( background->vertexArray ),
                   &( background->vertexBuffer ),
                   &background->vertices,
-                  files[optionSelected],
+                  assets[optionSelected],
                   "Blur" );
   u8 index = 0;
   for ( auto option = options.begin(); option != options.end();
@@ -291,6 +337,14 @@ Game::run()
       play();
     }
 
+    for ( auto c = font.begin(); c != font.end(); ++c ) {
+      renderer->drawText( &( ( *c )->vertexArray ),
+                          &( ( *c )->vertexBuffer ),
+                          &( *c )->vertices,
+                          ( *c )->textureID,
+                          "Text" );
+    }
+
     renderer->swapBuffers();
     renderer->pollEvents();
 
@@ -302,10 +356,14 @@ Game::run()
 
 Game::~Game()
 {
+  FT_Done_Face( face );
+  FT_Done_FreeType( ft );
+
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );
   std::for_each(
     options.begin(), options.end(), []( Quad* option ) { delete option; } );
+  std::for_each( font.begin(), font.end(), []( Text* f ) { delete f; } );
   delete preview;
   delete background;
 };

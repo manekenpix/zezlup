@@ -10,6 +10,7 @@ class Texture
 
 public:
   Texture( u8* buffer, s32 width, s32 height, u8 colourType );
+  Texture( u8* buffer, s32 width, s32 height );
   void bind();
   ~Texture(){};
 };
