@@ -1,6 +1,6 @@
 CC = clang++ -v
 CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -lX11 -lXrandr -Wl,-Bdynamic -lGL -lz -pthread
-CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz -lX11 -lXrandr
+CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz -lX11 -lXrandr -lfreetype
 SRCDIR = src
 INCLUDEDIR = src/include
 BUILDDIR = build
@@ -9,6 +9,7 @@ CCRELEASE = -std=c++17 -O3
 CCDEBUG = -std=c++17 -g
 SRCEXT = cpp
 HDREXT = h
+FREETYPE = -I/usr/include/freetype2
 
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
@@ -21,7 +22,7 @@ debug: $(OBJECTS)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(BUILDDIR)
-	$(CC) $(CCDEBUG) -Wall -c -o $@ $<
+	$(CC) $(FREETYPE) $(CCDEBUG) -Wall -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";

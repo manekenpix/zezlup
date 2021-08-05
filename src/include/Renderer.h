@@ -52,8 +52,14 @@ public:
   void draw( u32* vertexArray,
              u32* vertexBuffer,
              Vertices* vertices,
-             std::string selectedTexture,
-             std::string selectedShader );
+             std::string texture,
+             std::string shader );
+
+  void drawText( u32* vertexArray,
+                 u32* vertexBuffer,
+                 TextVertices* vertices,
+                 std::string texture,
+                 std::string shader );
 
   void swapBuffers();
   void pollEvents();
@@ -64,6 +70,8 @@ public:
                    s32 width,
                    s32 height,
                    u8 colourType );
+
+  void addTexture( std::string name, u8* buffer, s32 width, s32 height );
 
   std::string getKey();
 };

@@ -50,6 +50,9 @@ Renderer::createWindow( f32 windowW, f32 windowH )
   glewExperimental = GL_TRUE;
   glewInit();
 
+  glEnable( GL_BLEND );
+  glBlendFunc( GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA );
+
   glfwSetInputMode( window, GLFW_STICKY_KEYS, GLFW_TRUE );
   glClearColor( 0.0f, 0.0f, 0.0f, 0.0f );
 
@@ -87,6 +90,23 @@ Renderer::draw( u32* vertexArray,
 };
 
 void
+Renderer::drawText( u32* vertexArray,
+                    u32* vertexBuffer,
+                    TextVertices* vertices,
+                    std::string texture,
+                    std::string shader )
+{
+  shaders[shader]->use();
+  shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
+
+  textures[texture]->bind();
+  glBindVertexArray( *vertexArray );
+  glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
+  glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( *vertices ), vertices->data() );
+  glDrawArrays( GL_TRIANGLES, 0, 6 );
+};
+
+void
 Renderer::swapBuffers()
 {
   glfwSwapBuffers( window );
@@ -112,6 +132,12 @@ Renderer::addTexture( std::string name,
                       u8 colourType )
 {
   textures.insert( { name, new Texture( buffer, width, height, colourType ) } );
+};
+
+void
+Renderer::addTexture( std::string name, u8* buffer, s32 width, s32 height )
+{
+  textures.insert( { name, new Texture( buffer, width, height ) } );
 };
 
 std::string

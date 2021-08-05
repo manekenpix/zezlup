@@ -1,46 +1,33 @@
 #version 330 core
 out vec4 FragColor;
-  
+
 in vec2 texCoord;
 
 uniform sampler2D ourTexture;
 
-float normpdf(float x, float sigma)
-{
-  return 0.39894*exp(-0.5*x*x / (sigma*sigma)) / sigma;
-}
-
-void main()
-{
-  vec3 c = texture(ourTexture, texCoord.xy).rgb;
-
-  const int mSize = 11;
-  const int kSize = int((float(mSize) - 1.0) / 2.0);
-  float kernel[mSize];
-  vec3 final_color = vec3(0.0);
-
-  // Create the kernel
-  float sigma = 7.0;
-  float Z = 0.0;
-  for (int j = 0; j <= kSize; ++j)
+void main() {
+	float Pi = 6.28318530718; // Pi*2
+  
+  // Gaussian settings
+  float Directions = 16.0; // Blur Directions (Default 16.0 - More is better but slower)
+  float Quality = 10.0; // Blur Quality (Default 4.0 - More is better but slower)
+  float Size = 15.0; // Blur Size (Radius)
+  
+  vec2 Radius = Size / textureSize( ourTexture, 0 ).xy;
+  
+  // Pixel colour
+  vec4 Color = texture( ourTexture, texCoord );
+  
+  // Blur calculations
+  for( float d = 0.0; d < Pi; d += Pi / Directions )
   {
-    kernel[kSize + j] = kernel[kSize - j] = normpdf(float(j), sigma);
-  }
-
-  //get the normalization factor (as the gaussian has been clamped)
-  for (int j = 0; j < mSize; ++j)
-  {
-    Z += kernel[j];
-  }
-
-  //read out the texels
-  for (int i = -kSize; i <= kSize; ++i)
-  {
-    for (int j = -kSize; j <= kSize; ++j)
+		for( float i = 1.0 / Quality; i <= 1.0; i += 1.0 / Quality )
     {
-      final_color += kernel[kSize + j] * kernel[kSize + i] * texture(ourTexture, (texCoord.xy + vec2(float(i), float(j))/textureSize(ourTexture, 0).xy)).rgb;
+			Color += texture( ourTexture, texCoord + vec2( cos(d), sin(d)) * Radius * i );
     }
   }
- 
-  FragColor = vec4(final_color / (Z*Z), 1.0);
+  
+  // Output to screen
+  Color /= Quality * Directions - 15.0;
+  FragColor =  Color;
 }
