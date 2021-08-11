@@ -25,19 +25,23 @@ Game::Game()
   loadShaders();
 
   // Create a background
-  background = new Quad( windowWidth, windowHeight );
-  background->setPosition( 0, 0 );
+  renderer->createQuad( "background", windowWidth, windowHeight );
+  renderer->setQuadPosition( "background", 0, 0 );
 
   // Preview
-  preview = new Quad( previewWidth, previewHeight );
-  preview->setPosition( 100.0f, 100.0f );
+  renderer->createQuad( "preview", previewWidth, previewHeight );
+  renderer->setQuadPosition( "preview", previewX, previewY );
 
   // Grid
   grid = new Grid( gridWidth, gridHeight, windowWidth, windowHeight, empty );
-  Shuffle<Quad*> shuffle( grid->cells, gridWidth, gridHeight, empty, 1000 );
-  grid->cells = shuffle.run();
-  grid->setPositions();
-  empty = shuffle.getEmpty();
+  empty = grid->shuffle( empty, 200 );
+
+  for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
+    if ( *cell ) {
+      renderer->createQuad( ( *cell )->id, grid->cellWidth, grid->cellHeight );
+      renderer->setQuadPosition( ( *cell )->id, ( *cell )->x, ( *cell )->y );
+    }
+  }
 };
 
 void
@@ -54,13 +58,12 @@ Game::loadCoordinates()
 void
 Game::loadFont()
 {
-  // Fonts
   if ( FT_Init_FreeType( &ft ) ) {
     std::cout << "ERROR::FREETYPE: Could not init FreeType Library"
               << std::endl;
   }
 
-  if ( FT_New_Face( ft, "data/fonts/SpaceGrotesk-Regular.ttf", 0, &face ) ) {
+  if ( FT_New_Face( ft, "data/fonts/OpenSans-Regular.ttf", 0, &face ) ) {
     std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
   }
 
@@ -72,14 +75,17 @@ Game::loadFont()
       std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
     }
 
-    font.push_back(
-      new Text( face->glyph->bitmap.width, face->glyph->bitmap.rows ) );
-    font.back()->setPosition( xCoord, 950 - face->glyph->bitmap_top );
-    font.back()->textureID = std::string( 1, c );
-    renderer->addTexture( std::string( 1, c ),
-                          face->glyph->bitmap.buffer,
+    font.push_back( std::string( 1, c ) );
+    renderer->createQuad( std::string( 1, c ),
                           face->glyph->bitmap.width,
                           face->glyph->bitmap.rows );
+    renderer->setQuadPosition(
+      std::string( 1, c ), xCoord, 950 - face->glyph->bitmap_top );
+
+    renderer->loadTexture( std::string( 1, c ),
+                           face->glyph->bitmap.buffer,
+                           face->glyph->bitmap.width,
+                           face->glyph->bitmap.rows );
     xCoord += ( face->glyph->advance.x ) >> 6;
   }
 };
@@ -98,16 +104,16 @@ Game::loadAssets()
 void
 Game::loadShaders()
 {
-  renderer->addShader(
+  renderer->loadShader(
     "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
 
-  renderer->addShader(
+  renderer->loadShader(
     "Outline", "src/Shaders/common.vert", "src/Shaders/outline.frag" );
 
-  renderer->addShader(
+  renderer->loadShader(
     "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
 
-  renderer->addShader(
+  renderer->loadShader(
     "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
 };
 
@@ -118,16 +124,15 @@ Game::loadTextures()
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
     images.push_back( new Png( asset->c_str() ) );
 
-    options.push_back( new Quad( optionWidth, optionHeight ) );
-    options.back()->setPosition( optionsCoords[index].x,
-                                 optionsCoords[index].y );
-    options.back()->textureID = *asset;
+    renderer->createQuad( *asset, optionWidth, optionHeight );
+    renderer->setQuadPosition(
+      *asset, optionsCoords[index].x, optionsCoords[index].y );
 
-    renderer->addTexture( *asset,
-                          images[index]->getImageBuffer(),
-                          images[index]->getWidth(),
-                          images[index]->getHeight(),
-                          images[index]->getColourType() );
+    renderer->loadTexture( *asset,
+                           images[index]->getImageBuffer(),
+                           images[index]->getWidth(),
+                           images[index]->getHeight(),
+                           images[index]->getColourType() );
   }
 };
 
@@ -159,14 +164,14 @@ Game::loadGridTextures()
           cellBuffer[cellPosition] = imageBuffer[positionY + positionX];
         }
       }
-      renderer->addTexture( std::to_string( rows * gridWidth + columns ),
-                            cellBuffer,
-                            cellWidth,
-                            cellHeight,
-                            colourType );
+      renderer->loadTexture( std::to_string( rows * gridWidth + columns ),
+                             cellBuffer,
+                             cellWidth,
+                             cellHeight,
+                             colourType );
+      std::free( cellBuffer );
     }
   }
-  preview->textureID = assets[optionSelected];
 };
 
 void
@@ -258,6 +263,9 @@ Game::processGameInput()
     if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
       grid->swapCells( selected, empty );
       std::swap( selected, empty );
+      renderer->setQuadPosition( grid->cells[selected]->id,
+                                 grid->cells[selected]->x,
+                                 grid->cells[selected]->y );
     }
   } else if ( key == "c" ) {
     displayPreview = !displayPreview;
@@ -267,22 +275,11 @@ Game::processGameInput()
 void
 Game::menu()
 {
-  renderer->draw( &( background->vertexArray ),
-                  &( background->vertexBuffer ),
-                  &background->vertices,
-                  assets[optionSelected],
-                  "Blur" );
+  renderer->draw( "background", assets[optionSelected], "Blur" );
   u8 index = 0;
-  for ( auto option = options.begin(); option != options.end();
-        ++option, ++index ) {
-    if ( *option ) {
-
-      renderer->draw( &( ( *option )->vertexArray ),
-                      &( ( *option )->vertexBuffer ),
-                      &( *option )->vertices,
-                      ( *option )->textureID,
-                      index == optionSelected ? "Outline" : "Grid" );
-    }
+  for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
+    renderer->draw(
+      *asset, *asset, index == optionSelected ? "Outline" : "Grid" );
   }
 };
 
@@ -300,20 +297,12 @@ Game::play()
       else
         selectedShader = selected == index ? "Outline" : "Grid";
 
-      renderer->draw( &( ( *cell )->vertexArray ),
-                      &( ( *cell )->vertexBuffer ),
-                      &( *cell )->vertices,
-                      ( *cell )->textureID,
-                      selectedShader );
+      renderer->draw( ( *cell )->id, ( *cell )->id, selectedShader );
     }
   }
 
   if ( displayPreview )
-    renderer->draw( &( preview->vertexArray ),
-                    &( preview->vertexBuffer ),
-                    &preview->vertices,
-                    preview->textureID,
-                    "Grid" );
+    renderer->draw( "preview", assets[optionSelected], "Grid" );
 };
 
 void
@@ -338,11 +327,7 @@ Game::run()
     }
 
     for ( auto c = font.begin(); c != font.end(); ++c ) {
-      renderer->drawText( &( ( *c )->vertexArray ),
-                          &( ( *c )->vertexBuffer ),
-                          &( *c )->vertices,
-                          ( *c )->textureID,
-                          "Text" );
+      renderer->draw( *c, *c, "Text" );
     }
 
     renderer->swapBuffers();
@@ -363,7 +348,7 @@ Game::~Game()
     images.begin(), images.end(), []( Png* image ) { delete image; } );
   std::for_each(
     options.begin(), options.end(), []( Quad* option ) { delete option; } );
-  std::for_each( font.begin(), font.end(), []( Text* f ) { delete f; } );
+
   delete preview;
   delete background;
 };

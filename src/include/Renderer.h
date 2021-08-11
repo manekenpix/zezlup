@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "Png.h"
+#include "Quad.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "types.h"
@@ -38,9 +39,9 @@ class Renderer
   f32 width = 0;
   f32 height = 0;
 
-  // Shaders
   std::unordered_map<std::string, Shader*> shaders;
   std::unordered_map<std::string, Texture*> textures;
+  std::unordered_map<std::string, Quad*> quads;
   glm::mat4 projectionMatrix;
 
 public:
@@ -49,30 +50,21 @@ public:
 
   GLFWwindow* createWindow( f32 windowW, f32 windowH );
 
-  void draw( u32* vertexArray,
-             u32* vertexBuffer,
-             Vertices* vertices,
-             std::string texture,
-             std::string shader );
-
-  void drawText( u32* vertexArray,
-                 u32* vertexBuffer,
-                 TextVertices* vertices,
-                 std::string texture,
-                 std::string shader );
+  void draw( std::string quad, std::string texture, std::string shader );
 
   void swapBuffers();
   void pollEvents();
 
-  void addShader( std::string key, std::string vShader, std::string fShader );
-  void addTexture( std::string name,
-                   u8* buffer,
-                   s32 width,
-                   s32 height,
-                   u8 colourType );
+  void loadShader( std::string key, std::string vShader, std::string fShader );
+  void loadTexture( std::string name,
+                    u8* buffer,
+                    s32 width,
+                    s32 height,
+                    u8 colourType );
 
-  void addTexture( std::string name, u8* buffer, s32 width, s32 height );
-
+  void loadTexture( std::string name, u8* buffer, s32 width, s32 height );
+  void createQuad( std::string key, f32 width, f32 height );
+  void setQuadPosition( std::string quad, f32 x, f32 y );
   std::string getKey();
 };
 

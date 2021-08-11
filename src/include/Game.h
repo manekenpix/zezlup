@@ -7,7 +7,6 @@
 #include "Renderer.h"
 #include "Shader.h"
 #include "Shuffle.h"
-#include "Text.h"
 #include "Texture.h"
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
@@ -37,11 +36,13 @@ class Game
   bool displayPreview;
   const f32 previewWidth = 800.0f;
   const f32 previewHeight = 800.0f;
+  const f32 previewX = 100.0f;
+  const f32 previewY = 100.0f;
 
   // Fonts
   FT_Library ft;
   FT_Face face;
-  std::vector<Text*> font;
+  std::vector<std::string> font;
 
   // Menu
   Quad* background;
