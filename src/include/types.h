@@ -10,8 +10,6 @@ typedef uint32_t u32;
 typedef int32_t s32;
 typedef uint64_t u64;
 typedef float f32;
-typedef std::array<f32, 20> Vertices;
-typedef std::array<f32, 24> TextVertices;
 
 typedef struct Vec2
 {

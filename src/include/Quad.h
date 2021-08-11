@@ -11,27 +11,30 @@
 
 class Quad
 {
-  // Position
-  f32 x = 0;
-  f32 y = 0;
-  f32 width = 0;
-  f32 height = 0;
+  typedef std::array<f32, 24> Vertices;
+
+  f32 x;
+  f32 y;
+
+  f32 width;
+  f32 height;
 
 public:
-  u32 vertexArray, vertexBuffer, elementBufferObject;
+  u32 vertexArray, vertexBuffer;
 
-  // Textures
   std::string textureID;
 
   Vertices vertices = {
 
-    // positions      texture coords
-    0.0f, 0.0f, 0.0f, 1.0f, 1.0f, // bottom right
-    0.0f, 0.0f, 0.0f, 1.0f, 0.0f, // Top right
-    0.0f, 0.0f, 0.0f, 0.0f, 0.0f, // top left
-    0.0f, 0.0f, 0.0f, 0.0f, 1.0f  // bottom left
+    // positions texture coords
+    0.0f, 0.0f, 1.0f, 1.0f, // bottom right
+    0.0f, 0.0f, 1.0f, 0.0f, // Top right
+    0.0f, 0.0f, 0.0f, 0.0f, // top left
+
+    0.0f, 0.0f, 1.0f, 1.0f, // bottom right
+    0.0f, 0.0f, 0.0f, 1.0f, // bottom left
+    0.0f, 0.0f, 0.0f, 0.0f  // top left
   };
-  u32 indices[6] = { 0, 1, 3, 1, 2, 3 };
 
   Quad( f32 w, f32 h );
   ~Quad();

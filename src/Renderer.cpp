@@ -1,7 +1,7 @@
 #include "include/Renderer.h"
 
 Renderer::Renderer()
-  : isKeyPressed{ true }
+  : isKeyPressed{ false }
 {
   if ( !glfwInit() ) {
     fprintf( stderr, "Failed to initialize GLFW\n" );
@@ -71,38 +71,18 @@ Renderer::createWindow( f32 windowW, f32 windowH )
 };
 
 void
-Renderer::draw( u32* vertexArray,
-                u32* vertexBuffer,
-                Vertices* vertices,
-                std::string texture,
-                std::string shader )
+Renderer::draw( std::string quad, std::string texture, std::string shader )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
 
   textures[texture]->bind();
-  glBindVertexArray( *vertexArray );
-  glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
-  glBufferData(
-    GL_ARRAY_BUFFER, sizeof( *vertices ), vertices->data(), GL_STATIC_DRAW );
-
-  glDrawElements( GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0 );
-};
-
-void
-Renderer::drawText( u32* vertexArray,
-                    u32* vertexBuffer,
-                    TextVertices* vertices,
-                    std::string texture,
-                    std::string shader )
-{
-  shaders[shader]->use();
-  shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
-
-  textures[texture]->bind();
-  glBindVertexArray( *vertexArray );
-  glBindBuffer( GL_ARRAY_BUFFER, *vertexBuffer );
-  glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( *vertices ), vertices->data() );
+  glBindVertexArray( quads[quad]->vertexArray );
+  glBindBuffer( GL_ARRAY_BUFFER, quads[quad]->vertexBuffer );
+  glBufferSubData( GL_ARRAY_BUFFER,
+                   0,
+                   sizeof( quads[quad]->vertices ),
+                   quads[quad]->vertices.data() );
   glDrawArrays( GL_TRIANGLES, 0, 6 );
 };
 
@@ -119,25 +99,39 @@ Renderer::pollEvents()
 };
 
 void
-Renderer::addShader( std::string key, std::string vShader, std::string fShader )
+Renderer::loadShader( std::string key,
+                      std::string vShader,
+                      std::string fShader )
 {
   shaders.insert( { key, new Shader( vShader.c_str(), fShader.c_str() ) } );
 };
 
 void
-Renderer::addTexture( std::string name,
-                      u8* buffer,
-                      s32 width,
-                      s32 height,
-                      u8 colourType )
+Renderer::loadTexture( std::string name,
+                       u8* buffer,
+                       s32 width,
+                       s32 height,
+                       u8 colourType )
 {
   textures.insert( { name, new Texture( buffer, width, height, colourType ) } );
 };
 
 void
-Renderer::addTexture( std::string name, u8* buffer, s32 width, s32 height )
+Renderer::loadTexture( std::string name, u8* buffer, s32 width, s32 height )
 {
   textures.insert( { name, new Texture( buffer, width, height ) } );
+};
+
+void
+Renderer::createQuad( std::string key, f32 width, f32 height )
+{
+  quads.insert( { key, new Quad( width, height ) } );
+};
+
+void
+Renderer::setQuadPosition( std::string key, f32 x, f32 y )
+{
+  quads[key]->setPosition( x, y );
 };
 
 std::string
@@ -175,6 +169,11 @@ Renderer::~Renderer()
   for ( const auto& [key, v] : textures ) {
     delete v;
   }
+
+  for ( const auto& [key, v] : quads ) {
+    delete v;
+  }
+
   glfwTerminate();
 };
 
