@@ -326,10 +326,6 @@ Game::run()
       play();
     }
 
-    for ( auto c = font.begin(); c != font.end(); ++c ) {
-      renderer->draw( *c, *c, "Text" );
-    }
-
     renderer->swapBuffers();
     renderer->pollEvents();
 
