@@ -1,8 +1,16 @@
 #include "include/Grid.h"
 
-Grid::Grid( u8 cellsRow, u8 cellsColumn, f32 windowW, f32 windowH, u8 empty )
+Grid::Grid( u8 cellsRow,
+            u8 cellsColumn,
+            f32 windowW,
+            f32 windowH,
+            u8 empty,
+            f32 xOffset,
+            f32 yOffset )
   : cellsPerRow{ cellsRow }
   , cellsPerColumn{ cellsColumn }
+  , xOffset( xOffset )
+  , yOffset( yOffset )
 {
   cellWidth = windowW / cellsPerRow;
   cellHeight = windowH / cellsPerColumn;
@@ -10,8 +18,8 @@ Grid::Grid( u8 cellsRow, u8 cellsColumn, f32 windowW, f32 windowH, u8 empty )
   for ( u8 rows = 0; rows < cellsPerColumn; ++rows ) {
     for ( u8 columns = 0; columns < cellsPerRow; ++columns ) {
 
-      cells.push_back(
-        new Cell( 0, 0, std::to_string( rows * cellsPerRow + columns ) ) );
+      cells.push_back( new Cell(
+        0, 0, "cell" + std::to_string( rows * cellsPerRow + columns ) ) );
       coords.push_back( new Vec2( cellWidth * columns, cellHeight * rows ) );
     }
   }
@@ -29,6 +37,8 @@ Grid::setPositions()
   for ( u8 rows = 0; rows < cellsPerColumn; ++rows ) {
     for ( u8 columns = 0; columns < cellsPerRow; ++columns ) {
       position = ( rows * cellsPerRow ) + columns;
+      coords[position]->x += xOffset;
+      coords[position]->y += yOffset;
       if ( cells[position] ) {
         cells[position]->x = coords[position]->x;
         cells[position]->y = coords[position]->y;
