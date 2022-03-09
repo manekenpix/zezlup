@@ -4,8 +4,9 @@ out vec4 color;
 
 uniform sampler2D text;
 
-void main()
-{    
-  vec4 sampled = vec4(1.0, 1.0, 1.0, texture(text, texCoords).r);
-  color = vec4(1.0f, 1.0f, 1.0f, 1.0f) * sampled;
+void
+main()
+{
+  vec4 sampled = vec4( 1.0, 1.0, 1.0, texture( text, texCoords ).r );
+  color = vec4( 1.0f, 1.0f, 1.0f, 1.0f ) * sampled;
 }

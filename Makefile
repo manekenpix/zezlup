@@ -1,5 +1,5 @@
 CC = clang++ -v
-CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -lX11 -lXrandr -Wl,-Bdynamic -lGL -lz -pthread
+CFLAGS_RELEASE = -Llib/ -DGLEW_STATIC -lglfw3 -lGLEW -ldl -lX11 -lXrandr -Wl,-Bdynamic -lGL -lz -pthread -lfreetype
 CFLAGS_DEBUG = -lGL -lGLEW -lglfw -lz -lX11 -lXrandr -lfreetype
 SRCDIR = src
 INCLUDEDIR = src/include

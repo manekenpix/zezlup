@@ -11,9 +11,9 @@
 #include <X11/Xlib.h>
 #include <X11/extensions/Xrandr.h>
 #include <algorithm>
-#include <string>
-
+#include <charconv>
 #include <ft2build.h>
+#include <string>
 #include FT_FREETYPE_H
 
 class Game
@@ -27,27 +27,41 @@ class Game
   u8 gridHeight;
 
   // Window
-  const f32 windowWidth = 1024.0f;
-  const f32 windowHeight = 1024.0f;
+  const f32 windowWidth = 800.0f;
+  const f32 windowHeight = 825.0f;
   f32 framerate;
 
   // Preview
   Quad* preview;
   bool displayPreview;
-  const f32 previewWidth = 800.0f;
-  const f32 previewHeight = 800.0f;
+  const f32 previewWidth = 600.0f;
+  const f32 previewHeight = 600.0f;
   const f32 previewX = 100.0f;
-  const f32 previewY = 100.0f;
+  const f32 previewY = 125.0f;
 
   // Fonts
   FT_Library ft;
   FT_Face face;
-  std::vector<std::string> font;
+  typedef struct Font
+  {
+    u32 advanceX;
+    u32 advanceY;
+    u32 bitmapTop;
+    std::string character;
+
+    Font( u8 _character, u32 _advanceX, u32 _advanceY, u32 _bitmapTop )
+      : advanceX( _advanceX )
+      , advanceY( _advanceY )
+      , character( std::string( 1, _character ) )
+      , bitmapTop( _bitmapTop ){};
+  } Font;
+
+  std::vector<Font> font;
 
   // Menu
   Quad* background;
-  const f32 backgroundWidth = 1024.0f;
-  const f32 backgroundHeight = 1024.0f;
+  const f32 backgroundWidth = 800.0f;
+  const f32 backgroundHeight = 800.0f;
 
   // Options
   std::vector<Quad*> options;
@@ -61,7 +75,8 @@ class Game
 
   // Gameplay
   u8 selected;
-  // .u8 selectedImage;
+  u32 moves = 0;
+  f32 startTime = 0;
   u8 empty;
   u8 optionSelected;
   bool menuMode;
@@ -78,6 +93,8 @@ class Game
   void loadFont();
   void loadGridTextures();
   void shuffle();
+
+  void generateText( std::string s, u32 x, u32 y );
 
   void menu();
   void play();

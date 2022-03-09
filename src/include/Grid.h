@@ -11,6 +11,8 @@ class Grid
 {
   u8 cellsPerRow;
   u8 cellsPerColumn;
+  f32 xOffset;
+  f32 yOffset;
 
   std::vector<Vec2*> coords;
 
@@ -34,7 +36,13 @@ public:
   f32 cellWidth;
   f32 cellHeight;
 
-  Grid( u8 cellsRow, u8 cellsColumn, f32 windowW, f32 windowH, u8 empty );
+  Grid( u8 cellsRow,
+        u8 cellsColumn,
+        f32 windowW,
+        f32 windowH,
+        u8 empty,
+        f32 xOffset,
+        f32 yOffset );
   ~Grid();
 
   void swapCells( u8 c1, u8 c2 );

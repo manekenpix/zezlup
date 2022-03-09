@@ -67,6 +67,16 @@ Renderer::createWindow( f32 windowW, f32 windowH )
       GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
   }
 
+  auto icon = new Png( "data/logo.png" );
+
+  GLFWimage images[1];
+
+  images[0].width = icon->getWidth();
+  images[0].height = icon->getHeight();
+  images[0].pixels = icon->getImageBuffer();
+
+  glfwSetWindowIcon( window, 1, images );
+
   return window;
 };
 

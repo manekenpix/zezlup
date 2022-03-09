@@ -25,16 +25,17 @@ Game::Game()
   loadShaders();
 
   // Create a background
-  renderer->createQuad( "background", windowWidth, windowHeight );
-  renderer->setQuadPosition( "background", 0, 0 );
+  renderer->createQuad( "background", backgroundWidth, backgroundHeight );
+  renderer->setQuadPosition( "background", 0, 25 );
 
   // Preview
   renderer->createQuad( "preview", previewWidth, previewHeight );
   renderer->setQuadPosition( "preview", previewX, previewY );
 
   // Grid
-  grid = new Grid( gridWidth, gridHeight, windowWidth, windowHeight, empty );
-  empty = grid->shuffle( empty, 200 );
+  grid = new Grid(
+    gridWidth, gridHeight, backgroundWidth, backgroundHeight, empty, 0, 25 );
+  empty = grid->shuffle( empty, 20 );
 
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
     if ( *cell ) {
@@ -47,12 +48,12 @@ Game::Game()
 void
 Game::loadCoordinates()
 {
-  optionsCoords.push_back( Vec2( 100.0f, 200.0f ) );
-  optionsCoords.push_back( Vec2( 400.0f, 200.0f ) );
-  optionsCoords.push_back( Vec2( 700.0f, 200.0f ) );
-  optionsCoords.push_back( Vec2( 100.0f, 600.0f ) );
-  optionsCoords.push_back( Vec2( 400.0f, 600.0f ) );
-  optionsCoords.push_back( Vec2( 700.0f, 600.0f ) );
+  optionsCoords.push_back( Vec2( 50.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 300.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 550.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 50.0f, 516.0f ) );
+  optionsCoords.push_back( Vec2( 300.0f, 516.0f ) );
+  optionsCoords.push_back( Vec2( 550.0f, 516.0f ) );
 };
 
 void
@@ -63,30 +64,30 @@ Game::loadFont()
               << std::endl;
   }
 
-  if ( FT_New_Face( ft, "data/fonts/OpenSans-Regular.ttf", 0, &face ) ) {
+  if ( FT_New_Face( ft, "data/fonts/Tinos.ttf", 0, &face ) ) {
     std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
   }
 
   FT_Set_Pixel_Sizes( face, 0, 20 );
 
-  u32 xCoord = 10;
-  for ( u8 c = 65; c < 123; ++c ) {
+  for ( u8 c = '!'; c < '}'; ++c ) {
     if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
       std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
     }
 
-    font.push_back( std::string( 1, c ) );
+    font.push_back( { c,
+                      static_cast<u32>( ( face->glyph->advance.x ) >> 6 ),
+                      static_cast<u32>( ( face->glyph->advance.y ) >> 6 ),
+                      static_cast<u32>( face->glyph->bitmap_top ) } );
     renderer->createQuad( std::string( 1, c ),
                           face->glyph->bitmap.width,
                           face->glyph->bitmap.rows );
-    renderer->setQuadPosition(
-      std::string( 1, c ), xCoord, 950 - face->glyph->bitmap_top );
+    renderer->setQuadPosition( std::string( 1, c ), 0, 0 );
 
     renderer->loadTexture( std::string( 1, c ),
                            face->glyph->bitmap.buffer,
                            face->glyph->bitmap.width,
                            face->glyph->bitmap.rows );
-    xCoord += ( face->glyph->advance.x ) >> 6;
   }
 };
 
@@ -134,6 +135,16 @@ Game::loadTextures()
                            images[index]->getHeight(),
                            images[index]->getColourType() );
   }
+
+  // Top bar
+  auto topBar = new Png( "data/top_bar.png" );
+  renderer->createQuad( "top_bar", topBar->getWidth(), topBar->getHeight() );
+  renderer->setQuadPosition( "top_bar", 0, 0 );
+  renderer->loadTexture( "top_bar",
+                         topBar->getImageBuffer(),
+                         topBar->getWidth(),
+                         topBar->getHeight(),
+                         topBar->getColourType() );
 };
 
 void
@@ -164,7 +175,8 @@ Game::loadGridTextures()
           cellBuffer[cellPosition] = imageBuffer[positionY + positionX];
         }
       }
-      renderer->loadTexture( std::to_string( rows * gridWidth + columns ),
+      renderer->loadTexture( "cell" +
+                               std::to_string( rows * gridWidth + columns ),
                              cellBuffer,
                              cellWidth,
                              cellHeight,
@@ -173,36 +185,6 @@ Game::loadGridTextures()
     }
   }
 };
-
-void
-Game::getRefreshRate()
-{
-  Display* display = XOpenDisplay( NULL );
-  Window defaultWindow = XDefaultRootWindow( display );
-
-  XRRScreenResources* screenResources =
-    XRRGetScreenResources( display, defaultWindow );
-
-  RRMode activeModeID = 0;
-  for ( u8 i = 0; i < screenResources->ncrtc; ++i ) {
-    XRRCrtcInfo* crtcInfo =
-      XRRGetCrtcInfo( display, screenResources, screenResources->crtcs[i] );
-    // If None, then is not displaying the screen contents
-    if ( crtcInfo->mode != None ) {
-      activeModeID = crtcInfo->mode;
-    }
-  }
-
-  for ( u8 i = 0; i < screenResources->nmode; ++i ) {
-    XRRModeInfo modeInfo = screenResources->modes[i];
-    if ( modeInfo.id == activeModeID ) {
-      framerate = (double)modeInfo.dotClock /
-                  ( (double)modeInfo.hTotal * (double)modeInfo.vTotal );
-    }
-  }
-
-  std::cout << "Active rate is: " << framerate << std::endl;
-}
 
 void
 Game::processMenuInput()
@@ -230,6 +212,7 @@ Game::processMenuInput()
 
   } else if ( key == "enter" ) {
     loadGridTextures();
+    startTime = glfwGetTime();
     menuMode = false;
   }
 }
@@ -266,6 +249,7 @@ Game::processGameInput()
       renderer->setQuadPosition( grid->cells[selected]->id,
                                  grid->cells[selected]->x,
                                  grid->cells[selected]->y );
+      ++moves;
     }
   } else if ( key == "c" ) {
     displayPreview = !displayPreview;
@@ -301,6 +285,15 @@ Game::play()
     }
   }
 
+  generateText( std::string( "Moves: " ), 10, 20 );
+  generateText( std::to_string( moves ), 80, 20 );
+
+  generateText( std::string( "Time: " ), 150, 20 );
+  generateText(
+    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ),
+    205,
+    20 );
+
   if ( displayPreview )
     renderer->draw( "preview", assets[optionSelected], "Grid" );
 };
@@ -310,7 +303,6 @@ Game::run()
 {
   f32 startSeconds = glfwGetTime();
   f32 endSeconds = 0.0f;
-  f32 targetElapsedTime = 1000.0f / framerate;
 
   do {
     glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
@@ -318,6 +310,7 @@ Game::run()
 
     key = renderer->getKey();
 
+    renderer->draw( "top_bar", "top_bar", "Grid" );
     if ( menuMode ) {
       processMenuInput();
       menu();
@@ -326,14 +319,36 @@ Game::run()
       play();
     }
 
+    endSeconds = glfwGetTime();
+    generateText( std::string( "FPS: " ), 730, 20 );
+    generateText(
+      std::to_string( static_cast<u8>( 1 / ( endSeconds - startSeconds ) ) ),
+      775,
+      20 );
+    startSeconds = glfwGetTime();
+
     renderer->swapBuffers();
     renderer->pollEvents();
 
-    endSeconds = glfwGetTime();
-    startSeconds = glfwGetTime();
-
   } while ( key != "esc" );
-}
+};
+
+void
+Game::generateText( std::string s, u32 x, u32 y )
+{
+  u8 st;
+  for ( auto c = s.begin(); c != s.end(); ++c ) {
+    if ( *c == 32 )
+      x += 10;
+    else {
+      st = *c - 33;
+      renderer->setQuadPosition(
+        font[st].character, x, y - font[st].bitmapTop );
+      renderer->draw( font[st].character, font[st].character, "Text" );
+      x += font[st].advanceX;
+    }
+  }
+};
 
 Game::~Game()
 {

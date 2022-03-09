@@ -9,8 +9,7 @@ class Texture
   GLuint texture;
 
 public:
-  Texture( u8* buffer, s32 width, s32 height, u8 colourType );
-  Texture( u8* buffer, s32 width, s32 height );
+  Texture( u8* buffer, s32 width, s32 height, u8 colourType = 255 );
   void bind();
   ~Texture(){};
 };
