@@ -26,8 +26,9 @@ class Shuffle
   // Sides
   bool isInTopSide() { return position < width; };
   bool isInBottomSide() { return position > size - width - 1; };
-  bool isInLeftSide( s8 n )
+  bool isInLeftSide()
   {
+    s8 n = position;
     if ( n < width )
       return false;
     while ( n >= width ) {
@@ -38,8 +39,9 @@ class Shuffle
     return true;
   };
 
-  bool isInRightSide( s8 n )
+  bool isInRightSide()
   {
+    s8 n = position;
     if ( n < width - 1 )
       return false;
     while ( ( n + 1 ) >= width ) {
@@ -66,11 +68,12 @@ public:
 
   std::vector<T> run()
   {
-    u8 selected;
-    position = start;
+    u8 selected, previous;
+    position = previous = start;
+    std::vector<u8> options;
+    bool isEqual;
 
     for ( u8 index = 0; index < moves; ++index ) {
-      std::vector<u8> options;
 
       // Top Left
       if ( isTopLeft() ) {
@@ -111,14 +114,14 @@ public:
       }
 
       // Left side of the grid
-      else if ( isInLeftSide( position ) ) {
+      else if ( isInLeftSide() ) {
         options.push_back( position - width );
         options.push_back( position + 1 );
         options.push_back( position + width );
       }
 
       // Right side of the grid
-      else if ( isInRightSide( position ) ) {
+      else if ( isInRightSide() ) {
         options.push_back( position - width );
         options.push_back( position - 1 );
         options.push_back( position + width );
@@ -132,9 +135,16 @@ public:
         options.push_back( position + 1 );
       }
 
-      selected = options[std::rand() % options.size()];
+      do {
+        selected = options[std::rand() % options.size()];
+        isEqual = previous == selected;
+      } while ( isEqual );
+
       std::swap( array[position], array[selected] );
+      previous = position;
       position = selected;
+
+      options.clear();
     }
 
     return array;
