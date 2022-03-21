@@ -14,37 +14,20 @@
 
 class Renderer
 {
-  typedef struct KeyPair
+public:
+  enum class Keys
   {
-    std::string key;
-    int code;
-
-    KeyPair( std::string _key, int _code )
-      : key{ _key }
-      , code{ _code } {};
-
-  } KeyPair;
-
-  static const u8 totalKeys = 8;
-  bool isKeyPressed;
-  int pressedKey = -1;
-  const KeyPair keys[totalKeys] = {
-    KeyPair( "right", GLFW_KEY_RIGHT ), KeyPair( "left", GLFW_KEY_LEFT ),
-    KeyPair( "up", GLFW_KEY_UP ),       KeyPair( "down", GLFW_KEY_DOWN ),
-    KeyPair( "enter", GLFW_KEY_ENTER ), KeyPair( "m", GLFW_KEY_M ),
-    KeyPair( "c", GLFW_KEY_C ),         KeyPair( "esc", GLFW_KEY_ESCAPE ),
+    left,
+    right,
+    up,
+    down,
+    enter,
+    c,
+    m,
+    esc,
+    blank
   };
 
-  GLFWwindow* window;
-  f32 width = 0;
-  f32 height = 0;
-
-  std::unordered_map<std::string, Shader*> shaders;
-  std::unordered_map<std::string, Texture*> textures;
-  std::unordered_map<std::string, Quad*> quads;
-  glm::mat4 projectionMatrix;
-
-public:
   Renderer();
   ~Renderer();
 
@@ -65,7 +48,42 @@ public:
   void loadTexture( std::string name, u8* buffer, s32 width, s32 height );
   void createQuad( std::string key, f32 width, f32 height );
   void setQuadPosition( std::string quad, f32 x, f32 y );
-  std::string getKey();
+  Keys getKey();
+
+private:
+  typedef struct KeyPair
+  {
+    Keys key;
+    int code;
+
+    KeyPair( Keys _key, int _code )
+      : key{ _key }
+      , code{ _code } {};
+
+  } KeyPair;
+
+  static const u8 totalKeys = 8;
+  bool isKeyPressed;
+  int pressedKey = -1;
+  const KeyPair keys[totalKeys] = {
+    KeyPair( Keys::right, GLFW_KEY_RIGHT ),
+    KeyPair( Keys::left, GLFW_KEY_LEFT ),
+    KeyPair( Keys::up, GLFW_KEY_UP ),
+    KeyPair( Keys::down, GLFW_KEY_DOWN ),
+    KeyPair( Keys::enter, GLFW_KEY_ENTER ),
+    KeyPair( Keys::m, GLFW_KEY_M ),
+    KeyPair( Keys::c, GLFW_KEY_C ),
+    KeyPair( Keys::esc, GLFW_KEY_ESCAPE ),
+  };
+
+  GLFWwindow* window;
+  f32 width = 0;
+  f32 height = 0;
+
+  std::unordered_map<std::string, Shader*> shaders;
+  std::unordered_map<std::string, Texture*> textures;
+  std::unordered_map<std::string, Quad*> quads;
+  glm::mat4 projectionMatrix;
 };
 
 void APIENTRY

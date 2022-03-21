@@ -18,6 +18,14 @@
 
 class Game
 {
+  enum class Directions
+  {
+    left,
+    right,
+    up,
+    down
+  };
+
   // Renderer
   Renderer* renderer;
 
@@ -81,9 +89,15 @@ class Game
   u8 optionSelected;
   bool menuMode;
   bool isKeyPressed;
-  std::string key;
+  Renderer::Keys key;
 
-  void getRefreshRate();
+  // Animation
+  u8 shiftOffset = 60;
+  Directions direction;
+  Grid::Cell startCoordinates;
+  Grid::Cell endCoordinates;
+  bool inProgress = false;
+
   void processMenuInput();
   void processGameInput();
   void loadTextures();
@@ -94,7 +108,8 @@ class Game
   void loadGridTextures();
   void shuffle();
 
-  void generateText( std::string s, u32 x, u32 y );
+  void shiftCell();
+  void print( std::string s, u32 x, u32 y );
 
   void menu();
   void play();
