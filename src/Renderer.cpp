@@ -144,30 +144,28 @@ Renderer::setQuadPosition( std::string key, f32 x, f32 y )
   quads[key]->setPosition( x, y );
 };
 
-std::string
+Renderer::Keys
 Renderer::getKey()
 {
   u8 index = 0;
 
-  while ( !isKeyPressed && index < totalKeys ) {
+  for ( ; !isKeyPressed && index < totalKeys; ++index ) {
     if ( glfwGetKey( window, keys[index].code ) == GLFW_PRESS ) {
       isKeyPressed = true;
       pressedKey = keys[index].code;
       return keys[index].key;
     }
-    ++index;
   }
 
   index = 0;
-  while ( isKeyPressed && index < totalKeys ) {
+  for ( ; isKeyPressed && index < totalKeys; ++index ) {
     if ( glfwGetKey( window, pressedKey ) == GLFW_RELEASE ) {
       isKeyPressed = false;
-      return "-1";
+      return Keys::blank;
     }
-    ++index;
   }
 
-  return "-1";
+  return Keys::blank;
 };
 
 Renderer::~Renderer()

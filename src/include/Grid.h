@@ -19,18 +19,24 @@ class Grid
   void setPositions();
 
 public:
-  typedef struct Cell
+  struct Cell
   {
     f32 x;
     f32 y;
     std::string id;
+
+    Cell()
+      : x{ 0 }
+      , y{ 0 }
+      , id{ "0" } {};
 
     Cell( f32 _x, f32 _y, std::string _id )
       : x{ _x }
       , y{ _y }
       , id{ _id } {};
 
-  } Cell;
+    bool operator==( Cell rhs ) { return x == rhs.x && y == rhs.y; };
+  };
 
   std::vector<Cell*> cells;
   f32 cellWidth;
