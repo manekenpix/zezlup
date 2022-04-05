@@ -39,8 +39,23 @@ Quad::setPosition( f32 positionX, f32 positionY )
   vertices[21] = y;          // Top Left Y
 };
 
-Quad::~Quad()
+void
+Quad::bind()
+{
+  glBindVertexArray( vertexArray );
+  glBindBuffer( GL_ARRAY_BUFFER, vertexBuffer );
+  glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( vertices ), vertices.data() );
+  glDrawArrays( GL_TRIANGLES, 0, 6 );
+};
+
+void
+Quad::remove()
 {
   glDeleteVertexArrays( 1, &vertexArray );
   glDeleteBuffers( 1, &vertexBuffer );
+};
+
+Quad::~Quad()
+{
+  remove();
 };

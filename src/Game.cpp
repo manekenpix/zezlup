@@ -31,8 +31,11 @@ Game::Game()
   // Preview
   renderer->createQuad( "preview", previewWidth, previewHeight );
   renderer->setQuadPosition( "preview", previewX, previewY );
+};
 
-  // Grid
+void
+Game::createGrid()
+{
   grid = new Grid(
     gridWidth, gridHeight, backgroundWidth, backgroundHeight, empty, 0, 25 );
   empty = grid->shuffle( empty, 20 );
@@ -43,6 +46,17 @@ Game::Game()
       renderer->setQuadPosition( ( *cell )->id, ( *cell )->x, ( *cell )->y );
     }
   }
+};
+
+void
+Game::removeGrid()
+{
+  for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
+    if ( *cell )
+      renderer->deleteQuad( ( *cell )->id );
+  }
+
+  delete grid;
 };
 
 void
@@ -187,83 +201,107 @@ Game::loadGridTextures()
 };
 
 void
+Game::removeGridTextures()
+{
+  u8 cells = gridHeight * gridWidth;
+  for ( u8 cell = 0; cell < cells; ++cell ) {
+    renderer->deleteTexture( "cell" + std::to_string( cell ) );
+  }
+};
+
+void
 Game::processMenuInput()
 {
   // TODO(Josue): Use a map here
-  if ( key == Renderer::Keys::right ) {
-    if ( optionSelected < assets.size() - 1 ) {
-      ++optionSelected;
-    }
+  switch ( key ) {
+    case Renderer::Keys::right:
+      if ( optionSelected < assets.size() - 1 )
+        ++optionSelected;
+      break;
 
-  } else if ( key == Renderer::Keys::left ) {
-    if ( optionSelected > 0 ) {
-      --optionSelected;
-    }
+    case Renderer::Keys::left:
+      if ( optionSelected > 0 )
+        --optionSelected;
+      break;
 
-  } else if ( key == Renderer::Keys::down ) {
-    if ( optionSelected < 3 ) {
-      optionSelected += 3;
-    }
+    case Renderer::Keys::down:
+      if ( optionSelected < 3 )
+        optionSelected += 3;
+      break;
 
-  } else if ( key == Renderer::Keys::up ) {
-    if ( optionSelected > 2 ) {
-      optionSelected -= 3;
-    }
+    case Renderer::Keys::up:
+      if ( optionSelected > 2 )
+        optionSelected -= 3;
+      break;
 
-  } else if ( key == Renderer::Keys::enter ) {
-    loadGridTextures();
-    startTime = glfwGetTime();
-    menuMode = false;
+    case Renderer::Keys::enter:
+      createGrid();
+      loadGridTextures();
+      startTime = glfwGetTime();
+      menuMode = false;
+      break;
   }
 }
 
 void
 Game::processGameInput()
 {
-  if ( key == Renderer::Keys::right ) {
-    if ( selected < gridWidth * gridHeight - 1 ) {
-      ++selected;
-    }
+  switch ( key ) {
+    case Renderer::Keys::right:
+      if ( selected < gridWidth * gridHeight - 1 )
+        ++selected;
+      break;
 
-  } else if ( key == Renderer::Keys::left ) {
-    if ( selected > 0 ) {
-      --selected;
-    }
+    case Renderer::Keys::left:
+      if ( selected > 0 )
+        --selected;
+      break;
 
-  } else if ( key == Renderer::Keys::down ) {
-    if ( selected < gridWidth * ( gridHeight - 1 ) ) {
-      selected += gridWidth;
-    }
+    case Renderer::Keys::down:
+      if ( selected < gridWidth * ( gridHeight - 1 ) )
+        selected += gridWidth;
+      break;
 
-  } else if ( key == Renderer::Keys::up ) {
-    if ( selected > gridWidth - 1 ) {
-      selected -= gridWidth;
-    }
+    case Renderer::Keys::up:
+      if ( selected > gridWidth - 1 )
+        selected -= gridWidth;
+      break;
 
-  } else if ( key == Renderer::Keys::m ) {
-    s8 distanceBetweenBoxes = abs( selected - empty );
+    case Renderer::Keys::c:
+      displayPreview = !displayPreview;
+      break;
 
-    if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
-      startCoordinates = ( *grid->cells[selected] );
-      grid->swapCells( selected, empty );
-      std::swap( selected, empty );
-      endCoordinates = ( *grid->cells[selected] );
+    case Renderer::Keys::backspace:
+      removeGridTextures();
+      removeGrid();
+      displayPreview = false;
+      menuMode = true;
 
-      ++moves;
+      break;
 
-      if ( startCoordinates.x > endCoordinates.x )
-        direction = Directions::left;
-      else if ( startCoordinates.x < endCoordinates.x )
-        direction = Directions::right;
-      else if ( startCoordinates.y > endCoordinates.y )
-        direction = Directions::up;
-      else if ( startCoordinates.y < endCoordinates.y )
-        direction = Directions::down;
+    case Renderer::Keys::m:
+      s8 distanceBetweenBoxes = abs( selected - empty );
 
-      inProgress = true;
-    }
-  } else if ( key == Renderer::Keys::c ) {
-    displayPreview = !displayPreview;
+      if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
+        startCoordinates = ( *grid->cells[selected] );
+        grid->swapCells( selected, empty );
+        std::swap( selected, empty );
+        endCoordinates = ( *grid->cells[selected] );
+
+        ++moves;
+
+        if ( startCoordinates.x > endCoordinates.x )
+          direction = Directions::left;
+        else if ( startCoordinates.x < endCoordinates.x )
+          direction = Directions::right;
+        else if ( startCoordinates.y > endCoordinates.y )
+          direction = Directions::up;
+        else if ( startCoordinates.y < endCoordinates.y )
+          direction = Directions::down;
+
+        inProgress = true;
+      }
+      break;
   }
 }
 
@@ -355,12 +393,12 @@ Game::run()
       processMenuInput();
       menu();
     } else {
+      play();
       if ( inProgress ) {
         shiftCell();
       } else {
         processGameInput();
       }
-      play();
     }
 
     endSeconds = glfwGetTime();
@@ -406,4 +444,5 @@ Game::~Game()
 
   delete preview;
   delete background;
+  delete renderer;
 };

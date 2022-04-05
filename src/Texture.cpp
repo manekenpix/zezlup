@@ -36,7 +36,18 @@ Texture::Texture( u8* buffer, s32 width, s32 height, u8 colourType )
 };
 
 void
+Texture::remove()
+{
+  glDeleteTextures( 1, &texture );
+};
+
+void
 Texture::bind()
 {
   glBindTexture( GL_TEXTURE_2D, texture );
+};
+
+Texture::~Texture()
+{
+  remove();
 };

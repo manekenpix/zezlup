@@ -87,13 +87,7 @@ Renderer::draw( std::string quad, std::string texture, std::string shader )
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
 
   textures[texture]->bind();
-  glBindVertexArray( quads[quad]->vertexArray );
-  glBindBuffer( GL_ARRAY_BUFFER, quads[quad]->vertexBuffer );
-  glBufferSubData( GL_ARRAY_BUFFER,
-                   0,
-                   sizeof( quads[quad]->vertices ),
-                   quads[quad]->vertices.data() );
-  glDrawArrays( GL_TRIANGLES, 0, 6 );
+  quads[quad]->bind();
 };
 
 void
@@ -133,9 +127,21 @@ Renderer::loadTexture( std::string name, u8* buffer, s32 width, s32 height )
 };
 
 void
-Renderer::createQuad( std::string key, f32 width, f32 height )
+Renderer::deleteTexture( std::string texture )
 {
-  quads.insert( { key, new Quad( width, height ) } );
+  textures[texture]->remove();
+};
+
+void
+Renderer::createQuad( std::string name, f32 width, f32 height )
+{
+  quads.insert( { name, new Quad( width, height ) } );
+};
+
+void
+Renderer::deleteQuad( std::string name )
+{
+  quads[name]->remove();
 };
 
 void
