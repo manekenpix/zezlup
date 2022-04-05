@@ -22,9 +22,10 @@ public:
     up,
     down,
     enter,
+    esc,
+    backspace,
     c,
     m,
-    esc,
     blank
   };
 
@@ -46,7 +47,9 @@ public:
                     u8 colourType );
 
   void loadTexture( std::string name, u8* buffer, s32 width, s32 height );
-  void createQuad( std::string key, f32 width, f32 height );
+  void deleteTexture( std::string texture );
+  void createQuad( std::string name, f32 width, f32 height );
+  void deleteQuad( std::string name );
   void setQuadPosition( std::string quad, f32 x, f32 y );
   Keys getKey();
 
@@ -62,7 +65,7 @@ private:
 
   } KeyPair;
 
-  static const u8 totalKeys = 8;
+  static const u8 totalKeys = 9;
   bool isKeyPressed;
   int pressedKey = -1;
   const KeyPair keys[totalKeys] = {
@@ -74,6 +77,7 @@ private:
     KeyPair( Keys::m, GLFW_KEY_M ),
     KeyPair( Keys::c, GLFW_KEY_C ),
     KeyPair( Keys::esc, GLFW_KEY_ESCAPE ),
+    KeyPair( Keys::backspace, GLFW_KEY_BACKSPACE ),
   };
 
   GLFWwindow* window;

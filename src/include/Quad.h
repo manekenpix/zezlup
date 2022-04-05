@@ -37,6 +37,8 @@ public:
   };
 
   Quad( f32 w, f32 h );
+  void remove();
+  void bind();
   ~Quad();
 
   void setPosition( f32 x, f32 y );

@@ -106,7 +106,10 @@ class Game
   void loadCoordinates();
   void loadFont();
   void loadGridTextures();
+  void removeGridTextures();
   void shuffle();
+  void createGrid();
+  void removeGrid();
 
   void shiftCell();
   void print( std::string s, u32 x, u32 y );

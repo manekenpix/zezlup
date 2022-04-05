@@ -11,7 +11,8 @@ class Texture
 public:
   Texture( u8* buffer, s32 width, s32 height, u8 colourType = 255 );
   void bind();
-  ~Texture(){};
+  void remove();
+  ~Texture();
 };
 
 #endif // TEXTURE_H
