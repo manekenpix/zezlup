@@ -24,6 +24,7 @@ public:
     enter,
     esc,
     backspace,
+    help,
     c,
     m,
     blank
@@ -65,7 +66,7 @@ private:
 
   } KeyPair;
 
-  static const u8 totalKeys = 9;
+  static const u8 totalKeys = 10;
   bool isKeyPressed;
   int pressedKey = -1;
   const KeyPair keys[totalKeys] = {
@@ -76,6 +77,7 @@ private:
     KeyPair( Keys::enter, GLFW_KEY_ENTER ),
     KeyPair( Keys::m, GLFW_KEY_M ),
     KeyPair( Keys::c, GLFW_KEY_C ),
+    KeyPair( Keys::help, GLFW_KEY_H ),
     KeyPair( Keys::esc, GLFW_KEY_ESCAPE ),
     KeyPair( Keys::backspace, GLFW_KEY_BACKSPACE ),
   };

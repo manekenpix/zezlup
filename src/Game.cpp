@@ -12,7 +12,8 @@ Game::Game()
   , menuMode{ true }
   , isKeyPressed{ false }
   , key{ Renderer::Keys::blank }
-  , displayPreview{ false }
+  , isDisplayingPreview{ false }
+  , isDisplayingHelp{ false }
 {
   // Renderer
   renderer = new Renderer();
@@ -159,6 +160,15 @@ Game::loadTextures()
                          topBar->getWidth(),
                          topBar->getHeight(),
                          topBar->getColourType() );
+
+  auto helpPanel = new Png( "data/help_panel.png" );
+  renderer->createQuad( "helpPanel", previewWidth, previewHeight );
+  renderer->setQuadPosition( "helpPanel", previewX, previewY );
+  renderer->loadTexture( "helpPanel",
+                         helpPanel->getImageBuffer(),
+                         helpPanel->getWidth(),
+                         helpPanel->getHeight(),
+                         helpPanel->getColourType() );
 };
 
 void
@@ -212,35 +222,39 @@ Game::removeGridTextures()
 void
 Game::processMenuInput()
 {
-  // TODO(Josue): Use a map here
-  switch ( key ) {
-    case Renderer::Keys::right:
-      if ( optionSelected < assets.size() - 1 )
-        ++optionSelected;
-      break;
+  if ( key == Renderer::Keys::help )
+    isDisplayingHelp = !isDisplayingHelp;
 
-    case Renderer::Keys::left:
-      if ( optionSelected > 0 )
-        --optionSelected;
-      break;
+  if ( !isDisplayingHelp )
+    // TODO(Josue): Use a map here
+    switch ( key ) {
+      case Renderer::Keys::right:
+        if ( optionSelected < assets.size() - 1 )
+          ++optionSelected;
+        break;
 
-    case Renderer::Keys::down:
-      if ( optionSelected < 3 )
-        optionSelected += 3;
-      break;
+      case Renderer::Keys::left:
+        if ( optionSelected > 0 )
+          --optionSelected;
+        break;
 
-    case Renderer::Keys::up:
-      if ( optionSelected > 2 )
-        optionSelected -= 3;
-      break;
+      case Renderer::Keys::down:
+        if ( optionSelected < 3 )
+          optionSelected += 3;
+        break;
 
-    case Renderer::Keys::enter:
-      createGrid();
-      loadGridTextures();
-      startTime = glfwGetTime();
-      menuMode = false;
-      break;
-  }
+      case Renderer::Keys::up:
+        if ( optionSelected > 2 )
+          optionSelected -= 3;
+        break;
+
+      case Renderer::Keys::enter:
+        createGrid();
+        loadGridTextures();
+        startTime = glfwGetTime();
+        menuMode = false;
+        break;
+    }
 }
 
 void
@@ -268,13 +282,13 @@ Game::processGameInput()
       break;
 
     case Renderer::Keys::c:
-      displayPreview = !displayPreview;
+      isDisplayingPreview = !isDisplayingPreview;
       break;
 
     case Renderer::Keys::backspace:
       removeGridTextures();
       removeGrid();
-      displayPreview = false;
+      isDisplayingPreview = false;
       menuMode = true;
 
       break;
@@ -306,6 +320,32 @@ Game::processGameInput()
 }
 
 void
+Game::displayHelp()
+{
+  renderer->draw( "helpPanel", "helpPanel", "Grid" );
+
+  print( std::string( "Help" ), 350, 190 );
+  print( std::string( "------" ), 350, 200 );
+
+  // Menu
+  print( std::string( "Menu" ), 200, 250 );
+  print( std::string( "-------" ), 200, 260 );
+  print( std::string( "Use the arrow keys to move through images" ), 200, 300 );
+  print( std::string( "Enter: Select an image and start the game" ), 200, 350 );
+
+  // Game
+  print( std::string( "Game" ), 200, 400 );
+  print( std::string( "-------" ), 200, 410 );
+  print( std::string( "Use the arrow keys to move the selector" ), 200, 450 );
+  print(
+    std::string( "m: Shift the selected tile to the empty space" ), 200, 500 );
+  print( std::string( "c: Display solution" ), 200, 550 );
+  print( std::string( "Delete: Go back to the menu" ), 200, 600 );
+
+  print( std::string( "Press h to close this" ), 285, 675 );
+}
+
+void
 Game::menu()
 {
   renderer->draw( "background", assets[optionSelected], "Blur" );
@@ -314,6 +354,12 @@ Game::menu()
     renderer->draw(
       *asset, *asset, index == optionSelected ? "Outline" : "Grid" );
   }
+
+  print( std::string( "Zezlup " ), 10, 18 );
+  print( std::string( "[ Help: h ] " ), 600, 18 );
+
+  if ( isDisplayingHelp )
+    displayHelp();
 };
 
 void
@@ -325,7 +371,7 @@ Game::play()
         ++cell, ++index ) {
     if ( *cell ) {
 
-      if ( displayPreview )
+      if ( isDisplayingPreview )
         selectedShader = "Blur";
       else
         selectedShader = selected == index ? "Outline" : "Grid";
@@ -334,14 +380,14 @@ Game::play()
     }
   }
 
-  print( std::string( "Moves: " ), 10, 20 );
-  print( std::to_string( moves ), 80, 20 );
+  print( std::string( "Moves: " ), 10, 18 );
+  print( std::to_string( moves ), 80, 18 );
 
-  print( std::string( "Time: " ), 150, 20 );
+  print( std::string( "Time: " ), 150, 18 );
   print(
-    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 20 );
+    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 18 );
 
-  if ( displayPreview )
+  if ( isDisplayingPreview )
     renderer->draw( "preview", assets[optionSelected], "Grid" );
 };
 
@@ -377,6 +423,23 @@ Game::shiftCell()
 };
 
 void
+Game::print( std::string s, u32 x, u32 y )
+{
+  u8 st;
+  for ( auto c = s.begin(); c != s.end(); ++c ) {
+    if ( *c == 32 )
+      x += 10;
+    else {
+      st = *c - 33;
+      renderer->setQuadPosition(
+        font[st].character, x, y - font[st].bitmapTop );
+      renderer->draw( font[st].character, font[st].character, "Text" );
+      x += font[st].advanceX;
+    }
+  }
+};
+
+void
 Game::run()
 {
   f32 startSeconds = glfwGetTime();
@@ -402,7 +465,7 @@ Game::run()
     }
 
     endSeconds = glfwGetTime();
-    print( std::string( "FPS: " ), 730, 20 );
+    print( std::string( "FPS: " ), 730, 18 );
     print(
       std::to_string( static_cast<u8>( 1 / ( endSeconds - startSeconds ) ) ),
       775,
@@ -413,23 +476,6 @@ Game::run()
     renderer->pollEvents();
 
   } while ( key != Renderer::Keys::esc );
-};
-
-void
-Game::print( std::string s, u32 x, u32 y )
-{
-  u8 st;
-  for ( auto c = s.begin(); c != s.end(); ++c ) {
-    if ( *c == 32 )
-      x += 10;
-    else {
-      st = *c - 33;
-      renderer->setQuadPosition(
-        font[st].character, x, y - font[st].bitmapTop );
-      renderer->draw( font[st].character, font[st].character, "Text" );
-      x += font[st].advanceX;
-    }
-  }
 };
 
 Game::~Game()

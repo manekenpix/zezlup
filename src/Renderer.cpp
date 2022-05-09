@@ -163,13 +163,8 @@ Renderer::getKey()
     }
   }
 
-  index = 0;
-  for ( ; isKeyPressed && index < totalKeys; ++index ) {
-    if ( glfwGetKey( window, pressedKey ) == GLFW_RELEASE ) {
-      isKeyPressed = false;
-      return Keys::blank;
-    }
-  }
+  if ( isKeyPressed && glfwGetKey( window, pressedKey ) == GLFW_RELEASE )
+    isKeyPressed = false;
 
   return Keys::blank;
 };
