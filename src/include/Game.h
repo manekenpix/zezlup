@@ -41,7 +41,7 @@ class Game
 
   // Preview
   Quad* preview;
-  bool displayPreview;
+  bool isDisplayingPreview;
   const f32 previewWidth = 600.0f;
   const f32 previewHeight = 600.0f;
   const f32 previewX = 100.0f;
@@ -91,6 +91,8 @@ class Game
   bool isKeyPressed;
   Renderer::Keys key;
 
+  bool isDisplayingHelp;
+
   // Animation
   u8 shiftOffset = 60;
   Directions direction;
@@ -116,6 +118,8 @@ class Game
 
   void menu();
   void play();
+
+  void displayHelp();
 
 public:
   Game();
