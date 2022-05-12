@@ -47,6 +47,12 @@ Grid::setPositions()
   }
 };
 
+Vec2*
+Grid::getCoords( u8 cell )
+{
+  return coords[cell];
+};
+
 u8
 Grid::shuffle( u8 empty, u8 moves )
 {

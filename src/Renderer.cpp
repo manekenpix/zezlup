@@ -91,6 +91,15 @@ Renderer::draw( std::string quad, std::string texture, std::string shader )
 };
 
 void
+Renderer::draw( std::string quad, std::string shader )
+{
+  shaders[shader]->use();
+  shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
+
+  quads[quad]->bind();
+};
+
+void
 Renderer::swapBuffers()
 {
   glfwSwapBuffers( window );

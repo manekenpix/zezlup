@@ -91,6 +91,7 @@ class Game
   bool menuMode;
   bool isKeyPressed;
   Renderer::Keys key;
+  Vec2* emptyCell = nullptr;
 
   bool isDisplayingHelp;
 

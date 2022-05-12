@@ -35,6 +35,9 @@ Game::Game()
   renderer->createQuad(
     "blank", previewWidth / gridWidth, previewHeight / gridHeight );
   renderer->setQuadPosition( "blank", previewX, previewY );
+
+  renderer->createQuad(
+    "gameBlank", backgroundWidth / gridWidth, backgroundHeight / gridHeight );
 };
 
 void
@@ -48,6 +51,7 @@ Game::createGrid()
                    0,
                    25 );
   empty = grid->shuffle( initialEmpty, 20 );
+  emptyCell = grid->getCoords( empty );
 
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
     if ( *cell ) {
@@ -139,6 +143,10 @@ Game::loadShaders()
 
   renderer->loadShader(
     "Blank", "src/Shaders/common.vert", "src/Shaders/blank.frag" );
+
+  renderer->loadShader( "Blank_outline",
+                        "src/Shaders/common.vert",
+                        "src/Shaders/blank_outline.frag" );
 
   renderer->loadShader(
     "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
@@ -312,6 +320,7 @@ Game::processGameInput()
         grid->swapCells( selected, empty );
         std::swap( selected, empty );
         endCoordinates = ( *grid->cells[selected] );
+        emptyCell = grid->getCoords( empty );
 
         ++moves;
 
@@ -360,7 +369,7 @@ void
 Game::displayPreview()
 {
   renderer->draw( "preview", assets[optionSelected], "Grid" );
-  renderer->draw( "blank", assets[optionSelected], "Blank" );
+  renderer->draw( "blank", "Blank" );
 };
 
 void
@@ -395,6 +404,10 @@ Game::play()
         selectedShader = selected == index ? "Outline" : "Grid";
 
       renderer->draw( ( *cell )->id, ( *cell )->id, selectedShader );
+    }
+    if ( selected == empty ) {
+      renderer->setQuadPosition( "gameBlank", emptyCell->x, emptyCell->y );
+      renderer->draw( "gameBlank", "Blank_outline" );
     }
   }
 
