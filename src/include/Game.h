@@ -46,6 +46,7 @@ class Game
   const f32 previewHeight = 600.0f;
   const f32 previewX = 100.0f;
   const f32 previewY = 125.0f;
+  const u8 initialEmpty = 0;
 
   // Fonts
   FT_Library ft;
@@ -120,6 +121,7 @@ class Game
   void play();
 
   void displayHelp();
+  void displayPreview();
 
 public:
   Game();
