@@ -7,7 +7,6 @@ Game::Game()
   , gridWidth{ 4 }
   , selected{ 0 }
   , optionSelected{ 0 }
-  , empty{ 0 }
   , framerate{ 0 }
   , menuMode{ true }
   , isKeyPressed{ false }
@@ -32,14 +31,23 @@ Game::Game()
   // Preview
   renderer->createQuad( "preview", previewWidth, previewHeight );
   renderer->setQuadPosition( "preview", previewX, previewY );
+
+  renderer->createQuad(
+    "blank", previewWidth / gridWidth, previewHeight / gridHeight );
+  renderer->setQuadPosition( "blank", previewX, previewY );
 };
 
 void
 Game::createGrid()
 {
-  grid = new Grid(
-    gridWidth, gridHeight, backgroundWidth, backgroundHeight, empty, 0, 25 );
-  empty = grid->shuffle( empty, 20 );
+  grid = new Grid( gridWidth,
+                   gridHeight,
+                   backgroundWidth,
+                   backgroundHeight,
+                   initialEmpty,
+                   0,
+                   25 );
+  empty = grid->shuffle( initialEmpty, 20 );
 
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
     if ( *cell ) {
@@ -128,6 +136,9 @@ Game::loadShaders()
 
   renderer->loadShader(
     "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
+
+  renderer->loadShader(
+    "Blank", "src/Shaders/common.vert", "src/Shaders/blank.frag" );
 
   renderer->loadShader(
     "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
@@ -255,7 +266,7 @@ Game::processMenuInput()
         menuMode = false;
         break;
     }
-}
+};
 
 void
 Game::processGameInput()
@@ -317,7 +328,7 @@ Game::processGameInput()
       }
       break;
   }
-}
+};
 
 void
 Game::displayHelp()
@@ -343,7 +354,14 @@ Game::displayHelp()
   print( std::string( "Delete: Go back to the menu" ), 200, 600 );
 
   print( std::string( "Press h to close this" ), 285, 675 );
-}
+};
+
+void
+Game::displayPreview()
+{
+  renderer->draw( "preview", assets[optionSelected], "Grid" );
+  renderer->draw( "blank", assets[optionSelected], "Blank" );
+};
 
 void
 Game::menu()
@@ -387,8 +405,9 @@ Game::play()
   print(
     std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 18 );
 
-  if ( isDisplayingPreview )
-    renderer->draw( "preview", assets[optionSelected], "Grid" );
+  if ( isDisplayingPreview ) {
+    displayPreview();
+  }
 };
 
 void
