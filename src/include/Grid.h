@@ -51,6 +51,7 @@ public:
         f32 yOffset );
   ~Grid();
 
+  Vec2* getCoords( u8 cell );
   void swapCells( u8 c1, u8 c2 );
   u8 shuffle( u8 empty, u8 moves );
 };
