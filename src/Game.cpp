@@ -18,9 +18,9 @@ Game::Game()
   renderer = new Renderer();
   renderer->createWindow( windowWidth, windowHeight );
 
-  loadAssets();
   loadCoordinates();
   loadFont();
+  loadAssets();
   loadTextures();
   loadShaders();
 
@@ -86,20 +86,24 @@ Game::loadCoordinates()
 void
 Game::loadFont()
 {
+  const char* fontFile = "data/fonts/Tinos.ttf";
   if ( FT_Init_FreeType( &ft ) ) {
-    std::cout << "ERROR::FREETYPE: Could not init FreeType Library"
-              << std::endl;
+    logger.info( "s", "ERROR::FREETYPE: Could not init FreeType Library\n" );
+    throw;
   }
 
-  if ( FT_New_Face( ft, "data/fonts/Tinos.ttf", 0, &face ) ) {
-    std::cout << "ERROR::FREETYPE: Failed to load font" << std::endl;
+  if ( FT_New_Face( ft, fontFile, 0, &face ) ) {
+    logger.info( "s", "ERROR::FREETYPE: Failed to load font\n" );
+    throw;
   }
+
+  logger.info( "sss", "Loading font: ", fontFile, "\n" );
 
   FT_Set_Pixel_Sizes( face, 0, 20 );
 
   for ( u8 c = '!'; c < '}'; ++c ) {
     if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
-      std::cout << "ERROR::FREETYTPE: Failed to load Glyph" << std::endl;
+      logger.info( "s", "ERROR::FREETYTPE: Failed to load Glyph\n" );
     }
 
     font.push_back( { c,
@@ -132,6 +136,7 @@ Game::loadAssets()
 void
 Game::loadShaders()
 {
+  logger.info( "s", "Loading shaders" );
   renderer->loadShader(
     "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
 
@@ -155,6 +160,7 @@ Game::loadShaders()
 void
 Game::loadTextures()
 {
+  logger.info( "s", "Loading textures" );
   u8 index = 0;
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
     images.push_back( new Png( asset->c_str() ) );
