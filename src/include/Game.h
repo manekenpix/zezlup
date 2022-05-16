@@ -2,6 +2,7 @@
 #define GAME_H
 
 #include "Grid.h"
+#include "Logger.h"
 #include "Png.h"
 #include "Quad.h"
 #include "Renderer.h"
@@ -26,10 +27,9 @@ class Game
     down
   };
 
-  // Renderer
+  Logger logger;
   Renderer* renderer;
 
-  // Grid
   Grid* grid;
   u8 gridWidth;
   u8 gridHeight;
@@ -101,7 +101,6 @@ class Game
   Grid::Cell startCoordinates;
   Grid::Cell endCoordinates;
   bool inProgress = false;
-
   void processMenuInput();
   void processGameInput();
   void loadTextures();

@@ -1,6 +1,7 @@
 #ifndef PNG_H
 #define PNG_H
 
+#include "Logger.h"
 #include "types.h"
 #include <fstream>
 #include <iostream>
@@ -18,6 +19,7 @@ typedef std::vector<uint8_t>::iterator u8vIt;
 
 class Png
 {
+  Logger logger;
   const u32 CHUNK = 16384;
   const u8 PNGSignature[8] = { 137, 80, 78, 71, 13, 10, 26, 10 };
 

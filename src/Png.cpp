@@ -30,11 +30,12 @@ Png::Png( const char* file )
         break;
 
       case ChunkType::pHYs:
-        std::cout << "Pixels per unit, X axis " << readU32( fileIterator )
-                  << std::endl;
-        std::cout << "Pixels per unit, Y axis " << readU32( fileIterator )
-                  << std::endl;
-        std::cout << "Unit specifier " << +( *fileIterator++ ) << std::endl;
+        logger.debug(
+          "sd", "Pixels per unit, X axis: ", readU32( fileIterator ) );
+        logger.debug(
+          "sd", "Pixels per unit, Y axis: ", readU32( fileIterator ) );
+        logger.debug( "sd", "Unit specifier: ", ( *fileIterator++ ) );
+
         readU32( fileIterator );
         break;
 
@@ -63,9 +64,11 @@ Png::loadFile( const char* file )
   image.open( file, std::ios::binary );
 
   if ( !image.is_open() ) {
-    std::cout << "Error opening the file: " << std::endl;
+    logger.error( "ss", "Error opening the file: ", file );
     throw;
   }
+
+  logger.info( "ss", "Image: ", file );
 
   u8 begin;
   begin = image.tellg();
@@ -75,9 +78,10 @@ Png::loadFile( const char* file )
   image.seekg( 0, std::ios::beg );
 
   fileSize = fileSize - begin;
-  std::cout << "fileSize of file: " << fileSize << std::endl;
+  logger.debug( "sd", "fileSize of file: ", fileSize );
+
   fileBuffer.resize( fileSize );
-  std::cout << "Size of vector: " << fileBuffer.size() << std::endl;
+  logger.debug( "sd", "Size of vector: ", fileBuffer.size() );
 
   image.read( (char*)&fileBuffer[0], fileSize );
 };
@@ -123,12 +127,12 @@ Png::readIHDR( u8vIt& it )
 void
 Png::readPLTE( u8vIt& it, u32 size )
 {
-  std::cout << "Number of entries in the palette: " << size / 3 << std::endl;
-
   paletteEntries = size / 3;
+  logger.debug( "sd", "Number of entries in the palette: ", paletteEntries );
 
   if ( size % 3 != 0 )
-    std::cout << "Invalid palette" << std::endl;
+    logger.error( "s", "Invalid palette" );
+
   u8vIt end = it + size;
   palette.resize( paletteEntries );
   PaletteIterator paletteIt = palette.begin();
@@ -246,7 +250,7 @@ Png::filter()
         }
         break;
       default:
-        std::cout << "Wrong filter" << std::endl;
+        logger.error( "s", "Wrong filter" );
     }
     processedImageIt += scanline;
   }
@@ -294,7 +298,7 @@ Png::inf()
     counter++;
   } while ( strm.avail_out == 0 );
   /* done when inflate() says it's done */
-  std::cout << "Size of the image buffer: " << imageBuffer.size() << std::endl;
+  logger.debug( "sds", "Size of the image buffer: ", imageBuffer.size(), "\n" );
 
   /* clean up and return */
   (void)inflateEnd( &strm );
@@ -305,39 +309,41 @@ Png::inf()
 void
 Png::zerr( int ret )
 {
-  fputs( "zpipe: ", stderr );
-  switch ( ret ) {
-    case Z_ERRNO:
-      if ( ferror( stdin ) )
-        fputs( "error reading stdin\n", stderr );
-      if ( ferror( stdout ) )
-        fputs( "error writing stdout\n", stderr );
-      break;
-    case Z_STREAM_ERROR:
-      fputs( "invalid compression level\n", stderr );
-      break;
-    case Z_DATA_ERROR:
-      fputs( "invalid or incomplete deflate data\n", stderr );
-      break;
-    case Z_MEM_ERROR:
-      fputs( "out of memory\n", stderr );
-      break;
-    case Z_VERSION_ERROR:
-      fputs( "zlib version mismatch!\n", stderr );
+  if ( ret != 0 ) {
+    fputs( "zpipe: ", stderr );
+    switch ( ret ) {
+      case Z_ERRNO:
+        if ( ferror( stdin ) )
+          fputs( "error reading stdin\n", stderr );
+        if ( ferror( stdout ) )
+          fputs( "error writing stdout\n", stderr );
+        break;
+      case Z_STREAM_ERROR:
+        fputs( "invalid compression level\n", stderr );
+        break;
+      case Z_DATA_ERROR:
+        fputs( "invalid or incomplete deflate data\n", stderr );
+        break;
+      case Z_MEM_ERROR:
+        fputs( "out of memory\n", stderr );
+        break;
+      case Z_VERSION_ERROR:
+        fputs( "zlib version mismatch!\n", stderr );
+    }
   }
 }
 
 void
 Png::printImageInfo()
 {
-  std::cout << "Width: " << width << std::endl;
-  std::cout << "Height: " << height << std::endl;
-  std::cout << "Bit Depth: " << +bitDepth << std::endl;
-  std::cout << "Colour Type: " << +colourType << std::endl;
-  std::cout << "Bytes per Pixel: " << +bytesPerPixel << std::endl;
-  std::cout << "Compression Method: " << +compressionMethod << std::endl;
-  std::cout << "Filter Method: " << +filterMethod << std::endl;
-  std::cout << "Interlace Method: " << +interlaceMethod << std::endl;
+  logger.debug( "sd", "Width: ", width );
+  logger.debug( "sd", "Height: ", height );
+  logger.debug( "sc", "Bit Depth: ", bitDepth );
+  logger.debug( "sc", "Colour Type: ", colourType );
+  logger.debug( "sc", "Bytes per Pixel: ", bytesPerPixel );
+  logger.debug( "sc", "Compression Method: ", +compressionMethod );
+  logger.debug( "sc", "Filter Method: ", +filterMethod );
+  logger.debug( "sc", "Interlace Method: ", +interlaceMethod );
 };
 
 u32
@@ -399,10 +405,11 @@ Png::printChunkType( u32 chunk )
 u8
 paethPredictor( u8 a, u8 b, u8 c )
 {
-  int32_t p = a + b - c;
+  s32 p = a + b - c;
   u32 pa = abs( p - a );
   u32 pb = abs( p - b );
   u32 pc = abs( p - c );
+
   if ( pa <= pb && pa <= pc )
     return a;
   else if ( pb <= pc )
