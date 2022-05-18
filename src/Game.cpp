@@ -18,20 +18,16 @@ Game::Game()
   renderer = new Renderer();
   renderer->createWindow( windowWidth, windowHeight );
 
-  loadCoordinates();
+  logger.info( "s", "Zezlup!" );
+
+  loadMenuAssets();
   loadFont();
   loadAssets();
   loadTextures();
   loadShaders();
 
-  // Create a background
-  renderer->createQuad( "background", backgroundWidth, backgroundHeight );
-  renderer->setQuadPosition( "background", 0, 25 );
-
-  // Preview
-  renderer->createQuad( "preview", previewWidth, previewHeight );
-  renderer->setQuadPosition( "preview", previewX, previewY );
-
+  // TODO(Josue): This shouldn't be here. Move this to a place where all the
+  // game stuff is created/loaded
   renderer->createQuad(
     "blank", previewWidth / gridWidth, previewHeight / gridHeight );
   renderer->setQuadPosition( "blank", previewX, previewY );
@@ -62,6 +58,27 @@ Game::createGrid()
 };
 
 void
+Game::loadMenuAssets()
+{
+  logger.info( "s", "Loading menu assets..." );
+  optionsCoords.push_back( Vec2( 50.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 300.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 550.0f, 183.0f ) );
+  optionsCoords.push_back( Vec2( 50.0f, 516.0f ) );
+  optionsCoords.push_back( Vec2( 300.0f, 516.0f ) );
+  optionsCoords.push_back( Vec2( 550.0f, 516.0f ) );
+
+  // Create a background
+  renderer->createQuad( "background", backgroundWidth, backgroundHeight );
+  renderer->setQuadPosition( "background", 0, 25 );
+
+  // Preview
+  renderer->createQuad( "preview", previewWidth, previewHeight );
+  renderer->setQuadPosition( "preview", previewX, previewY );
+  logger.info( "s", "Loading menu assets: done" );
+};
+
+void
 Game::removeGrid()
 {
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
@@ -73,19 +90,9 @@ Game::removeGrid()
 };
 
 void
-Game::loadCoordinates()
-{
-  optionsCoords.push_back( Vec2( 50.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 300.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 550.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 50.0f, 516.0f ) );
-  optionsCoords.push_back( Vec2( 300.0f, 516.0f ) );
-  optionsCoords.push_back( Vec2( 550.0f, 516.0f ) );
-};
-
-void
 Game::loadFont()
 {
+  logger.info( "s", "Loading fonts..." );
   const char* fontFile = "data/fonts/Tinos.ttf";
   if ( FT_Init_FreeType( &ft ) ) {
     logger.info( "s", "ERROR::FREETYPE: Could not init FreeType Library\n" );
@@ -97,7 +104,7 @@ Game::loadFont()
     throw;
   }
 
-  logger.info( "sss", "Loading font: ", fontFile, "\n" );
+  logger.info( "ss", "Font: ", fontFile );
 
   FT_Set_Pixel_Sizes( face, 0, 20 );
 
@@ -120,23 +127,28 @@ Game::loadFont()
                            face->glyph->bitmap.width,
                            face->glyph->bitmap.rows );
   }
+  logger.info( "s", "Loading fonts: done" );
 };
 
 void
 Game::loadAssets()
 {
+  logger.info( "s", "Loading assets..." );
+  ;
   assets.push_back( "data/lego_small.png" );
   assets.push_back( "data/cube_small.png" );
   assets.push_back( "data/pieces_small.png" );
   assets.push_back( "data/small_windows_small.png" );
   assets.push_back( "data/open_window_small.png" );
   assets.push_back( "data/cards_small.png" );
+  logger.info( "s", "Loading assets: done" );
+  ;
 };
 
 void
 Game::loadShaders()
 {
-  logger.info( "s", "Loading shaders" );
+  logger.info( "s", "Loading shaders..." );
   renderer->loadShader(
     "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
 
@@ -155,12 +167,13 @@ Game::loadShaders()
 
   renderer->loadShader(
     "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
+  logger.info( "s", "Loading shaders: done" );
 };
 
 void
 Game::loadTextures()
 {
-  logger.info( "s", "Loading textures" );
+  logger.info( "s", "Loading textures..." );
   u8 index = 0;
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
     images.push_back( new Png( asset->c_str() ) );
@@ -194,6 +207,7 @@ Game::loadTextures()
                          helpPanel->getWidth(),
                          helpPanel->getHeight(),
                          helpPanel->getColourType() );
+  logger.info( "s", "Loading textures: done" );
 };
 
 void
@@ -356,15 +370,19 @@ Game::displayHelp()
   // Menu
   print( std::string( "Menu" ), 200, 250 );
   print( std::string( "-------" ), 200, 260 );
-  print( std::string( "Use the arrow keys to move through images" ), 200, 300 );
-  print( std::string( "Enter: Select an image and start the game" ), 200, 350 );
+  print(
+    std::string( "Use the arrow keys to move through images" ), 200, 300 );
+  print(
+    std::string( "Enter: Select an image and start the game" ), 200, 350 );
 
   // Game
   print( std::string( "Game" ), 200, 400 );
   print( std::string( "-------" ), 200, 410 );
-  print( std::string( "Use the arrow keys to move the selector" ), 200, 450 );
   print(
-    std::string( "m: Shift the selected tile to the empty space" ), 200, 500 );
+    std::string( "Use the arrow keys to move the selector" ), 200, 450 );
+  print( std::string( "m: Shift the selected tile to the empty space" ),
+         200,
+         500 );
   print( std::string( "c: Display solution" ), 200, 550 );
   print( std::string( "Delete: Go back to the menu" ), 200, 600 );
 
@@ -389,7 +407,7 @@ Game::menu()
   }
 
   print( std::string( "Zezlup " ), 10, 18 );
-  print( std::string( "[ Help: h ] " ), 600, 18 );
+  print( std::string( "[ Help: h ] " ), 690, 18 );
 
   if ( isDisplayingHelp )
     displayHelp();
@@ -478,6 +496,14 @@ Game::print( std::string s, u32 x, u32 y )
 };
 
 void
+Game::displayFPS( f32& start, f32& end )
+{
+  print( std::string( "FPS: " ), 600, 18 );
+  print(
+    std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 645, 20 );
+};
+
+void
 Game::run()
 {
   f32 startSeconds = glfwGetTime();
@@ -503,11 +529,9 @@ Game::run()
     }
 
     endSeconds = glfwGetTime();
-    print( std::string( "FPS: " ), 730, 18 );
-    print(
-      std::to_string( static_cast<u8>( 1 / ( endSeconds - startSeconds ) ) ),
-      775,
-      20 );
+
+    displayFPS( startSeconds, endSeconds );
+
     startSeconds = glfwGetTime();
 
     renderer->swapBuffers();

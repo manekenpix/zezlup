@@ -106,7 +106,7 @@ class Game
   void loadTextures();
   void loadShaders();
   void loadAssets();
-  void loadCoordinates();
+  void loadMenuAssets();
   void loadFont();
   void loadGridTextures();
   void removeGridTextures();
@@ -122,6 +122,7 @@ class Game
 
   void displayHelp();
   void displayPreview();
+  void displayFPS( f32& start, f32& end );
 
 public:
   Game();

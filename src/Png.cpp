@@ -68,7 +68,7 @@ Png::loadFile( const char* file )
     throw;
   }
 
-  logger.info( "ss", "Image: ", file );
+  logger.debug( "ss", "Image: ", file );
 
   u8 begin;
   begin = image.tellg();
