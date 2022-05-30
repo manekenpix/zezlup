@@ -18,6 +18,8 @@ Game::Game()
   renderer = new Renderer();
   renderer->createWindow( windowWidth, windowHeight );
 
+  mouse = renderer->getMouse();
+
   logger.info( "s", "Zezlup!" );
 
   loadMenuAssets();
@@ -258,6 +260,41 @@ Game::removeGridTextures()
   }
 };
 
+bool
+Game::getOptionSelectedWithMouse()
+{
+  s8 xPos = -1, yPos = -1;
+
+  for ( u8 x = 0; x < optionColumns; ++x )
+    if ( mouse->x >= optionsCoords[x].x &&
+         mouse->x < optionsCoords[x].x + optionWidth )
+      xPos = x;
+
+  for ( u8 y = 0; y < optionRows * optionColumns; y += optionColumns )
+    if ( mouse->y >= optionsCoords[y].y &&
+         mouse->y < optionsCoords[y].y + optionHeight )
+      yPos = y;
+
+  if ( xPos != -1 && yPos != -1 ) {
+    optionSelected = yPos + xPos;
+    return true;
+  }
+
+  return false;
+};
+
+void
+Game::selectOptionWithMouseClick()
+{
+  if ( getOptionSelectedWithMouse() ) {
+    createGrid();
+    loadGridTextures();
+    startTime = glfwGetTime();
+    menuMode = false;
+  }
+  mouse->isLeftPressed = false;
+};
+
 void
 Game::processMenuInput()
 {
@@ -294,6 +331,74 @@ Game::processMenuInput()
         menuMode = false;
         break;
     }
+
+  if ( mouse->isCoordsChanged )
+    getOptionSelectedWithMouse();
+
+  if ( mouse->isLeftPressed )
+    selectOptionWithMouseClick();
+};
+
+bool
+Game::getCellSelectedWithMouse()
+{
+  s8 xPos = -1, yPos = -1;
+
+  std::vector<Vec2*> cellsCoords;
+
+  for ( u8 cells = 0; cells < gridWidth * gridHeight; ++cells ) {
+    cellsCoords.push_back( grid->getCoords( cells ) );
+  }
+
+  u32 cellWidth = cellsCoords[1]->x;
+  u32 cellHeight = cellsCoords[gridWidth]->y;
+
+  for ( u8 x = 0; x < gridWidth; ++x )
+    if ( mouse->x >= cellsCoords[x]->x &&
+         mouse->x < cellsCoords[x]->x + cellWidth )
+      xPos = x;
+
+  for ( u8 y = 0; y < gridWidth * gridHeight; y += gridWidth )
+    if ( mouse->y >= cellsCoords[y]->y &&
+         mouse->y < cellsCoords[y]->y + cellHeight )
+      yPos = y;
+
+  if ( xPos != -1 && yPos != -1 ) {
+    selected = yPos + xPos;
+    return true;
+  }
+
+  return false;
+};
+
+void
+Game::selectCellWithMouseClick()
+{
+  if ( getCellSelectedWithMouse() ) {
+    s8 distanceBetweenBoxes = abs( selected - empty );
+
+    if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
+      startCoordinates = ( *grid->cells[selected] );
+      grid->swapCells( selected, empty );
+      std::swap( selected, empty );
+      endCoordinates = ( *grid->cells[selected] );
+      emptyCell = grid->getCoords( empty );
+
+      ++moves;
+
+      if ( startCoordinates.x > endCoordinates.x )
+        direction = Directions::left;
+      else if ( startCoordinates.x < endCoordinates.x )
+        direction = Directions::right;
+      else if ( startCoordinates.y > endCoordinates.y )
+        direction = Directions::up;
+      else if ( startCoordinates.y < endCoordinates.y )
+        direction = Directions::down;
+
+      inProgress = true;
+    }
+  }
+  mouse->isLeftPressed = false;
 };
 
 void
@@ -357,6 +462,13 @@ Game::processGameInput()
       }
       break;
   }
+
+  if ( mouse->isCoordsChanged )
+    getCellSelectedWithMouse();
+
+  if ( mouse->isLeftPressed ) {
+    selectCellWithMouseClick();
+  }
 };
 
 void
@@ -370,19 +482,15 @@ Game::displayHelp()
   // Menu
   print( std::string( "Menu" ), 200, 250 );
   print( std::string( "-------" ), 200, 260 );
-  print(
-    std::string( "Use the arrow keys to move through images" ), 200, 300 );
-  print(
-    std::string( "Enter: Select an image and start the game" ), 200, 350 );
+  print( std::string( "Use the arrow keys to move through images" ), 200, 300 );
+  print( std::string( "Enter: Select an image and start the game" ), 200, 350 );
 
   // Game
   print( std::string( "Game" ), 200, 400 );
   print( std::string( "-------" ), 200, 410 );
+  print( std::string( "Use the arrow keys to move the selector" ), 200, 450 );
   print(
-    std::string( "Use the arrow keys to move the selector" ), 200, 450 );
-  print( std::string( "m: Shift the selected tile to the empty space" ),
-         200,
-         500 );
+    std::string( "m: Shift the selected tile to the empty space" ), 200, 500 );
   print( std::string( "c: Display solution" ), 200, 550 );
   print( std::string( "Delete: Go back to the menu" ), 200, 600 );
 
@@ -499,8 +607,7 @@ void
 Game::displayFPS( f32& start, f32& end )
 {
   print( std::string( "FPS: " ), 600, 18 );
-  print(
-    std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 645, 20 );
+  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 645, 18 );
 };
 
 void
@@ -514,6 +621,7 @@ Game::run()
     glClear( GL_COLOR_BUFFER_BIT );
 
     key = renderer->getKey();
+    renderer->getMouseState();
 
     renderer->draw( "top_bar", "top_bar", "Grid" );
     if ( menuMode ) {
@@ -531,7 +639,6 @@ Game::run()
     endSeconds = glfwGetTime();
 
     displayFPS( startSeconds, endSeconds );
-
     startSeconds = glfwGetTime();
 
     renderer->swapBuffers();

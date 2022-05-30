@@ -7,6 +7,7 @@
 #include "Texture.h"
 #include "types.h"
 
+#include <array>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <string>
@@ -29,6 +30,17 @@ public:
     m,
     blank
   };
+
+  typedef struct Mouse
+  {
+    double x, y;
+    bool isLeftPressed;
+    bool isRightPressed;
+    bool isCoordsChanged;
+
+  } Mouse;
+
+  Mouse mouse;
 
   Renderer();
   ~Renderer();
@@ -54,6 +66,8 @@ public:
   void deleteQuad( std::string name );
   void setQuadPosition( std::string quad, f32 x, f32 y );
   Keys getKey();
+  Mouse* getMouse();
+  void getMouseState();
 
 private:
   typedef struct KeyPair
@@ -67,10 +81,11 @@ private:
 
   } KeyPair;
 
-  static const u8 totalKeys = 10;
   bool isKeyPressed;
   int pressedKey = -1;
-  const KeyPair keys[totalKeys] = {
+
+  static const u8 totalKeys = 10;
+  const std::array<KeyPair, totalKeys> keys = {
     KeyPair( Keys::right, GLFW_KEY_RIGHT ),
     KeyPair( Keys::left, GLFW_KEY_LEFT ),
     KeyPair( Keys::up, GLFW_KEY_UP ),

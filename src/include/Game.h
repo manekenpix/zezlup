@@ -29,6 +29,7 @@ class Game
 
   Logger logger;
   Renderer* renderer;
+  Renderer::Mouse* mouse;
 
   Grid* grid;
   u8 gridWidth;
@@ -76,6 +77,8 @@ class Game
   std::vector<Quad*> options;
   const f32 optionWidth = 200.0f;
   const f32 optionHeight = 200.0f;
+  const u8 optionRows = 2;
+  const u8 optionColumns = 3;
   std::vector<Vec2> optionsCoords;
 
   // Images
@@ -116,6 +119,11 @@ class Game
 
   void shiftCell();
   void print( std::string s, u32 x, u32 y );
+
+  bool getOptionSelectedWithMouse();
+  void selectOptionWithMouseClick();
+  bool getCellSelectedWithMouse();
+  void selectCellWithMouseClick();
 
   void menu();
   void play();
