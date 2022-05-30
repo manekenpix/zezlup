@@ -178,6 +178,30 @@ Renderer::getKey()
   return Keys::blank;
 };
 
+void
+Renderer::getMouseState()
+{
+  double x, y;
+  glfwGetCursorPos( window, &x, &y );
+
+  mouse.isCoordsChanged = !( mouse.x == x && mouse.y == y );
+  mouse.isLeftPressed =
+    glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_LEFT ) == GLFW_PRESS;
+  mouse.isRightPressed =
+    glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_RIGHT ) == GLFW_PRESS;
+
+  if ( mouse.isCoordsChanged ) {
+    mouse.x = x;
+    mouse.y = y;
+  }
+};
+
+Renderer::Mouse*
+Renderer::getMouse()
+{
+  return &mouse;
+};
+
 Renderer::~Renderer()
 {
   for ( const auto& [key, v] : shaders ) {
