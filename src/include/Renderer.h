@@ -52,6 +52,7 @@ public:
 
   void swapBuffers();
   void pollEvents();
+  bool windowShouldClose();
 
   void loadShader( std::string key, std::string vShader, std::string fShader );
   void loadTexture( std::string name,
