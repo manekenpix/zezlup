@@ -80,6 +80,12 @@ Renderer::createWindow( f32 windowW, f32 windowH )
   return window;
 };
 
+bool
+Renderer::windowShouldClose()
+{
+  return glfwWindowShouldClose( window );
+};
+
 void
 Renderer::draw( std::string quad, std::string texture, std::string shader )
 {

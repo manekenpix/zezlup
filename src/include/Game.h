@@ -74,7 +74,6 @@ class Game
   const f32 backgroundHeight = 800.0f;
 
   // Options
-  std::vector<Quad*> options;
   const f32 optionWidth = 200.0f;
   const f32 optionHeight = 200.0f;
   const u8 optionRows = 2;
@@ -127,6 +126,8 @@ class Game
 
   void menu();
   void play();
+  void initializeStartGame();
+  void shiftSelectedCell();
 
   void displayHelp();
   void displayPreview();

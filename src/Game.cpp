@@ -51,10 +51,10 @@ Game::createGrid()
   empty = grid->shuffle( initialEmpty, 20 );
   emptyCell = grid->getCoords( empty );
 
-  for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
-    if ( *cell ) {
-      renderer->createQuad( ( *cell )->id, grid->cellWidth, grid->cellHeight );
-      renderer->setQuadPosition( ( *cell )->id, ( *cell )->x, ( *cell )->y );
+  for ( const auto& cell : grid->cells ) {
+    if ( cell != nullptr ) {
+      renderer->createQuad( cell->id, grid->cellWidth, grid->cellHeight );
+      renderer->setQuadPosition( cell->id, cell->x, cell->y );
     }
   }
 };
@@ -83,9 +83,9 @@ Game::loadMenuAssets()
 void
 Game::removeGrid()
 {
-  for ( auto cell = grid->cells.begin(); cell != grid->cells.end(); ++cell ) {
-    if ( *cell )
-      renderer->deleteQuad( ( *cell )->id );
+  for ( const auto& cell : grid->cells ) {
+    if ( cell != nullptr )
+      renderer->deleteQuad( cell->id );
   }
 
   delete grid;
@@ -136,7 +136,7 @@ void
 Game::loadAssets()
 {
   logger.info( "s", "Loading assets..." );
-  ;
+
   assets.push_back( "data/lego_small.png" );
   assets.push_back( "data/cube_small.png" );
   assets.push_back( "data/pieces_small.png" );
@@ -144,7 +144,6 @@ Game::loadAssets()
   assets.push_back( "data/open_window_small.png" );
   assets.push_back( "data/cards_small.png" );
   logger.info( "s", "Loading assets: done" );
-  ;
 };
 
 void
@@ -177,18 +176,19 @@ Game::loadTextures()
 {
   logger.info( "s", "Loading textures..." );
   u8 index = 0;
-  for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
-    images.push_back( new Png( asset->c_str() ) );
+  for ( const auto& asset : assets ) {
+    images.push_back( new Png( asset.c_str() ) );
 
-    renderer->createQuad( *asset, optionWidth, optionHeight );
+    renderer->createQuad( asset, optionWidth, optionHeight );
     renderer->setQuadPosition(
-      *asset, optionsCoords[index].x, optionsCoords[index].y );
+      asset, optionsCoords[index].x, optionsCoords[index].y );
 
-    renderer->loadTexture( *asset,
+    renderer->loadTexture( asset,
                            images[index]->getImageBuffer(),
                            images[index]->getWidth(),
                            images[index]->getHeight(),
                            images[index]->getColourType() );
+    ++index;
   }
 
   // Top bar
@@ -264,16 +264,16 @@ bool
 Game::getOptionSelectedWithMouse()
 {
   s8 xPos = -1, yPos = -1;
+  u8 index = 0;
+  for ( auto it = optionsCoords.cbegin(); index < optionColumns; ++index, ++it )
+    if ( mouse->x >= it->x && mouse->x < it->x + optionWidth )
+      xPos = index;
 
-  for ( u8 x = 0; x < optionColumns; ++x )
-    if ( mouse->x >= optionsCoords[x].x &&
-         mouse->x < optionsCoords[x].x + optionWidth )
-      xPos = x;
-
-  for ( u8 y = 0; y < optionRows * optionColumns; y += optionColumns )
-    if ( mouse->y >= optionsCoords[y].y &&
-         mouse->y < optionsCoords[y].y + optionHeight )
-      yPos = y;
+  index = 0;
+  for ( auto it = optionsCoords.cbegin(); index < optionRows * optionColumns;
+        index += optionColumns, it += optionColumns )
+    if ( mouse->y >= it->y && mouse->y < it->y + optionHeight )
+      yPos = index;
 
   if ( xPos != -1 && yPos != -1 ) {
     optionSelected = yPos + xPos;
@@ -286,13 +286,19 @@ Game::getOptionSelectedWithMouse()
 void
 Game::selectOptionWithMouseClick()
 {
-  if ( getOptionSelectedWithMouse() ) {
-    createGrid();
-    loadGridTextures();
-    startTime = glfwGetTime();
-    menuMode = false;
-  }
+  if ( getOptionSelectedWithMouse() )
+    initializeStartGame();
+
   mouse->isLeftPressed = false;
+};
+
+void
+Game::initializeStartGame()
+{
+  createGrid();
+  loadGridTextures();
+  startTime = glfwGetTime();
+  menuMode = false;
 };
 
 void
@@ -325,10 +331,7 @@ Game::processMenuInput()
         break;
 
       case Renderer::Keys::enter:
-        createGrid();
-        loadGridTextures();
-        startTime = glfwGetTime();
-        menuMode = false;
+        initializeStartGame();
         break;
     }
 
@@ -353,15 +356,16 @@ Game::getCellSelectedWithMouse()
   u32 cellWidth = cellsCoords[1]->x;
   u32 cellHeight = cellsCoords[gridWidth]->y;
 
-  for ( u8 x = 0; x < gridWidth; ++x )
-    if ( mouse->x >= cellsCoords[x]->x &&
-         mouse->x < cellsCoords[x]->x + cellWidth )
-      xPos = x;
+  u8 index = 0;
+  for ( auto it = cellsCoords.cbegin(); index < gridWidth; ++index, ++it )
+    if ( mouse->x >= ( *it )->x && mouse->x < ( *it )->x + cellWidth )
+      xPos = index;
 
-  for ( u8 y = 0; y < gridWidth * gridHeight; y += gridWidth )
-    if ( mouse->y >= cellsCoords[y]->y &&
-         mouse->y < cellsCoords[y]->y + cellHeight )
-      yPos = y;
+  index = 0;
+  for ( auto it = cellsCoords.cbegin(); index < gridWidth * gridHeight;
+        index += gridWidth, it += gridWidth )
+    if ( mouse->y >= ( *it )->y && mouse->y < ( *it )->y + cellHeight )
+      yPos = index;
 
   if ( xPos != -1 && yPos != -1 ) {
     selected = yPos + xPos;
@@ -374,31 +378,37 @@ Game::getCellSelectedWithMouse()
 void
 Game::selectCellWithMouseClick()
 {
-  if ( getCellSelectedWithMouse() ) {
-    s8 distanceBetweenBoxes = abs( selected - empty );
+  if ( getCellSelectedWithMouse() )
+    shiftSelectedCell();
 
-    if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
-      startCoordinates = ( *grid->cells[selected] );
-      grid->swapCells( selected, empty );
-      std::swap( selected, empty );
-      endCoordinates = ( *grid->cells[selected] );
-      emptyCell = grid->getCoords( empty );
-
-      ++moves;
-
-      if ( startCoordinates.x > endCoordinates.x )
-        direction = Directions::left;
-      else if ( startCoordinates.x < endCoordinates.x )
-        direction = Directions::right;
-      else if ( startCoordinates.y > endCoordinates.y )
-        direction = Directions::up;
-      else if ( startCoordinates.y < endCoordinates.y )
-        direction = Directions::down;
-
-      inProgress = true;
-    }
-  }
   mouse->isLeftPressed = false;
+};
+
+void
+Game::shiftSelectedCell()
+{
+  s8 distanceBetweenBoxes = abs( selected - empty );
+
+  if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
+    startCoordinates = ( *grid->cells[selected] );
+    grid->swapCells( selected, empty );
+    std::swap( selected, empty );
+    endCoordinates = ( *grid->cells[selected] );
+    emptyCell = grid->getCoords( empty );
+
+    ++moves;
+
+    if ( startCoordinates.x > endCoordinates.x )
+      direction = Directions::left;
+    else if ( startCoordinates.x < endCoordinates.x )
+      direction = Directions::right;
+    else if ( startCoordinates.y > endCoordinates.y )
+      direction = Directions::up;
+    else if ( startCoordinates.y < endCoordinates.y )
+      direction = Directions::down;
+
+    inProgress = true;
+  }
 };
 
 void
@@ -438,35 +448,15 @@ Game::processGameInput()
       break;
 
     case Renderer::Keys::m:
-      s8 distanceBetweenBoxes = abs( selected - empty );
+      shiftSelectedCell();
 
-      if ( distanceBetweenBoxes == 1 || distanceBetweenBoxes == gridWidth ) {
-        startCoordinates = ( *grid->cells[selected] );
-        grid->swapCells( selected, empty );
-        std::swap( selected, empty );
-        endCoordinates = ( *grid->cells[selected] );
-        emptyCell = grid->getCoords( empty );
-
-        ++moves;
-
-        if ( startCoordinates.x > endCoordinates.x )
-          direction = Directions::left;
-        else if ( startCoordinates.x < endCoordinates.x )
-          direction = Directions::right;
-        else if ( startCoordinates.y > endCoordinates.y )
-          direction = Directions::up;
-        else if ( startCoordinates.y < endCoordinates.y )
-          direction = Directions::down;
-
-        inProgress = true;
-      }
       break;
   }
 
   if ( mouse->isCoordsChanged )
     getCellSelectedWithMouse();
 
-  if ( mouse->isLeftPressed ) {
+  if ( mouse->isLeftPressed && !isDisplayingPreview ) {
     selectCellWithMouseClick();
   }
 };
@@ -644,7 +634,7 @@ Game::run()
     renderer->swapBuffers();
     renderer->pollEvents();
 
-  } while ( key != Renderer::Keys::esc );
+  } while ( key != Renderer::Keys::esc && !renderer->windowShouldClose() );
 };
 
 Game::~Game()
@@ -654,8 +644,6 @@ Game::~Game()
 
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );
-  std::for_each(
-    options.begin(), options.end(), []( Quad* option ) { delete option; } );
 
   delete preview;
   delete background;
