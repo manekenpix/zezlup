@@ -44,7 +44,8 @@ Quad::bind()
 {
   glBindVertexArray( vertexArray );
   glBindBuffer( GL_ARRAY_BUFFER, vertexBuffer );
-  glBufferSubData( GL_ARRAY_BUFFER, 0, sizeof( vertices ), vertices.data() );
+  glBufferData(
+    GL_ARRAY_BUFFER, sizeof( vertices ), vertices.data(), GL_STATIC_DRAW );
   glDrawArrays( GL_TRIANGLES, 0, 6 );
 };
 
