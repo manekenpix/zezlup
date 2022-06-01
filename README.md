@@ -1,10 +1,18 @@
 # zezlup
 
-zezlup is a slide-puzzle game for Linux created to learn game development.
+Zezlup is a tiny slide-puzzle game for Linux created for the sole purpose of learning a bit of game development.
 
-To better understand the process and its different parts, no game development libraries or tools were used.
+To make it more fun (and also learn more), a tiny game engine was developed for this project.
 
 ## Build
+
+### Dependencies
+
+- [zlib](https://zlib.net/)
+- [glfw](https://www.glfw.org/)
+- [glew](http://glew.sourceforge.net/)
+- [glm](https://github.com/g-truc/glm)
+- [freetype](https://freetype.org/)
 
 To build zezlup:
 
@@ -23,15 +31,20 @@ To run the game:
 ```
 
 ### Menu
-Use the arrow keys and enter to select an image
+Select the puzzle you want to solve (use your mouse or arrows and enter keys)
 
-![Image](data/zezlup1.png)
+![Image](data/zezlup_menu.png)
 
+### Gameplay
 
-### Controls:
+**Controls:**
 - `Arrow keys`: move selector.
-- `m`: slide the selected cell into the empty cell.
+- `m`: slide the selected cell.
 - `c` (toggle): display the solution of the puzzle.
-- `Esc`: Exit zezlup.
+- `Esc`: exit zezlup.
 
-![Image](data/zezlup2.png)
+![Image](data/zezlup_gameplay.png)
+
+Display the solution of the puzzle when you feel lost
+
+![Image](data/zezlup_solution.png)
