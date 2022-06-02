@@ -144,7 +144,8 @@ Renderer::loadTexture( std::string name, u8* buffer, s32 width, s32 height )
 void
 Renderer::deleteTexture( std::string texture )
 {
-  textures[texture]->remove();
+  delete textures[texture];
+  textures.erase( texture );
 };
 
 void
@@ -156,7 +157,8 @@ Renderer::createQuad( std::string name, f32 width, f32 height )
 void
 Renderer::deleteQuad( std::string name )
 {
-  quads[name]->remove();
+  delete quads[name];
+  quads.erase( name );
 };
 
 void
