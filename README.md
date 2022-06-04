@@ -31,20 +31,22 @@ To run the game:
 ```
 
 ### Menu
+
 Select the puzzle you want to solve (use your mouse or arrows and enter keys)
 
-![Image](data/zezlup_menu.png)
+![Image](data/images/zezlup_menu.png)
 
 ### Gameplay
 
 **Controls:**
+
 - `Arrow keys`: move selector.
 - `m`: slide the selected cell.
 - `c` (toggle): display the solution of the puzzle.
 - `Esc`: exit zezlup.
 
-![Image](data/zezlup_gameplay.png)
+![Image](data/images/zezlup_gameplay.png)
 
 Display the solution of the puzzle when you feel lost
 
-![Image](data/zezlup_solution.png)
+![Image](data/images/zezlup_solution.png)

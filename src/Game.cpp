@@ -137,12 +137,12 @@ Game::loadAssets()
 {
   logger.info( "s", "Loading assets..." );
 
-  assets.push_back( "data/lego_small.png" );
-  assets.push_back( "data/cube_small.png" );
-  assets.push_back( "data/pieces_small.png" );
-  assets.push_back( "data/small_windows_small.png" );
-  assets.push_back( "data/open_window_small.png" );
-  assets.push_back( "data/cards_small.png" );
+  assets.push_back( "data/images/tic_tac_toe.png" );
+  assets.push_back( "data/images/cube_small.png" );
+  assets.push_back( "data/images/chess.png" );
+  assets.push_back( "data/images/pieces_small.png" );
+  assets.push_back( "data/images/laberinth.png" );
+  assets.push_back( "data/images/green.png" );
   logger.info( "s", "Loading assets: done" );
 };
 
@@ -192,7 +192,7 @@ Game::loadTextures()
   }
 
   // Top bar
-  auto topBar = new Png( "data/top_bar.png" );
+  auto topBar = new Png( "data/images/top_bar.png" );
   renderer->createQuad( "top_bar", topBar->getWidth(), topBar->getHeight() );
   renderer->setQuadPosition( "top_bar", 0, 0 );
   renderer->loadTexture( "top_bar",
@@ -201,7 +201,7 @@ Game::loadTextures()
                          topBar->getHeight(),
                          topBar->getColourType() );
 
-  auto helpPanel = new Png( "data/help_panel.png" );
+  auto helpPanel = new Png( "data/images/help_panel.png" );
   renderer->createQuad( "helpPanel", previewWidth, previewHeight );
   renderer->setQuadPosition( "helpPanel", previewX, previewY );
   renderer->loadTexture( "helpPanel",
