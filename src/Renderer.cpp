@@ -67,7 +67,7 @@ Renderer::createWindow( f32 windowW, f32 windowH )
       GL_DONT_CARE, GL_DONT_CARE, GL_DONT_CARE, 0, nullptr, GL_TRUE );
   }
 
-  auto icon = new Png( "data/logo.png" );
+  auto icon = new Png( "data/images/logo.png" );
 
   GLFWimage images[1];
 
