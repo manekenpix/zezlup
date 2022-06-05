@@ -14,8 +14,8 @@ Logger::Logger()
 void
 Logger::setLogLevel( string _level )
 {
-  auto level = find( levels.begin(), levels.end(), _level );
-  logLevel = level != levels.end() ? *level : "info";
+  auto level = find( LEVELS.begin(), LEVELS.end(), _level );
+  logLevel = level != LEVELS.end() ? *level : "info";
 };
 
 void

@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 
+#include "Font.h"
 #include "Grid.h"
 #include "Logger.h"
 #include "Png.h"
@@ -9,8 +10,6 @@
 #include "Shader.h"
 #include "Shuffle.h"
 #include "Texture.h"
-#include <X11/Xlib.h>
-#include <X11/extensions/Xrandr.h>
 #include <algorithm>
 #include <charconv>
 #include <ft2build.h>
@@ -50,23 +49,7 @@ class Game
   const u8 initialEmpty = 0;
 
   // Fonts
-  FT_Library ft;
-  FT_Face face;
-  typedef struct Font
-  {
-    u32 advanceX;
-    u32 advanceY;
-    u32 bitmapTop;
-    std::string character;
-
-    Font( u8 _character, u32 _advanceX, u32 _advanceY, u32 _bitmapTop )
-      : advanceX( _advanceX )
-      , advanceY( _advanceY )
-      , character( std::string( 1, _character ) )
-      , bitmapTop( _bitmapTop ){};
-  } Font;
-
-  std::vector<Font> font;
+  Font* font;
 
   // Menu
   Quad* background;
