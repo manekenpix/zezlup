@@ -27,7 +27,7 @@ class Logger
   stringstream doubleStream;
 
   string log, logLevel;
-  const vector<string> levels = { "debug", "info" };
+  const vector<string> LEVELS = { "debug", "info" };
 
   time_t t;
   char mbstr[100];

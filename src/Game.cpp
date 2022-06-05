@@ -95,39 +95,18 @@ void
 Game::loadFont()
 {
   logger.info( "s", "Loading fonts..." );
-  const char* fontFile = "data/fonts/Tinos.ttf";
-  if ( FT_Init_FreeType( &ft ) ) {
-    logger.info( "s", "ERROR::FREETYPE: Could not init FreeType Library\n" );
-    throw;
-  }
-
-  if ( FT_New_Face( ft, fontFile, 0, &face ) ) {
-    logger.info( "s", "ERROR::FREETYPE: Failed to load font\n" );
-    throw;
-  }
-
-  logger.info( "ss", "Font: ", fontFile );
-
-  FT_Set_Pixel_Sizes( face, 0, 20 );
+  font = new Font( "data/fonts/Tinos.ttf" );
 
   for ( u8 c = '!'; c < '}'; ++c ) {
-    if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
-      logger.info( "s", "ERROR::FREETYTPE: Failed to load Glyph\n" );
-    }
+    renderer->createQuad(
+      std::string( 1, c ), font->getWidth( c ), font->getHeight( c ) );
 
-    font.push_back( { c,
-                      static_cast<u32>( ( face->glyph->advance.x ) >> 6 ),
-                      static_cast<u32>( ( face->glyph->advance.y ) >> 6 ),
-                      static_cast<u32>( face->glyph->bitmap_top ) } );
-    renderer->createQuad( std::string( 1, c ),
-                          face->glyph->bitmap.width,
-                          face->glyph->bitmap.rows );
     renderer->setQuadPosition( std::string( 1, c ), 0, 0 );
 
     renderer->loadTexture( std::string( 1, c ),
-                           face->glyph->bitmap.buffer,
-                           face->glyph->bitmap.width,
-                           face->glyph->bitmap.rows );
+                           font->getBuffer( c ),
+                           font->getWidth( c ),
+                           font->getHeight( c ) );
   }
   logger.info( "s", "Loading fonts: done" );
 };
@@ -579,16 +558,17 @@ Game::shiftCell()
 void
 Game::print( std::string s, u32 x, u32 y )
 {
-  u8 st;
+  std::string st;
   for ( auto c = s.begin(); c != s.end(); ++c ) {
     if ( *c == 32 )
       x += 10;
     else {
-      st = *c - 33;
-      renderer->setQuadPosition(
-        font[st].character, x, y - font[st].bitmapTop );
-      renderer->draw( font[st].character, font[st].character, "Text" );
-      x += font[st].advanceX;
+      st = font->getStringChar( *c );
+      renderer->setQuadPosition( st, x, y - font->getBitmapTop( *c ) );
+
+      renderer->draw( st, st, "Text" );
+
+      x += font->getAdvanceX( *c );
     }
   }
 };
@@ -639,13 +619,11 @@ Game::run()
 
 Game::~Game()
 {
-  FT_Done_Face( face );
-  FT_Done_FreeType( ft );
-
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );
 
   delete preview;
   delete background;
   delete renderer;
+  delete font;
 };
