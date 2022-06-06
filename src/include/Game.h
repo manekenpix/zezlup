@@ -77,6 +77,7 @@ class Game
   bool isKeyPressed;
   Renderer::Keys key;
   Vec2* emptyCell = nullptr;
+  const initialMoves = 20;
 
   bool isDisplayingHelp;
 
@@ -86,6 +87,7 @@ class Game
   Grid::Cell startCoordinates;
   Grid::Cell endCoordinates;
   bool inProgress = false;
+
   void processMenuInput();
   void processGameInput();
   void loadTextures();
@@ -109,6 +111,7 @@ class Game
 
   void menu();
   void play();
+  bool isPuzzleCompleted();
   void initializeStartGame();
   void shiftSelectedCell();
 
