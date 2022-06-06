@@ -53,6 +53,15 @@ Grid::getCoords( u8 cell )
   return coords[cell];
 };
 
+std::string
+Grid::getId( u8 position )
+{
+  if ( cells[position] )
+    return cells[position]->id;
+
+  return "-1";
+};
+
 u8
 Grid::shuffle( u8 empty, u8 moves )
 {

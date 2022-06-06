@@ -48,7 +48,7 @@ Game::createGrid()
                    initialEmpty,
                    0,
                    25 );
-  empty = grid->shuffle( initialEmpty, 20 );
+  empty = grid->shuffle( initialEmpty, initialMoves );
   emptyCell = grid->getCoords( empty );
 
   for ( const auto& cell : grid->cells ) {
@@ -393,6 +393,13 @@ Game::shiftSelectedCell()
 void
 Game::processGameInput()
 {
+  if ( isPuzzleCompleted() ) {
+    removeGridTextures();
+    removeGrid();
+    isDisplayingPreview = false;
+    menuMode = true;
+  }
+
   switch ( key ) {
     case Renderer::Keys::right:
       if ( selected < gridWidth * gridHeight - 1 )
@@ -439,6 +446,18 @@ Game::processGameInput()
     selectCellWithMouseClick();
   }
 };
+
+bool
+Game::isPuzzleCompleted()
+{
+  for ( u8 i = 1; i < gridWidth * gridHeight; ++i ) {
+    std::string s = grid->getId( i );
+    if ( s == "-1" || s.substr( 4 ) != std::to_string( i ) )
+      return false;
+  }
+
+  return true;
+}
 
 void
 Game::displayHelp()
