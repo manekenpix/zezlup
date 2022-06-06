@@ -77,7 +77,7 @@ class Game
   bool isKeyPressed;
   Renderer::Keys key;
   Vec2* emptyCell = nullptr;
-  const initialMoves = 20;
+  const u8 initialMoves = 20;
 
   bool isDisplayingHelp;
 
