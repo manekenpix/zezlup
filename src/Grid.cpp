@@ -9,24 +9,27 @@ Grid::Grid( u8 cellsRow,
             f32 yOffset )
   : cellsPerRow{ cellsRow }
   , cellsPerColumn{ cellsColumn }
-  , xOffset( xOffset )
-  , yOffset( yOffset )
+  , xOffset{ xOffset }
+  , yOffset{ yOffset }
 {
   cellWidth = windowW / cellsPerRow;
   cellHeight = windowH / cellsPerColumn;
 
+  u32 xPos, yPos;
+  u8 position;
   for ( u8 rows = 0; rows < cellsPerColumn; ++rows ) {
     for ( u8 columns = 0; columns < cellsPerRow; ++columns ) {
+      xPos = cellWidth * columns;
+      yPos = cellHeight * rows;
+      position = ( rows * cellsPerRow ) + columns;
 
-      cells.push_back( new Cell(
-        0, 0, "cell" + std::to_string( rows * cellsPerRow + columns ) ) );
-      coords.push_back( new Vec2( cellWidth * columns, cellHeight * rows ) );
+      cells.push_back( new Cell( xPos + xOffset,
+                                 yPos + yOffset,
+                                 CELL + std::to_string( position ),
+                                 Vec2( xPos + xOffset, yPos + yOffset ) ) );
+      coords.push_back( new Vec2( xPos + xOffset, yPos + yOffset ) );
     }
   }
-
-  Cell* deletedCell = cells[empty];
-  delete deletedCell;
-  cells[empty] = nullptr;
 };
 
 void
@@ -50,35 +53,41 @@ Grid::setPositions()
 Vec2*
 Grid::getCoords( u8 cell )
 {
-  return coords[cell];
+  return &( cells[cell]->coords );
 };
 
 std::string
 Grid::getId( u8 position )
 {
-  if ( cells[position] )
-    return cells[position]->id;
-
-  return "-1";
+  return cells[position]->id;
 };
 
 u8
 Grid::shuffle( u8 empty, u8 moves )
 {
-  Shuffle<Cell*> s( cells, cellsPerRow, cellsPerColumn, empty, moves );
-  cells = s.run();
+  std::vector<std::string> ids( cellsPerRow * cellsPerColumn, "0" );
+  u8 index = 0;
+  for ( auto i = ids.begin(); i != ids.end(); ++i, ++index )
+    *i = std::to_string( index );
 
-  setPositions();
-  return s.getEmpty();
+  Shuffle<std::string> s( ids, cellsPerRow, cellsPerColumn, empty, moves );
+  ids = s.run();
+
+  auto cell = cells.begin();
+  for ( auto i = ids.begin(); i != ids.end(); ++i, ++cell ) {
+    ( *cell )->id = CELL + *i;
+  }
+
+  u8 emptyAfterShuffling = s.getEmpty();
+  cells[emptyAfterShuffling]->id = Empty;
+
+  return emptyAfterShuffling;
 };
 
 void
 Grid::swapCells( u8 c1, u8 c2 )
 {
-  cells[c1]->x = coords[c2]->x;
-  cells[c1]->y = coords[c2]->y;
-
-  std::swap( cells[c1], cells[c2] );
+  std::swap( cells[c1]->id, cells[c2]->id );
 };
 
 Grid::~Grid()
