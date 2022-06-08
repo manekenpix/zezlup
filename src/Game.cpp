@@ -52,10 +52,8 @@ Game::createGrid()
   emptyCell = grid->getCoords( empty );
 
   for ( const auto& cell : grid->cells ) {
-    if ( cell != nullptr ) {
-      renderer->createQuad( cell->id, grid->cellWidth, grid->cellHeight );
-      renderer->setQuadPosition( cell->id, cell->x, cell->y );
-    }
+    renderer->createQuad( cell->id, grid->cellWidth, grid->cellHeight );
+    renderer->setQuadPosition( cell->id, cell->x, cell->y );
   }
 };
 
@@ -84,7 +82,7 @@ void
 Game::removeGrid()
 {
   for ( const auto& cell : grid->cells ) {
-    if ( cell != nullptr )
+    if ( cell->id != grid->Empty )
       renderer->deleteQuad( cell->id );
   }
 
@@ -452,7 +450,7 @@ Game::isPuzzleCompleted()
 {
   for ( u8 i = 1; i < gridWidth * gridHeight; ++i ) {
     std::string s = grid->getId( i );
-    if ( s == "-1" || s.substr( 4 ) != std::to_string( i ) )
+    if ( s == grid->Empty || s.substr( 4 ) != std::to_string( i ) )
       return false;
   }
 
@@ -516,7 +514,9 @@ Game::play()
   u8 index = 0;
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end();
         ++cell, ++index ) {
-    if ( *cell ) {
+    // TODO(Josue): We should create a static member in Grid to define the empty
+    // state, like string has npos
+    if ( ( *cell )->id != grid->Empty ) {
 
       if ( isDisplayingPreview )
         selectedShader = "Blur";

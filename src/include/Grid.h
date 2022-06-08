@@ -19,21 +19,27 @@ class Grid
   void setPositions();
 
 public:
+  const std::string Empty = "-1";
+  const std::string CELL = "cell";
+
   struct Cell
   {
     f32 x;
     f32 y;
     std::string id;
+    Vec2 coords;
 
     Cell()
       : x{ 0 }
       , y{ 0 }
-      , id{ "0" } {};
+      , id{ "0" }
+      , coords{ Vec2( 0, 0 ) } {};
 
-    Cell( f32 _x, f32 _y, std::string _id )
+    Cell( f32 _x, f32 _y, std::string _id, Vec2 _coords )
       : x{ _x }
       , y{ _y }
-      , id{ _id } {};
+      , id{ _id }
+      , coords{ _coords } {};
 
     bool operator==( Cell rhs ) { return x == rhs.x && y == rhs.y; };
   };
