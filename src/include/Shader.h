@@ -74,25 +74,31 @@ public:
     // necessary
     glDeleteShader( vertex );
     glDeleteShader( fragment );
-  }
+  };
   // activate the shader
-  void use() { glUseProgram( id ); }
+  void use() { glUseProgram( id ); };
 
   // utility uniform functions
   void setBool( const std::string& name, bool value ) const
   {
-    glUniform1i( glGetUniformLocation( id, name.c_str() ), (int)value );
-  }
+    glUniform1i( glGetUniformLocation( id, name.c_str() ),
+                 static_cast<int>( value ) );
+  };
 
   void setInt( const std::string& name, s32 value ) const
   {
     glUniform1i( glGetUniformLocation( id, name.c_str() ), value );
-  }
+  };
 
-  void setFloat( const std::string& name, f32 value ) const
+  void setFloat( const std::string& name, float value ) const
   {
     glUniform1f( glGetUniformLocation( id, name.c_str() ), value );
-  }
+  };
+
+  void set3vf( const std::string& name, std::array<f32, 3> value ) const
+  {
+    glUniform3fv( glGetUniformLocation( id, name.c_str() ), 1, value.data() );
+  };
 
   void setMatrix4fv( const std::string& name, glm::mat4 value ) const
   {
@@ -100,7 +106,7 @@ public:
                         1,
                         GL_FALSE,
                         glm::value_ptr( value ) );
-  }
+  };
 
 private:
   Logger logger;
@@ -129,4 +135,5 @@ private:
     }
   }
 };
+
 #endif

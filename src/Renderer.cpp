@@ -87,20 +87,37 @@ Renderer::windowShouldClose()
 };
 
 void
-Renderer::draw( std::string quad, std::string texture, std::string shader )
+Renderer::draw( std::string quad,
+                std::string texture,
+                std::string shader,
+                std::array<f32, 3> colour )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
+  shaders[shader]->set3vf( "passed_colour", colour );
+  shaders[shader]->setBool( "has_border", true );
 
-  textures[texture]->bind();
+  if ( texture != "Blank" ) {
+    shaders[shader]->setBool( "has_texture", true );
+    textures[texture]->bind();
+  } else
+    shaders[shader]->setBool( "has_texture", false );
+
   quads[quad]->bind();
 };
 
 void
-Renderer::draw( std::string quad, std::string shader )
+Renderer::draw( std::string quad, std::string texture, std::string shader )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
+  shaders[shader]->setBool( "has_border", false );
+
+  if ( texture != "Blank" ) {
+    shaders[shader]->setBool( "has_texture", true );
+    textures[texture]->bind();
+  } else
+    shaders[shader]->setBool( "has_texture", false );
 
   quads[quad]->bind();
 };

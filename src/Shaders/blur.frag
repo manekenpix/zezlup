@@ -8,14 +8,18 @@ uniform sampler2D ourTexture;
 void
 main()
 {
-  float Pi = 6.28318530718; // Pi*2
+  // Pi*2
+  float Pi = 6.28318530718;
 
-  // Gaussian settings
-  float Directions =
-    16.0; // Blur Directions (Default 16.0 - More is better but slower)
-  float Quality =
-    10.0;            // Blur Quality (Default 4.0 - More is better but slower)
-  float Size = 15.0; // Blur Size (Radius)
+  /** Gaussian settings **/
+  // Blur Directions (Default 16.0 - More is better but slower)
+  float Directions = 16.0;
+
+  // Blur Quality (Default 4.0 - More is better but slower)
+  float Quality = 10.0;
+
+  // Blur Size (Radius)
+  float Size = 15.0;
 
   vec2 Radius = Size / textureSize( ourTexture, 0 ).xy;
 
