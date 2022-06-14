@@ -51,10 +51,7 @@ Game::createGrid()
   empty = grid->shuffle( initialEmpty, initialMoves );
   emptyCell = grid->getCoords( empty );
 
-  for ( const auto& cell : grid->cells ) {
-    renderer->createQuad( cell->id, grid->cellWidth, grid->cellHeight );
-    renderer->setQuadPosition( cell->id, cell->x, cell->y );
-  }
+  renderer->createQuad( "cellQuad", grid->cellWidth, grid->cellHeight );
 };
 
 void
@@ -118,7 +115,7 @@ Game::loadAssets()
   assets.push_back( "data/images/cube_small.png" );
   assets.push_back( "data/images/chess.png" );
   assets.push_back( "data/images/pieces_small.png" );
-  assets.push_back( "data/images/laberinth.png" );
+  assets.push_back( "data/images/labyrinth.png" );
   assets.push_back( "data/images/green.png" );
   logger.info( "s", "Loading assets: done" );
 };
@@ -128,20 +125,10 @@ Game::loadShaders()
 {
   logger.info( "s", "Loading shaders..." );
   renderer->loadShader(
-    "Grid", "src/Shaders/common.vert", "src/Shaders/grid.frag" );
+    "Grid", "src/Shaders/common.vert", "src/Shaders/default.frag" );
 
   renderer->loadShader(
-    "Outline", "src/Shaders/common.vert", "src/Shaders/outline.frag" );
-
-  renderer->loadShader(
-    "Blur", "src/Shaders/common.vert", "src/Shaders/gauss.frag" );
-
-  renderer->loadShader(
-    "Blank", "src/Shaders/common.vert", "src/Shaders/blank.frag" );
-
-  renderer->loadShader( "Blank_outline",
-                        "src/Shaders/common.vert",
-                        "src/Shaders/blank_outline.frag" );
+    "Blur", "src/Shaders/common.vert", "src/Shaders/blur.frag" );
 
   renderer->loadShader(
     "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
@@ -152,13 +139,12 @@ void
 Game::loadTextures()
 {
   logger.info( "s", "Loading textures..." );
+
+  renderer->createQuad( "optionQuad", optionWidth, optionHeight );
+
   u8 index = 0;
   for ( const auto& asset : assets ) {
     images.push_back( new Png( asset.c_str() ) );
-
-    renderer->createQuad( asset, optionWidth, optionHeight );
-    renderer->setQuadPosition(
-      asset, optionsCoords[index].x, optionsCoords[index].y );
 
     renderer->loadTexture( asset,
                            images[index]->getImageBuffer(),
@@ -462,32 +448,39 @@ Game::displayHelp()
 {
   renderer->draw( "helpPanel", "helpPanel", "Grid" );
 
-  print( std::string( "Help" ), 350, 190 );
-  print( std::string( "------" ), 350, 200 );
+  print( std::string( "Help" ), headerOffsetX, 190 );
+  print( std::string( "----" ), headerOffsetX, 200 );
 
   // Menu
-  print( std::string( "Menu" ), 200, 250 );
-  print( std::string( "-------" ), 200, 260 );
-  print( std::string( "Use the arrow keys to move through images" ), 200, 300 );
-  print( std::string( "Enter: Select an image and start the game" ), 200, 350 );
+  print( std::string( "Menu" ), bodyOffsetX, 250 );
+  print( std::string( "----" ), bodyOffsetX, 260 );
+  print( std::string( "Use the arrow keys to move through images" ),
+         bodyOffsetX,
+         300 );
+  print( std::string( "Enter: Select an image and start the game" ),
+         bodyOffsetX,
+         350 );
 
   // Game
-  print( std::string( "Game" ), 200, 400 );
-  print( std::string( "-------" ), 200, 410 );
-  print( std::string( "Use the arrow keys to move the selector" ), 200, 450 );
-  print(
-    std::string( "m: Shift the selected tile to the empty space" ), 200, 500 );
-  print( std::string( "c: Display solution" ), 200, 550 );
-  print( std::string( "Delete: Go back to the menu" ), 200, 600 );
+  print( std::string( "Game" ), bodyOffsetX, 400 );
+  print( std::string( "----" ), bodyOffsetX, 410 );
+  print( std::string( "Use the arrow keys to move the selector" ),
+         bodyOffsetX,
+         450 );
+  print( std::string( "m: Shift the selected tile to the empty space" ),
+         bodyOffsetX,
+         500 );
+  print( std::string( "c: Display solution" ), bodyOffsetX, 550 );
+  print( std::string( "Delete: Go back to the menu" ), bodyOffsetX, 600 );
 
-  print( std::string( "Press h to close this" ), 285, 675 );
+  print( std::string( "Press h to close this" ), footerOffsetX, 675 );
 };
 
 void
 Game::displayPreview()
 {
   renderer->draw( "preview", assets[optionSelected], "Grid" );
-  renderer->draw( "blank", "Blank" );
+  renderer->draw( "blank", "Blank", "Grid" );
 };
 
 void
@@ -495,13 +488,19 @@ Game::menu()
 {
   renderer->draw( "background", assets[optionSelected], "Blur" );
   u8 index = 0;
+
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
-    renderer->draw(
-      *asset, *asset, index == optionSelected ? "Outline" : "Grid" );
+    renderer->setQuadPosition(
+      "optionQuad", optionsCoords[index].x, optionsCoords[index].y );
+
+    if ( index == optionSelected )
+      renderer->draw( "optionQuad", *asset, "Grid", PURPLE );
+    else
+      renderer->draw( "optionQuad", *asset, "Grid" );
   }
 
-  print( std::string( "Zezlup " ), 10, 18 );
-  print( std::string( "[ Help: h ] " ), 690, 18 );
+  print( std::string( "[ Help: h ]" ), 10, 18 );
+  print( std::string( "v.0.0.1" ), 735, 18 );
 
   if ( isDisplayingHelp )
     displayHelp();
@@ -516,18 +515,18 @@ Game::play()
         ++cell, ++index ) {
     // TODO(Josue): We should create a static member in Grid to define the empty
     // state, like string has npos
+    renderer->setQuadPosition( "cellQuad", ( *cell )->x, ( *cell )->y );
     if ( ( *cell )->id != grid->Empty ) {
-
-      if ( isDisplayingPreview )
-        selectedShader = "Blur";
+      if ( index == selected && !isDisplayingPreview )
+        renderer->draw( "cellQuad", ( *cell )->id, "Grid", PURPLE );
       else
-        selectedShader = selected == index ? "Outline" : "Grid";
-
-      renderer->draw( ( *cell )->id, ( *cell )->id, selectedShader );
-    }
-    if ( selected == empty ) {
-      renderer->setQuadPosition( "gameBlank", emptyCell->x, emptyCell->y );
-      renderer->draw( "gameBlank", "Blank_outline" );
+        renderer->draw(
+          "cellQuad", ( *cell )->id, isDisplayingPreview ? "Blur" : "Grid" );
+    } else {
+      if ( selected == empty )
+        renderer->draw( "cellQuad", "Blank", "Grid", PURPLE );
+      else
+        renderer->draw( "cellQuad", "Blank", "Grid" );
     }
   }
 
@@ -569,9 +568,9 @@ Game::shiftCell()
   }
 
   inProgress ? renderer->setQuadPosition(
-                 startCoordinates.id, startCoordinates.x, startCoordinates.y )
+                 "cellQuad", startCoordinates.x, startCoordinates.y )
              : renderer->setQuadPosition(
-                 endCoordinates.id, endCoordinates.x, endCoordinates.y );
+                 "cellQuad", endCoordinates.x, endCoordinates.y );
 };
 
 void
@@ -585,7 +584,7 @@ Game::print( std::string s, u32 x, u32 y )
       st = font->getStringChar( *c );
       renderer->setQuadPosition( st, x, y - font->getBitmapTop( *c ) );
 
-      renderer->draw( st, st, "Text" );
+      renderer->draw( st, st, "Text", WHITE );
 
       x += font->getAdvanceX( *c );
     }
@@ -595,8 +594,8 @@ Game::print( std::string s, u32 x, u32 y )
 void
 Game::displayFPS( f32& start, f32& end )
 {
-  print( std::string( "FPS: " ), 600, 18 );
-  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 645, 18 );
+  print( std::string( "FPS: " ), 650, 18 );
+  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 685, 18 );
 };
 
 void
@@ -612,7 +611,9 @@ Game::run()
     key = renderer->getKey();
     renderer->getMouseState();
 
+    renderer->setQuadPosition( "top_bar", 0, 0 );
     renderer->draw( "top_bar", "top_bar", "Grid" );
+
     if ( menuMode ) {
       processMenuInput();
       menu();

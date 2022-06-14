@@ -47,8 +47,11 @@ public:
 
   GLFWwindow* createWindow( f32 windowW, f32 windowH );
 
+  void draw( std::string quad,
+             std::string texture,
+             std::string shader,
+             std::array<f32, 3> colour );
   void draw( std::string quad, std::string texture, std::string shader );
-  void draw( std::string quad, std::string shader );
 
   void swapBuffers();
   void pollEvents();

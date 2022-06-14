@@ -13,7 +13,7 @@ Font::Font( const char* fontFile )
   }
 
   logger.info( "ss", "Font: ", fontFile );
-  FT_Set_Pixel_Sizes( face, 0, 20 );
+  FT_Set_Pixel_Sizes( face, 0, 16 );
 
   for ( u8 c = FIRST_CHAR; c < LAST_CHAR; ++c ) {
     if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {
@@ -29,7 +29,6 @@ Font::Font( const char* fontFile )
         static_cast<u32>( ( face->glyph->advance.y ) >> 6 ),
         static_cast<u32>( face->glyph->bitmap_top ) } );
   }
-  logger.info( "s", "I'm done doing this" );
 };
 
 u8

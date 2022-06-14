@@ -56,6 +56,11 @@ class Game
   const f32 backgroundWidth = 800.0f;
   const f32 backgroundHeight = 800.0f;
 
+  // Help
+  const u32 headerOffsetX = 375;
+  const u32 bodyOffsetX = 225;
+  const u32 footerOffsetX = 310;
+
   // Options
   const f32 optionWidth = 200.0f;
   const f32 optionHeight = 200.0f;
@@ -80,6 +85,8 @@ class Game
   const u8 initialMoves = 20;
 
   bool isDisplayingHelp;
+  std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
+  std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
 
   // Animation
   u8 shiftOffset = 60;
