@@ -117,14 +117,16 @@ class Game
   void selectCellWithMouseClick();
 
   void menu();
-  void play();
+  void renderActiveCell();
+  void renderInactiveCells();
   bool isPuzzleCompleted();
-  void initializeStartGame();
+  void initializeGameplay();
   void shiftSelectedCell();
 
   void displayHelp();
   void displayPreview();
   void displayFPS( f32& start, f32& end );
+  void displayStats();
 
 public:
   Game();
