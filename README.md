@@ -1,8 +1,8 @@
 # zezlup
 
-Zezlup is a tiny slide-puzzle game for Linux created for the sole purpose of learning a bit of game development.
+Zezlup is a little slide-puzzle game for Linux created for the sole purpose of learning a bit of game development.
 
-To make it more fun (and also learn more), a tiny game engine was developed for this project.
+To make it more fun (and also learn more), I made my own tiny renderer for this project.
 
 ## Build
 
