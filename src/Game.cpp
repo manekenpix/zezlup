@@ -250,18 +250,19 @@ void
 Game::selectOptionWithMouseClick()
 {
   if ( getOptionSelectedWithMouse() )
-    initializeStartGame();
+    initializeGameplay();
 
   mouse->isLeftPressed = false;
 };
 
 void
-Game::initializeStartGame()
+Game::initializeGameplay()
 {
   createGrid();
   loadGridTextures();
-  startTime = glfwGetTime();
+  moves = 0;
   menuMode = false;
+  startTime = glfwGetTime();
 };
 
 void
@@ -294,7 +295,7 @@ Game::processMenuInput()
         break;
 
       case Renderer::Keys::enter:
-        initializeStartGame();
+        initializeGameplay();
         break;
     }
 
@@ -414,12 +415,11 @@ Game::processGameInput()
       removeGrid();
       isDisplayingPreview = false;
       menuMode = true;
-
       break;
 
     case Renderer::Keys::m:
-      shiftSelectedCell();
-
+      if ( !isDisplayingPreview )
+        shiftSelectedCell();
       break;
   }
 
@@ -507,39 +507,49 @@ Game::menu()
 };
 
 void
-Game::play()
+Game::renderActiveCell()
 {
-  std::string selectedShader;
+  std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
+  renderer->setQuadPosition(
+    "cellQuad", grid->cells[selected]->x, grid->cells[selected]->y );
+
+  // TODO(Josue): We should create a static member in Grid to define the empty
+  // state, like string has npos
+  if ( grid->cells[selected]->id != grid->Empty )
+    renderer->draw(
+      "cellQuad", grid->cells[selected]->id, selectedShader, PURPLE );
+  else
+    renderer->draw( "cellQuad", "Blank", "Grid", PURPLE );
+};
+
+void
+Game::renderInactiveCells()
+{
   u8 index = 0;
+  std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
+
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end();
         ++cell, ++index ) {
-    // TODO(Josue): We should create a static member in Grid to define the empty
-    // state, like string has npos
     renderer->setQuadPosition( "cellQuad", ( *cell )->x, ( *cell )->y );
-    if ( ( *cell )->id != grid->Empty ) {
-      if ( index == selected && !isDisplayingPreview )
-        renderer->draw( "cellQuad", ( *cell )->id, "Grid", PURPLE );
-      else
-        renderer->draw(
-          "cellQuad", ( *cell )->id, isDisplayingPreview ? "Blur" : "Grid" );
-    } else {
-      if ( selected == empty )
-        renderer->draw( "cellQuad", "Blank", "Grid", PURPLE );
-      else
+
+    if ( index != selected || isDisplayingPreview ) {
+      if ( index == empty )
         renderer->draw( "cellQuad", "Blank", "Grid" );
+      else
+        renderer->draw( "cellQuad", ( *cell )->id, selectedShader );
     }
   }
+};
 
+void
+Game::displayStats()
+{
   print( std::string( "Moves: " ), 10, 18 );
   print( std::to_string( moves ), 80, 18 );
 
   print( std::string( "Time: " ), 150, 18 );
   print(
     std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 18 );
-
-  if ( isDisplayingPreview ) {
-    displayPreview();
-  }
 };
 
 void
@@ -567,10 +577,13 @@ Game::shiftCell()
       break;
   }
 
-  inProgress ? renderer->setQuadPosition(
-                 "cellQuad", startCoordinates.x, startCoordinates.y )
-             : renderer->setQuadPosition(
-                 "cellQuad", endCoordinates.x, endCoordinates.y );
+  if ( inProgress )
+    renderer->setQuadPosition(
+      "cellQuad", startCoordinates.x, startCoordinates.y );
+  else
+    renderer->setQuadPosition( "cellQuad", endCoordinates.x, endCoordinates.y );
+
+  renderer->draw( "cellQuad", grid->cells[selected]->id, "Grid", PURPLE );
 };
 
 void
@@ -618,10 +631,15 @@ Game::run()
       processMenuInput();
       menu();
     } else {
-      play();
+      displayStats();
+      renderInactiveCells();
       if ( inProgress ) {
         shiftCell();
+      } else if ( isDisplayingPreview ) {
+        displayPreview();
+        processGameInput();
       } else {
+        renderActiveCell();
         processGameInput();
       }
     }
