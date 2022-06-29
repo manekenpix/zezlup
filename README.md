@@ -1,4 +1,6 @@
-# zezlup
+# zezlup <img align="left" width="100" height="100" src=https://github.com/manekenpix/zezlup/blob/main/data/images/logo.png>
+
+![Format Check](https://github.com/manekenpix/zezlup/actions/workflows/clang-format-check.yml/badge.svg)
 
 Zezlup is a little slide-puzzle game for Linux created for the sole purpose of learning a bit of game development.
 
