@@ -123,6 +123,16 @@ Renderer::draw( std::string quad, std::string texture, std::string shader )
 };
 
 void
+Renderer::draw( std::string quad, std::array<f32, 3> colour )
+{
+  shaders["Solid"]->use();
+  shaders["Solid"]->setMatrix4fv( "projection", projectionMatrix );
+  shaders["Solid"]->set3vf( "passed_colour", colour );
+
+  quads[quad]->bind();
+};
+
+void
 Renderer::swapBuffers()
 {
   glfwSwapBuffers( window );

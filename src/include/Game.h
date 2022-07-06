@@ -87,6 +87,7 @@ class Game
   bool isDisplayingHelp;
   std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
   std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
+  std::array<f32, 3> BLUE = { 0.07f, 0.12f, 0.23f };
 
   // Animation
   u8 shiftOffset = 60;
