@@ -36,6 +36,14 @@ Game::Game()
 
   renderer->createQuad(
     "gameBlank", backgroundWidth / gridWidth, backgroundHeight / gridHeight );
+
+  // Top bar
+  renderer->createQuad( "top_bar", 800, 25 );
+  renderer->setQuadPosition( "top_bar", 0, 0 );
+
+  // Help panel
+  renderer->createQuad( "helpPanel", previewWidth, previewHeight );
+  renderer->setQuadPosition( "helpPanel", previewX, previewY );
 };
 
 void
@@ -128,6 +136,9 @@ Game::loadShaders()
     "Grid", "src/Shaders/common.vert", "src/Shaders/default.frag" );
 
   renderer->loadShader(
+    "Solid", "src/Shaders/common.vert", "src/Shaders/solid.frag" );
+
+  renderer->loadShader(
     "Blur", "src/Shaders/common.vert", "src/Shaders/blur.frag" );
 
   renderer->loadShader(
@@ -154,24 +165,6 @@ Game::loadTextures()
     ++index;
   }
 
-  // Top bar
-  auto topBar = new Png( "data/images/top_bar.png" );
-  renderer->createQuad( "top_bar", topBar->getWidth(), topBar->getHeight() );
-  renderer->setQuadPosition( "top_bar", 0, 0 );
-  renderer->loadTexture( "top_bar",
-                         topBar->getImageBuffer(),
-                         topBar->getWidth(),
-                         topBar->getHeight(),
-                         topBar->getColourType() );
-
-  auto helpPanel = new Png( "data/images/help_panel.png" );
-  renderer->createQuad( "helpPanel", previewWidth, previewHeight );
-  renderer->setQuadPosition( "helpPanel", previewX, previewY );
-  renderer->loadTexture( "helpPanel",
-                         helpPanel->getImageBuffer(),
-                         helpPanel->getWidth(),
-                         helpPanel->getHeight(),
-                         helpPanel->getColourType() );
   logger.info( "s", "Loading textures: done" );
 };
 
@@ -446,7 +439,7 @@ Game::isPuzzleCompleted()
 void
 Game::displayHelp()
 {
-  renderer->draw( "helpPanel", "helpPanel", "Grid" );
+  renderer->draw( "helpPanel", BLUE );
 
   print( std::string( "Help" ), headerOffsetX, 190 );
   print( std::string( "----" ), headerOffsetX, 200 );
@@ -625,7 +618,7 @@ Game::run()
     renderer->getMouseState();
 
     renderer->setQuadPosition( "top_bar", 0, 0 );
-    renderer->draw( "top_bar", "top_bar", "Grid" );
+    renderer->draw( "top_bar", BLUE );
 
     if ( menuMode ) {
       processMenuInput();

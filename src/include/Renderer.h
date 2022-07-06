@@ -52,6 +52,7 @@ public:
              std::string shader,
              std::array<f32, 3> colour );
   void draw( std::string quad, std::string texture, std::string shader );
+  void draw( std::string quad, std::array<f32, 3> colour );
 
   void swapBuffers();
   void pollEvents();
