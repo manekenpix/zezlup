@@ -1,9 +1,11 @@
 #ifndef FONT_H
 #define FONT_H
 
-#include "Logger.h"
-#include "types.h"
+#include "../Logger/Logger.h"
+#include "../types.h"
 #include <ft2build.h>
+#include <string>
+#include <vector>
 
 #include FT_FREETYPE_H
 

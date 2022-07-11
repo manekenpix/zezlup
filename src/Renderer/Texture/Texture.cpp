@@ -1,4 +1,4 @@
-#include "include/Texture.h"
+#include "Texture.h"
 
 Texture::Texture( u8* buffer, s32 width, s32 height, u8 colourType )
 {

@@ -1,10 +1,10 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "Png.h"
-#include "Quad.h"
-#include "Shuffle.h"
-#include "types.h"
+#include "../PngParser/PngParser.h"
+#include "../Renderer/Quad/Quad.h"
+#include "../Shuffle.h"
+#include "../types.h"
 #include <algorithm>
 
 class Grid

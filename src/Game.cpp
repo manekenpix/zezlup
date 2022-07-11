@@ -1,4 +1,4 @@
-#include "include/Game.h"
+#include "Game.h"
 
 Game::Game()
   : preview{ nullptr }

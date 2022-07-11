@@ -1,4 +1,4 @@
-#include "include/Renderer.h"
+#include "Renderer.h"
 
 Renderer::Renderer()
   : isKeyPressed{ false }

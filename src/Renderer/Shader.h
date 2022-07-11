@@ -1,8 +1,8 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "Logger.h"
-#include "types.h"
+#include "../Logger/Logger.h"
+#include "../types.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>

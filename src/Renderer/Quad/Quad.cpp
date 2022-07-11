@@ -1,4 +1,4 @@
-#include "include/Quad.h"
+#include "Quad.h"
 
 Quad::Quad( f32 w, f32 h )
   : width{ w }

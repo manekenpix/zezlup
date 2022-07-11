@@ -1,4 +1,4 @@
-#include "include/Grid.h"
+#include "Grid.h"
 
 Grid::Grid( u8 cellsRow,
             u8 cellsColumn,

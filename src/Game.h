@@ -1,15 +1,14 @@
 #ifndef GAME_H
 #define GAME_H
 
-#include "Font.h"
-#include "Grid.h"
-#include "Logger.h"
-#include "Png.h"
-#include "Quad.h"
-#include "Renderer.h"
-#include "Shader.h"
+#include "Font/Font.h"
+#include "Grid/Grid.h"
+#include "Logger/Logger.h"
+#include "PngParser/PngParser.h"
+#include "Renderer/Quad/Quad.h"
+#include "Renderer/Renderer.h"
+#include "Renderer/Texture/Texture.h"
 #include "Shuffle.h"
-#include "Texture.h"
 #include <algorithm>
 #include <charconv>
 #include <ft2build.h>
