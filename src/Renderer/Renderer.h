@@ -1,11 +1,11 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "Png.h"
-#include "Quad.h"
+#include "../PngParser/PngParser.h"
+#include "../types.h"
+#include "Quad/Quad.h"
 #include "Shader.h"
-#include "Texture.h"
-#include "types.h"
+#include "Texture/Texture.h"
 
 #include <array>
 #include <glm/glm.hpp>

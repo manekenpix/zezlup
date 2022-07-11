@@ -1,8 +1,8 @@
 #ifndef PNG_H
 #define PNG_H
 
-#include "Logger.h"
-#include "types.h"
+#include "../Logger/Logger.h"
+#include "../types.h"
 #include <fstream>
 #include <iostream>
 #include <vector>

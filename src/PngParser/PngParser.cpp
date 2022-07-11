@@ -1,4 +1,4 @@
-#include "include/Png.h"
+#include "PngParser.h"
 #include <algorithm>
 #include <cmath>
 #include <fstream>
