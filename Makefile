@@ -6,21 +6,23 @@ BUILDDIR = build
 TARGET = zezlup
 SRCEXT = cpp
 FREETYPE = -I/usr/include/freetype2
-RELEASE = -03
+RELEASE = -O3
 DEBUG = -g
 
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
+release: export CMODE := -O3
 release: $(OBJECTS)
 	$(CC) $(RELEASE) $^ -o $(TARGET) $(CFLAGS_RELEASE)
 
+debug: export CMODE := -g
 debug: $(OBJECTS)
 	$(CC) $(DEBUG) $^ -o $(TARGET) $(CFLAGS_DEBUG)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.$(SRCEXT)
 	@mkdir -p $(dir $@)
-	$(CC) $(DEBUG) $(FREETYPE) -Wall -c -o $@ $<
+	$(CC) $(CMODE) $(FREETYPE) -Wall -c -o $@ $<
 
 clean:
 	@echo " Cleaning...";

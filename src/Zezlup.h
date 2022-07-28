@@ -1,5 +1,5 @@
-#ifndef GAME_H
-#define GAME_H
+#ifndef ZEZLUP_H
+#define ZEZLUP_H
 
 #include "Font/Font.h"
 #include "Grid/Grid.h"
@@ -16,7 +16,7 @@
 #include <string>
 #include FT_FREETYPE_H
 
-class Game
+class Zezlup
 {
   enum class Directions
   {
@@ -135,8 +135,8 @@ class Game
   void displayStats();
 
 public:
-  Game();
-  ~Game();
+  Zezlup();
+  ~Zezlup();
   void run();
 
   friend inline std::vector<std::string> splitString( const std::string& str,

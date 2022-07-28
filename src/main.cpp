@@ -1,12 +1,12 @@
-#include "Game.h"
+#include "Zezlup.h"
 
 int
 main( int argc, char* argv[] )
 {
 
-  Game game;
+  Zezlup zezlup;
 
-  game.run();
+  zezlup.run();
 
   return 0;
 };
