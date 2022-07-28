@@ -45,20 +45,20 @@ class Font
 
   std::vector<CharInfo> charactersInfo;
 
-  u8 calculateOffset( const u8 c ) const;
+  u8 calculateOffset( const u8& c ) const;
 
 public:
   Font() = delete;
-  Font( const char* fontFile );
+  Font( const std::string& fontFile );
   ~Font();
 
-  std::string getStringChar( const u8 c ) const;
-  f32 getWidth( const u8 c ) const;
-  f32 getHeight( const u8 c ) const;
-  u32 getAdvanceX( const u8 c ) const;
-  u32 getAdvanceY( const u8 c ) const;
-  u32 getBitmapTop( const u8 c ) const;
-  u8* getBuffer( const u8 c );
+  std::string getStringChar( const u8& c ) const;
+  f32 getWidth( const u8& c ) const;
+  f32 getHeight( const u8& c ) const;
+  u32 getAdvanceX( const u8& c ) const;
+  u32 getAdvanceY( const u8& c ) const;
+  u32 getBitmapTop( const u8& c ) const;
+  u8* getBuffer( const u8& c );
 };
 
 #endif
