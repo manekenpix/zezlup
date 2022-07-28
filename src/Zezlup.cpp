@@ -1,6 +1,6 @@
-#include "Game.h"
+#include "Zezlup.h"
 
-Game::Game()
+Zezlup::Zezlup()
   : preview{ nullptr }
   , background{ nullptr }
   , gridHeight{ 4 }
@@ -52,7 +52,7 @@ Game::Game()
 };
 
 void
-Game::createGrid()
+Zezlup::createGrid()
 {
   grid = new Grid( gridWidth,
                    gridHeight,
@@ -68,7 +68,7 @@ Game::createGrid()
 };
 
 void
-Game::loadMenuAssets()
+Zezlup::loadMenuAssets()
 {
   logger.info( "s", "Loading menu assets..." );
   vector<string> coordsFromConfig = parser->getSectionData( COORDS );
@@ -91,7 +91,7 @@ Game::loadMenuAssets()
 };
 
 void
-Game::removeGrid()
+Zezlup::removeGrid()
 {
   for ( const auto& cell : grid->cells ) {
     if ( cell->id != grid->Empty )
@@ -102,7 +102,7 @@ Game::removeGrid()
 };
 
 void
-Game::loadFont()
+Zezlup::loadFont()
 {
   logger.info( "s", "Loading fonts..." );
 
@@ -124,7 +124,7 @@ Game::loadFont()
 };
 
 void
-Game::loadAssets()
+Zezlup::loadAssets()
 {
   logger.info( "s", "Loading assets..." );
   vector<string> assetPaths = parser->getSectionData( ASSETS );
@@ -136,7 +136,7 @@ Game::loadAssets()
 };
 
 void
-Game::loadShaders()
+Zezlup::loadShaders()
 {
   logger.info( "s", "Loading shaders..." );
   vector<string> shadersPaths = parser->getSectionData( SHADERS );
@@ -151,7 +151,7 @@ Game::loadShaders()
 };
 
 void
-Game::loadTextures()
+Zezlup::loadTextures()
 {
   renderer->createQuad( "optionQuad", optionWidth, optionHeight );
 
@@ -169,7 +169,7 @@ Game::loadTextures()
 };
 
 void
-Game::loadGridTextures()
+Zezlup::loadGridTextures()
 {
   u8* imageBuffer = images[optionSelected]->getImageBuffer();
   u32 imageWidth = images[optionSelected]->getWidth();
@@ -208,7 +208,7 @@ Game::loadGridTextures()
 };
 
 void
-Game::removeGridTextures()
+Zezlup::removeGridTextures()
 {
   u8 cells = gridHeight * gridWidth;
   for ( u8 cell = 0; cell < cells; ++cell ) {
@@ -217,7 +217,7 @@ Game::removeGridTextures()
 };
 
 bool
-Game::getOptionSelectedWithMouse()
+Zezlup::getOptionSelectedWithMouse()
 {
   s8 xPos = -1, yPos = -1;
   u8 index = 0;
@@ -240,7 +240,7 @@ Game::getOptionSelectedWithMouse()
 };
 
 void
-Game::selectOptionWithMouseClick()
+Zezlup::selectOptionWithMouseClick()
 {
   if ( getOptionSelectedWithMouse() )
     initializeGameplay();
@@ -249,7 +249,7 @@ Game::selectOptionWithMouseClick()
 };
 
 void
-Game::initializeGameplay()
+Zezlup::initializeGameplay()
 {
   createGrid();
   loadGridTextures();
@@ -259,7 +259,7 @@ Game::initializeGameplay()
 };
 
 void
-Game::processMenuInput()
+Zezlup::processMenuInput()
 {
   if ( key == Renderer::Keys::help )
     isDisplayingHelp = !isDisplayingHelp;
@@ -300,7 +300,7 @@ Game::processMenuInput()
 };
 
 bool
-Game::getCellSelectedWithMouse()
+Zezlup::getCellSelectedWithMouse()
 {
   s8 xPos = -1, yPos = -1;
 
@@ -333,7 +333,7 @@ Game::getCellSelectedWithMouse()
 };
 
 void
-Game::selectCellWithMouseClick()
+Zezlup::selectCellWithMouseClick()
 {
   if ( getCellSelectedWithMouse() )
     shiftSelectedCell();
@@ -342,7 +342,7 @@ Game::selectCellWithMouseClick()
 };
 
 void
-Game::shiftSelectedCell()
+Zezlup::shiftSelectedCell()
 {
   s8 distanceBetweenBoxes = abs( selected - empty );
 
@@ -369,7 +369,7 @@ Game::shiftSelectedCell()
 };
 
 void
-Game::processGameInput()
+Zezlup::processGameInput()
 {
   if ( isPuzzleCompleted() ) {
     removeGridTextures();
@@ -425,7 +425,7 @@ Game::processGameInput()
 };
 
 bool
-Game::isPuzzleCompleted()
+Zezlup::isPuzzleCompleted()
 {
   for ( u8 i = 1; i < gridWidth * gridHeight; ++i ) {
     std::string s = grid->getId( i );
@@ -437,7 +437,7 @@ Game::isPuzzleCompleted()
 }
 
 void
-Game::displayHelp()
+Zezlup::displayHelp()
 {
   renderer->draw( "helpPanel", BLUE );
 
@@ -470,14 +470,14 @@ Game::displayHelp()
 };
 
 void
-Game::displayPreview()
+Zezlup::displayPreview()
 {
   renderer->draw( "preview", assets[optionSelected], "Grid" );
   renderer->draw( "blank", "Blank", "Grid" );
 };
 
 void
-Game::menu()
+Zezlup::menu()
 {
   renderer->draw( "background", assets[optionSelected], "Blur" );
   u8 index = 0;
@@ -500,7 +500,7 @@ Game::menu()
 };
 
 void
-Game::renderActiveCell()
+Zezlup::renderActiveCell()
 {
   std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
   renderer->setQuadPosition(
@@ -516,7 +516,7 @@ Game::renderActiveCell()
 };
 
 void
-Game::renderInactiveCells()
+Zezlup::renderInactiveCells()
 {
   u8 index = 0;
   std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
@@ -535,7 +535,7 @@ Game::renderInactiveCells()
 };
 
 void
-Game::displayStats()
+Zezlup::displayStats()
 {
   print( std::string( "Moves: " ), 10, 18 );
   print( std::to_string( moves ), 80, 18 );
@@ -546,7 +546,7 @@ Game::displayStats()
 };
 
 void
-Game::shiftCell()
+Zezlup::shiftCell()
 {
   switch ( direction ) {
     case Directions::left:
@@ -580,7 +580,7 @@ Game::shiftCell()
 };
 
 void
-Game::print( std::string s, u32 x, u32 y )
+Zezlup::print( std::string s, u32 x, u32 y )
 {
   std::string st;
   for ( auto c = s.begin(); c != s.end(); ++c ) {
@@ -598,14 +598,14 @@ Game::print( std::string s, u32 x, u32 y )
 };
 
 void
-Game::displayFPS( f32& start, f32& end )
+Zezlup::displayFPS( f32& start, f32& end )
 {
   print( std::string( "FPS: " ), 650, 18 );
   print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 685, 18 );
 };
 
 void
-Game::run()
+Zezlup::run()
 {
   f32 startSeconds = glfwGetTime();
   f32 endSeconds = 0.0f;
@@ -648,7 +648,7 @@ Game::run()
   } while ( key != Renderer::Keys::esc && !renderer->windowShouldClose() );
 };
 
-Game::~Game()
+Zezlup::~Zezlup()
 {
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );

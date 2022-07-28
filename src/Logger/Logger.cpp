@@ -5,17 +5,15 @@ Logger::Logger()
   log.reserve( 2048 );
 
   const char* env = getenv( ZEZLUP_LOG_LEVEL );
-  if ( env )
-    setLogLevel( string( env ) );
-  else
-    logLevel = "info";
+  setLogLevel( string( env ) );
 };
 
 void
 Logger::setLogLevel( string _level )
 {
-  auto level = find( LEVELS.begin(), LEVELS.end(), _level );
-  logLevel = level != LEVELS.end() ? *level : "info";
+  logLevel = find( LEVELS.begin(), LEVELS.end(), _level ) != LEVELS.end()
+               ? _level
+               : "info";
 };
 
 void
