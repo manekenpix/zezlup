@@ -14,13 +14,18 @@ Game::Game()
   , isDisplayingPreview{ false }
   , isDisplayingHelp{ false }
 {
+  logger.info( "s", "Zezlup!" );
+
+  // Read config file
+  parser = new Parser( '-', '#' );
+  parser->loadFile( "config.ini" );
+  parser->parse();
+
   // Renderer
   renderer = new Renderer();
   renderer->createWindow( windowWidth, windowHeight );
 
   mouse = renderer->getMouse();
-
-  logger.info( "s", "Zezlup!" );
 
   loadMenuAssets();
   loadFont();
@@ -66,12 +71,14 @@ void
 Game::loadMenuAssets()
 {
   logger.info( "s", "Loading menu assets..." );
-  optionsCoords.push_back( Vec2( 50.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 300.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 550.0f, 183.0f ) );
-  optionsCoords.push_back( Vec2( 50.0f, 516.0f ) );
-  optionsCoords.push_back( Vec2( 300.0f, 516.0f ) );
-  optionsCoords.push_back( Vec2( 550.0f, 516.0f ) );
+  vector<string> coordsFromConfig = parser->getSectionData( COORDS );
+
+  std::vector<std::string> coord;
+  for ( string& coords : coordsFromConfig ) {
+    coord = splitString( coords, ',' );
+    optionsCoords.push_back(
+      Vec2( std::stof( coord[0] ), std::stof( coord[1] ) ) );
+  }
 
   // Create a background
   renderer->createQuad( "background", backgroundWidth, backgroundHeight );
@@ -98,7 +105,9 @@ void
 Game::loadFont()
 {
   logger.info( "s", "Loading fonts..." );
-  font = new Font( "data/fonts/Tinos.ttf" );
+
+  vector<string> fonts = parser->getSectionData( FONTS );
+  font = new Font( fonts[0].c_str() );
 
   for ( u8 c = '!'; c < '}'; ++c ) {
     renderer->createQuad(
@@ -118,13 +127,11 @@ void
 Game::loadAssets()
 {
   logger.info( "s", "Loading assets..." );
+  vector<string> assetPaths = parser->getSectionData( ASSETS );
 
-  assets.push_back( "data/images/tic_tac_toe.png" );
-  assets.push_back( "data/images/cube_small.png" );
-  assets.push_back( "data/images/chess.png" );
-  assets.push_back( "data/images/pieces_small.png" );
-  assets.push_back( "data/images/labyrinth.png" );
-  assets.push_back( "data/images/green.png" );
+  for ( string& assetPath : assetPaths )
+    assets.push_back( assetPath );
+
   logger.info( "s", "Loading assets: done" );
 };
 
@@ -132,25 +139,20 @@ void
 Game::loadShaders()
 {
   logger.info( "s", "Loading shaders..." );
-  renderer->loadShader(
-    "Grid", "src/Shaders/common.vert", "src/Shaders/default.frag" );
+  vector<string> shadersPaths = parser->getSectionData( SHADERS );
 
-  renderer->loadShader(
-    "Solid", "src/Shaders/common.vert", "src/Shaders/solid.frag" );
+  std::vector<std::string> shader;
+  for ( string& shaderPath : shadersPaths ) {
+    shader = splitString( shaderPath, ',' );
+    renderer->loadShader( shader[0], shader[1], shader[2] );
+  }
 
-  renderer->loadShader(
-    "Blur", "src/Shaders/common.vert", "src/Shaders/blur.frag" );
-
-  renderer->loadShader(
-    "Text", "src/Shaders/text.vert", "src/Shaders/text.frag" );
   logger.info( "s", "Loading shaders: done" );
 };
 
 void
 Game::loadTextures()
 {
-  logger.info( "s", "Loading textures..." );
-
   renderer->createQuad( "optionQuad", optionWidth, optionHeight );
 
   u8 index = 0;
@@ -164,8 +166,6 @@ Game::loadTextures()
                            images[index]->getColourType() );
     ++index;
   }
-
-  logger.info( "s", "Loading textures: done" );
 };
 
 void
@@ -653,6 +653,7 @@ Game::~Game()
   std::for_each(
     images.begin(), images.end(), []( Png* image ) { delete image; } );
 
+  delete parser;
   delete preview;
   delete background;
   delete renderer;
