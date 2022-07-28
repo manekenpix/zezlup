@@ -5,7 +5,10 @@ Logger::Logger()
   log.reserve( 2048 );
 
   const char* env = getenv( ZEZLUP_LOG_LEVEL );
-  setLogLevel( string( env ) );
+  if ( env )
+    setLogLevel( string( env ) );
+  else
+    logLevel = "info";
 };
 
 void
