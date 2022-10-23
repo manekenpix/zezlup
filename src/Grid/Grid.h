@@ -1,7 +1,7 @@
 #ifndef GRID_H
 #define GRID_H
 
-#include "../PngParser/PngParser.h"
+#include "../Image/Image.h"
 #include "../Renderer/Quad/Quad.h"
 #include "../Shuffle.h"
 #include "../types.h"

@@ -157,7 +157,7 @@ Zezlup::loadTextures()
 
   u8 index = 0;
   for ( const auto& asset : assets ) {
-    images.push_back( new Png( asset.c_str() ) );
+    images.push_back( loadImage( asset.c_str() ) );
 
     renderer->loadTexture( asset,
                            images[index]->getImageBuffer(),
@@ -651,7 +651,7 @@ Zezlup::run()
 Zezlup::~Zezlup()
 {
   std::for_each(
-    images.begin(), images.end(), []( Png* image ) { delete image; } );
+    images.begin(), images.end(), []( Image* image ) { delete image; } );
 
   delete parser;
   delete preview;

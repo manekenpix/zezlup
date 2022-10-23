@@ -3,12 +3,10 @@
 
 #include "Font/Font.h"
 #include "Grid/Grid.h"
+#include "Image/Image.h"
 #include "Logger/Logger.h"
 #include "Parser/Parser.h"
-#include "PngParser/PngParser.h"
-#include "Renderer/Quad/Quad.h"
 #include "Renderer/Renderer.h"
-#include "Renderer/Texture/Texture.h"
 #include "Shuffle.h"
 #include <algorithm>
 #include <charconv>
@@ -75,7 +73,7 @@ class Zezlup
   const string ASSETS = "Assets";
   const string SHADERS = "Shaders";
   std::vector<std::string> assets;
-  std::vector<Png*> images;
+  std::vector<Image*> images;
 
   // Gameplay
   u8 selected;
