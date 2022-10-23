@@ -1,8 +1,9 @@
 #ifndef PNG_H
 #define PNG_H
 
-#include "../Logger/Logger.h"
-#include "../types.h"
+#include "../../Logger/Logger.h"
+#include "../../types.h"
+#include "../Image.h"
 #include <fstream>
 #include <iostream>
 #include <vector>
@@ -17,7 +18,7 @@ struct PaletteColour
 typedef std::vector<PaletteColour>::iterator PaletteIterator;
 typedef std::vector<uint8_t>::iterator u8vIt;
 
-class Png
+class Png : public Image
 {
   Logger logger;
   const u32 CHUNK = 16384;
@@ -89,6 +90,7 @@ class Png
 
 public:
   Png( const char* );
+  ~Png(){};
   u32 getWidth();
   u32 getHeight();
   u8* getImageBuffer();

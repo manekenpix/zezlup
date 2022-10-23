@@ -1,7 +1,7 @@
 #ifndef RENDERER_H
 #define RENDERER_H
 
-#include "../PngParser/PngParser.h"
+#include "../Image/Image.h"
 #include "../types.h"
 #include "Quad/Quad.h"
 #include "Shader.h"
