@@ -1,6 +1,7 @@
 #ifndef ZEZLUP_H
 #define ZEZLUP_H
 
+#include "ColourPicker/ColourPicker.h"
 #include "Font/Font.h"
 #include "Grid/Grid.h"
 #include "Image/Image.h"
@@ -75,6 +76,14 @@ class Zezlup
   std::vector<std::string> assets;
   std::vector<Image*> images;
 
+  // Colour picker
+  u32 selectedColourHeight, selectedColourWidth, selectedColourX,
+    selectedColourY;
+  u32 pickerHeight, pickerWidth, pickerX, pickerY;
+  bool isDisplayingPicker;
+  ColourPicker* picker;
+  std::array<f32, 3> selectedColour;
+
   // Gameplay
   u8 selected;
   u32 moves = 0;
@@ -88,9 +97,9 @@ class Zezlup
   const u8 initialMoves = 20;
 
   bool isDisplayingHelp;
-  std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
-  std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
-  std::array<f32, 3> BLUE = { 0.07f, 0.12f, 0.23f };
+  const std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
+  const std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
+  const std::array<f32, 3> BLUE = { 0.07f, 0.12f, 0.23f };
 
   // Animation
   u8 shiftOffset = 60;
@@ -119,6 +128,8 @@ class Zezlup
   void selectOptionWithMouseClick();
   bool getCellSelectedWithMouse();
   void selectCellWithMouseClick();
+  bool isSelectedColourClicked();
+  bool isColourPickerClicked();
 
   void menu();
   void renderActiveCell();
@@ -131,6 +142,7 @@ class Zezlup
   void displayPreview();
   void displayFPS( f32& start, f32& end );
   void displayStats();
+  void createColourPicker();
 
 public:
   Zezlup();
