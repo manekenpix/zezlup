@@ -13,6 +13,7 @@ Zezlup::Zezlup()
   , key{ Renderer::Keys::blank }
   , isDisplayingPreview{ false }
   , isDisplayingHelp{ false }
+  , isDisplayingPicker{ false }
 {
   logger.info( "s", "Zezlup!" );
 
@@ -32,6 +33,7 @@ Zezlup::Zezlup()
   loadAssets();
   loadTextures();
   loadShaders();
+  createColourPicker();
 
   // TODO(Josue): This shouldn't be here. Move this to a place where all the
   // game stuff is created/loaded
@@ -45,10 +47,17 @@ Zezlup::Zezlup()
   // Top bar
   renderer->createQuad( "top_bar", 800, 25 );
   renderer->setQuadPosition( "top_bar", 0, 0 );
+  std::copy( PURPLE.cbegin(), PURPLE.cend(), selectedColour.begin() );
 
   // Help panel
   renderer->createQuad( "helpPanel", previewWidth, previewHeight );
   renderer->setQuadPosition( "helpPanel", previewX, previewY );
+
+  // Selected Colour
+  renderer->createQuad(
+    "selectedColour", selectedColourWidth, selectedColourHeight );
+  renderer->setQuadPosition(
+    "selectedColour", selectedColourX, selectedColourY );
 };
 
 void
@@ -216,6 +225,27 @@ Zezlup::removeGridTextures()
   }
 };
 
+void
+Zezlup::createColourPicker()
+{
+  pickerHeight = 127 * 5;
+  pickerWidth = 25;
+  pickerX = 600;
+  pickerY = 40;
+  selectedColourWidth = 25;
+  selectedColourHeight = 15;
+  selectedColourX = 600;
+  selectedColourY = 5;
+
+  picker = new ColourPicker( pickerWidth, pickerHeight );
+
+  renderer->createQuad( "colourPicker", pickerWidth, pickerHeight );
+  renderer->setQuadPosition( "colourPicker", pickerX, pickerY );
+
+  renderer->loadTexture(
+    "colourPicker", picker->getBuffer(), pickerWidth, pickerHeight, 0 );
+};
+
 bool
 Zezlup::getOptionSelectedWithMouse()
 {
@@ -258,6 +288,22 @@ Zezlup::initializeGameplay()
   startTime = glfwGetTime();
 };
 
+bool
+Zezlup::isSelectedColourClicked()
+{
+  return mouse->x >= selectedColourX &&
+         mouse->x <= ( selectedColourX + selectedColourWidth ) &&
+         mouse->y >= selectedColourY &&
+         mouse->y <= ( selectedColourY + selectedColourHeight );
+};
+
+bool
+Zezlup::isColourPickerClicked()
+{
+  return mouse->x >= pickerX && mouse->x <= ( pickerX + pickerWidth ) &&
+         mouse->y >= pickerY && mouse->y <= ( pickerY + pickerHeight );
+};
+
 void
 Zezlup::processMenuInput()
 {
@@ -295,8 +341,19 @@ Zezlup::processMenuInput()
   if ( mouse->isCoordsChanged )
     getOptionSelectedWithMouse();
 
-  if ( mouse->isLeftPressed )
-    selectOptionWithMouseClick();
+  if ( mouse->isLeftPressed ) {
+    if ( !isDisplayingPicker && isSelectedColourClicked() ) {
+      isDisplayingPicker = true;
+    } else if ( isDisplayingPicker && isColourPickerClicked() ) {
+      isDisplayingPicker = false;
+      std::array<f32, 3> newColour =
+        picker->getColour( mouse->x - pickerX, mouse->y - pickerY );
+      std::copy( newColour.cbegin(), newColour.cend(), selectedColour.begin() );
+    } else {
+      isDisplayingPicker = false;
+      selectOptionWithMouseClick();
+    }
+  }
 };
 
 bool
@@ -487,13 +544,18 @@ Zezlup::menu()
       "optionQuad", optionsCoords[index].x, optionsCoords[index].y );
 
     if ( index == optionSelected )
-      renderer->draw( "optionQuad", *asset, "Grid", PURPLE );
+      renderer->draw( "optionQuad", *asset, "Grid", selectedColour );
     else
       renderer->draw( "optionQuad", *asset, "Grid" );
   }
 
+  renderer->draw( "selectedColour", selectedColour );
+
+  if ( isDisplayingPicker )
+    renderer->draw( "colourPicker", "colourPicker", "Grid" );
+
   print( std::string( "[ Help: h ]" ), 10, 18 );
-  print( std::string( "v.0.0.1" ), 735, 18 );
+  print( std::string( "v0.0.1" ), 735, 18 );
 
   if ( isDisplayingHelp )
     displayHelp();
@@ -510,9 +572,9 @@ Zezlup::renderActiveCell()
   // state, like string has npos
   if ( grid->cells[selected]->id != grid->Empty )
     renderer->draw(
-      "cellQuad", grid->cells[selected]->id, selectedShader, PURPLE );
+      "cellQuad", grid->cells[selected]->id, selectedShader, selectedColour );
   else
-    renderer->draw( "cellQuad", "Blank", "Grid", PURPLE );
+    renderer->draw( "cellQuad", "Blank", "Grid", selectedColour );
 };
 
 void
@@ -576,7 +638,8 @@ Zezlup::shiftCell()
   else
     renderer->setQuadPosition( "cellQuad", endCoordinates.x, endCoordinates.y );
 
-  renderer->draw( "cellQuad", grid->cells[selected]->id, "Grid", PURPLE );
+  renderer->draw(
+    "cellQuad", grid->cells[selected]->id, "Grid", selectedColour );
 };
 
 void
@@ -658,4 +721,5 @@ Zezlup::~Zezlup()
   delete background;
   delete renderer;
   delete font;
+  delete picker;
 };
