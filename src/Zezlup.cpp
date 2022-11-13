@@ -14,6 +14,8 @@ Zezlup::Zezlup()
   , isDisplayingPreview{ false }
   , isDisplayingHelp{ false }
   , isDisplayingPicker{ false }
+  , leftMouseAlreadyClicked{ false }
+  , rightMouseAlreadyClicked{ false }
 {
   logger.info( "s", "Zezlup!" );
 
@@ -231,7 +233,7 @@ Zezlup::createColourPicker()
   pickerHeight = 127 * 5;
   pickerWidth = 25;
   pickerX = 600;
-  pickerY = 40;
+  pickerY = 20;
   selectedColourWidth = 25;
   selectedColourHeight = 15;
   selectedColourX = 600;
@@ -341,7 +343,8 @@ Zezlup::processMenuInput()
   if ( mouse->isCoordsChanged )
     getOptionSelectedWithMouse();
 
-  if ( mouse->isLeftPressed ) {
+  if ( mouse->isLeftPressed && !leftMouseAlreadyClicked ) {
+    leftMouseAlreadyClicked = true;
     if ( !isDisplayingPicker && isSelectedColourClicked() ) {
       isDisplayingPicker = true;
     } else if ( isDisplayingPicker && isColourPickerClicked() ) {
@@ -476,7 +479,9 @@ Zezlup::processGameInput()
   if ( mouse->isCoordsChanged )
     getCellSelectedWithMouse();
 
-  if ( mouse->isLeftPressed && !isDisplayingPreview ) {
+  if ( mouse->isLeftPressed && !isDisplayingPreview &&
+       !leftMouseAlreadyClicked ) {
+    leftMouseAlreadyClicked = true;
     selectCellWithMouseClick();
   }
 };
@@ -679,6 +684,10 @@ Zezlup::run()
 
     key = renderer->getKey();
     renderer->getMouseState();
+    if ( !mouse->isLeftPressed )
+      leftMouseAlreadyClicked = false;
+    if ( !mouse->isRightPressed )
+      rightMouseAlreadyClicked = false;
 
     renderer->setQuadPosition( "top_bar", 0, 0 );
     renderer->draw( "top_bar", BLUE );
