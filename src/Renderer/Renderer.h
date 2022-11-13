@@ -2,6 +2,7 @@
 #define RENDERER_H
 
 #include "../Image/Image.h"
+#include "../Logger/Logger.h"
 #include "../types.h"
 #include "Quad/Quad.h"
 #include "Shader.h"
@@ -85,6 +86,8 @@ private:
       , code{ _code } {};
 
   } KeyPair;
+
+  Logger logger;
 
   bool isKeyPressed;
   int pressedKey = -1;

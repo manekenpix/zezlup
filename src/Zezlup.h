@@ -29,6 +29,8 @@ class Zezlup
   Parser* parser;
   Renderer* renderer;
   Renderer::Mouse* mouse;
+  bool leftMouseAlreadyClicked;
+  bool rightMouseAlreadyClicked;
 
   Grid* grid;
   u8 gridWidth;
