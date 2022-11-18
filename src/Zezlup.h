@@ -37,8 +37,8 @@ class Zezlup
   u8 gridHeight;
 
   // Window
-  const f32 windowWidth = 800.0f;
-  const f32 windowHeight = 825.0f;
+  const f32 windowWidth = 850.0f;
+  const f32 windowHeight = 875.0f;
   f32 framerate;
 
   // Preview
@@ -46,8 +46,8 @@ class Zezlup
   bool isDisplayingPreview;
   const f32 previewWidth = 600.0f;
   const f32 previewHeight = 600.0f;
-  const f32 previewX = 100.0f;
-  const f32 previewY = 125.0f;
+  const f32 previewX = 125.0f;
+  const f32 previewY = 150.0f;
   const u8 initialEmpty = 0;
 
   // Fonts
@@ -79,9 +79,14 @@ class Zezlup
   std::vector<Image*> images;
 
   // Colour picker
-  u32 selectedColourHeight, selectedColourWidth, selectedColourX,
-    selectedColourY;
-  u32 pickerHeight, pickerWidth, pickerX, pickerY;
+  const u32 selectedColourHeight = 15;
+  const u32 selectedColourWidth = 25;
+  const u32 selectedColourX = 800;
+  const u32 selectedColourY = 6;
+  const u32 pickerHeight = 127 * 5;
+  const u32 pickerWidth = 25;
+  const u32 pickerX = 800;
+  const u32 pickerY = 21;
   bool isDisplayingPicker;
   ColourPicker* picker;
   std::array<f32, 3> selectedColour;
@@ -102,6 +107,8 @@ class Zezlup
   const std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
   const std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
   const std::array<f32, 3> BLUE = { 0.07f, 0.12f, 0.23f };
+  const std::array<f32, 3> BLUE_2 = { 0.17f, 0.52f, 0.86f };
+  const std::array<f32, 3> YELLOW = { 0.98f, 0.63f, 0.06f };
 
   // Animation
   u8 shiftOffset = 60;
@@ -122,6 +129,7 @@ class Zezlup
   void shuffle();
   void createGrid();
   void removeGrid();
+  void createColourPicker();
 
   void shiftCell();
   void print( std::string s, u32 x, u32 y );
@@ -140,11 +148,12 @@ class Zezlup
   void initializeGameplay();
   void shiftSelectedCell();
 
-  void displayHelp();
   void displayPreview();
   void displayFPS( f32& start, f32& end );
   void displayStats();
-  void createColourPicker();
+  void displayControls();
+  void displaySelectedColour();
+  void displayColourPicker();
 
 public:
   Zezlup();

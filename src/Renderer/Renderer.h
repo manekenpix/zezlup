@@ -27,8 +27,8 @@ public:
     esc,
     backspace,
     help,
-    c,
-    m,
+    x,
+    z,
     blank
   };
 
@@ -55,9 +55,12 @@ public:
   void draw( std::string quad, std::string texture, std::string shader );
   void draw( std::string quad, std::array<f32, 3> colour );
 
-  void swapBuffers();
-  void pollEvents();
-  bool windowShouldClose();
+  f32 getTime() const;
+  void clearColor( const std::array<f32, 3> colour ) const;
+  void clear() const;
+  void swapBuffers() const;
+  void pollEvents() const;
+  bool windowShouldClose() const;
 
   void loadShader( std::string key, std::string vShader, std::string fShader );
   void loadTexture( std::string name,
@@ -99,8 +102,8 @@ private:
     KeyPair( Keys::up, GLFW_KEY_UP ),
     KeyPair( Keys::down, GLFW_KEY_DOWN ),
     KeyPair( Keys::enter, GLFW_KEY_ENTER ),
-    KeyPair( Keys::m, GLFW_KEY_M ),
-    KeyPair( Keys::c, GLFW_KEY_C ),
+    KeyPair( Keys::x, GLFW_KEY_X ),
+    KeyPair( Keys::z, GLFW_KEY_Z ),
     KeyPair( Keys::help, GLFW_KEY_H ),
     KeyPair( Keys::esc, GLFW_KEY_ESCAPE ),
     KeyPair( Keys::backspace, GLFW_KEY_BACKSPACE ),

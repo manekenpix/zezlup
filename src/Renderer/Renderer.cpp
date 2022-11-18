@@ -81,7 +81,7 @@ Renderer::createWindow( f32 windowW, f32 windowH )
 };
 
 bool
-Renderer::windowShouldClose()
+Renderer::windowShouldClose() const
 {
   return glfwWindowShouldClose( window );
 };
@@ -133,15 +133,33 @@ Renderer::draw( std::string quad, std::array<f32, 3> colour )
 };
 
 void
-Renderer::swapBuffers()
+Renderer::clearColor( const std::array<f32, 3> colour ) const
+{
+  glClearColor( colour[0], colour[1], colour[2], 1.0f );
+};
+
+void
+Renderer::clear() const
+{
+  glClear( GL_COLOR_BUFFER_BIT );
+};
+
+void
+Renderer::swapBuffers() const
 {
   glfwSwapBuffers( window );
 };
 
 void
-Renderer::pollEvents()
+Renderer::pollEvents() const
 {
   glfwPollEvents();
+};
+
+f32
+Renderer::getTime() const
+{
+  return glfwGetTime();
 };
 
 void

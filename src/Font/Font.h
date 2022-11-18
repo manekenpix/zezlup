@@ -12,7 +12,7 @@
 class Font
 {
   const u8 FIRST_CHAR = '!';
-  const u8 LAST_CHAR = '}';
+  const u8 LAST_CHAR = '~';
   const u8 CHAR_OFFSET = 33;
 
   Logger logger;
@@ -20,7 +20,7 @@ class Font
   FT_Library ft;
   FT_Face face;
 
-  typedef struct CharInfo
+  typedef struct Char
   {
     std::string character;
     f32 width;
@@ -29,21 +29,21 @@ class Font
     u32 advanceY;
     u32 bitmapTop;
 
-    CharInfo( u8 _character,
-              u32 _width,
-              u32 _height,
-              u32 _advanceX,
-              u32 _advanceY,
-              u32 _bitmapTop )
+    Char( u8 _character,
+          u32 _width,
+          u32 _height,
+          u32 _advanceX,
+          u32 _advanceY,
+          u32 _bitmapTop )
       : character( std::string( 1, _character ) )
       , width( _width )
       , height( _height )
       , advanceX( _advanceX )
       , advanceY( _advanceY )
       , bitmapTop( _bitmapTop ){};
-  } CharInfo;
+  } Char;
 
-  std::vector<CharInfo> charactersInfo;
+  std::vector<Char> charactersInfo;
 
   u8 calculateOffset( const u8& c ) const;
 

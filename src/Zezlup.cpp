@@ -12,7 +12,6 @@ Zezlup::Zezlup()
   , isKeyPressed{ false }
   , key{ Renderer::Keys::blank }
   , isDisplayingPreview{ false }
-  , isDisplayingHelp{ false }
   , isDisplayingPicker{ false }
   , leftMouseAlreadyClicked{ false }
   , rightMouseAlreadyClicked{ false }
@@ -46,20 +45,54 @@ Zezlup::Zezlup()
   renderer->createQuad(
     "gameBlank", backgroundWidth / gridWidth, backgroundHeight / gridHeight );
 
-  // Top bar
-  renderer->createQuad( "top_bar", 800, 25 );
-  renderer->setQuadPosition( "top_bar", 0, 0 );
-  std::copy( PURPLE.cbegin(), PURPLE.cend(), selectedColour.begin() );
-
-  // Help panel
-  renderer->createQuad( "helpPanel", previewWidth, previewHeight );
-  renderer->setQuadPosition( "helpPanel", previewX, previewY );
+  std::copy( YELLOW.cbegin(), YELLOW.cend(), selectedColour.begin() );
 
   // Selected Colour
   renderer->createQuad(
     "selectedColour", selectedColourWidth, selectedColourHeight );
   renderer->setQuadPosition(
     "selectedColour", selectedColourX, selectedColourY );
+
+  // Arrows
+  renderer->createQuad( "circle-up", 15, 15 );
+  renderer->setQuadPosition( "circle-up", 90, 5 );
+
+  Image* up = loadImage( "data/images/circle-up.png" );
+  renderer->loadTexture( "circle-up",
+                         up->getImageBuffer(),
+                         up->getWidth(),
+                         up->getHeight(),
+                         up->getColourType() );
+
+  renderer->createQuad( "circle-down", 15, 15 );
+  renderer->setQuadPosition( "circle-down", 115, 5 );
+
+  Image* down = loadImage( "data/images/circle-down.png" );
+  renderer->loadTexture( "circle-down",
+                         down->getImageBuffer(),
+                         down->getWidth(),
+                         down->getHeight(),
+                         down->getColourType() );
+
+  renderer->createQuad( "circle-left", 15, 15 );
+  renderer->setQuadPosition( "circle-left", 140, 5 );
+
+  Image* left = loadImage( "data/images/circle-left.png" );
+  renderer->loadTexture( "circle-left",
+                         left->getImageBuffer(),
+                         left->getWidth(),
+                         left->getHeight(),
+                         left->getColourType() );
+
+  renderer->createQuad( "circle-right", 15, 15 );
+  renderer->setQuadPosition( "circle-right", 165, 5 );
+
+  Image* right = loadImage( "data/images/circle-right.png" );
+  renderer->loadTexture( "circle-right",
+                         right->getImageBuffer(),
+                         right->getWidth(),
+                         right->getHeight(),
+                         right->getColourType() );
 };
 
 void
@@ -70,8 +103,8 @@ Zezlup::createGrid()
                    backgroundWidth,
                    backgroundHeight,
                    initialEmpty,
-                   0,
-                   25 );
+                   25,
+                   50 );
   empty = grid->shuffle( initialEmpty, initialMoves );
   emptyCell = grid->getCoords( empty );
 
@@ -93,7 +126,7 @@ Zezlup::loadMenuAssets()
 
   // Create a background
   renderer->createQuad( "background", backgroundWidth, backgroundHeight );
-  renderer->setQuadPosition( "background", 0, 25 );
+  renderer->setQuadPosition( "background", 25, 50 );
 
   // Preview
   renderer->createQuad( "preview", previewWidth, previewHeight );
@@ -230,15 +263,6 @@ Zezlup::removeGridTextures()
 void
 Zezlup::createColourPicker()
 {
-  pickerHeight = 127 * 5;
-  pickerWidth = 25;
-  pickerX = 600;
-  pickerY = 20;
-  selectedColourWidth = 25;
-  selectedColourHeight = 15;
-  selectedColourX = 600;
-  selectedColourY = 5;
-
   picker = new ColourPicker( pickerWidth, pickerHeight );
 
   renderer->createQuad( "colourPicker", pickerWidth, pickerHeight );
@@ -309,36 +333,32 @@ Zezlup::isColourPickerClicked()
 void
 Zezlup::processMenuInput()
 {
-  if ( key == Renderer::Keys::help )
-    isDisplayingHelp = !isDisplayingHelp;
+  // TODO(Josue): Use a map here
+  switch ( key ) {
+    case Renderer::Keys::right:
+      if ( optionSelected < assets.size() - 1 )
+        ++optionSelected;
+      break;
 
-  if ( !isDisplayingHelp )
-    // TODO(Josue): Use a map here
-    switch ( key ) {
-      case Renderer::Keys::right:
-        if ( optionSelected < assets.size() - 1 )
-          ++optionSelected;
-        break;
+    case Renderer::Keys::left:
+      if ( optionSelected > 0 )
+        --optionSelected;
+      break;
 
-      case Renderer::Keys::left:
-        if ( optionSelected > 0 )
-          --optionSelected;
-        break;
+    case Renderer::Keys::down:
+      if ( optionSelected < 3 )
+        optionSelected += 3;
+      break;
 
-      case Renderer::Keys::down:
-        if ( optionSelected < 3 )
-          optionSelected += 3;
-        break;
+    case Renderer::Keys::up:
+      if ( optionSelected > 2 )
+        optionSelected -= 3;
+      break;
 
-      case Renderer::Keys::up:
-        if ( optionSelected > 2 )
-          optionSelected -= 3;
-        break;
-
-      case Renderer::Keys::enter:
-        initializeGameplay();
-        break;
-    }
+    case Renderer::Keys::enter:
+      initializeGameplay();
+      break;
+  }
 
   if ( mouse->isCoordsChanged )
     getOptionSelectedWithMouse();
@@ -459,7 +479,7 @@ Zezlup::processGameInput()
         selected -= gridWidth;
       break;
 
-    case Renderer::Keys::c:
+    case Renderer::Keys::z:
       isDisplayingPreview = !isDisplayingPreview;
       break;
 
@@ -470,7 +490,7 @@ Zezlup::processGameInput()
       menuMode = true;
       break;
 
-    case Renderer::Keys::m:
+    case Renderer::Keys::x:
       if ( !isDisplayingPreview )
         shiftSelectedCell();
       break;
@@ -499,39 +519,6 @@ Zezlup::isPuzzleCompleted()
 }
 
 void
-Zezlup::displayHelp()
-{
-  renderer->draw( "helpPanel", BLUE );
-
-  print( std::string( "Help" ), headerOffsetX, 190 );
-  print( std::string( "----" ), headerOffsetX, 200 );
-
-  // Menu
-  print( std::string( "Menu" ), bodyOffsetX, 250 );
-  print( std::string( "----" ), bodyOffsetX, 260 );
-  print( std::string( "Use the arrow keys to move through images" ),
-         bodyOffsetX,
-         300 );
-  print( std::string( "Enter: Select an image and start the game" ),
-         bodyOffsetX,
-         350 );
-
-  // Game
-  print( std::string( "Game" ), bodyOffsetX, 400 );
-  print( std::string( "----" ), bodyOffsetX, 410 );
-  print( std::string( "Use the arrow keys to move the selector" ),
-         bodyOffsetX,
-         450 );
-  print( std::string( "m: Shift the selected tile to the empty space" ),
-         bodyOffsetX,
-         500 );
-  print( std::string( "c: Display solution" ), bodyOffsetX, 550 );
-  print( std::string( "Delete: Go back to the menu" ), bodyOffsetX, 600 );
-
-  print( std::string( "Press h to close this" ), footerOffsetX, 675 );
-};
-
-void
 Zezlup::displayPreview()
 {
   renderer->draw( "preview", assets[optionSelected], "Grid" );
@@ -554,16 +541,10 @@ Zezlup::menu()
       renderer->draw( "optionQuad", *asset, "Grid" );
   }
 
-  renderer->draw( "selectedColour", selectedColour );
-
   if ( isDisplayingPicker )
-    renderer->draw( "colourPicker", "colourPicker", "Grid" );
+    displayColourPicker();
 
-  print( std::string( "[ Help: h ]" ), 10, 18 );
-  print( std::string( "v0.0.1" ), 735, 18 );
-
-  if ( isDisplayingHelp )
-    displayHelp();
+  print( std::string( "v0.0.1" ), 775, 868 );
 };
 
 void
@@ -604,12 +585,51 @@ Zezlup::renderInactiveCells()
 void
 Zezlup::displayStats()
 {
-  print( std::string( "Moves: " ), 10, 18 );
-  print( std::to_string( moves ), 80, 18 );
+  print( std::string( "Moves" ), 10, 18 );
+  print( std::to_string( moves ), 60, 18 );
 
-  print( std::string( "Time: " ), 150, 18 );
-  print(
-    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 18 );
+  u32 time = static_cast<u32>( renderer->getTime() - startTime );
+  u8 seconds = time % 60;
+  u8 minutes = time / 60;
+
+  if ( minutes < 10 ) {
+    print( std::string( "Time" ), 150, 18 );
+    print( std::string( "0" ), 188, 18 );
+    print( std::to_string( minutes ), 197, 18 );
+  } else {
+    print( std::string( "Time" ), 150, 18 );
+    print( std::to_string( minutes ), 188, 18 );
+  }
+  print( ":", 208, 18 );
+  if ( seconds < 10 ) {
+    print( std::string( "0" ), 215, 18 );
+    print( std::to_string( seconds ), 224, 18 );
+  } else {
+    print( std::to_string( seconds ), 215, 18 );
+  }
+};
+
+void
+Zezlup::displayControls()
+{
+  print( std::string( "Controls:" ), 25, 18 );
+  renderer->draw( "circle-up", "circle-up", "Grid" );
+  renderer->draw( "circle-down", "circle-down", "Grid" );
+  renderer->draw( "circle-left", "circle-left", "Grid" );
+  renderer->draw( "circle-right", "circle-right", "Grid" );
+};
+
+void
+Zezlup::displayColourPicker()
+{
+  renderer->draw( "colourPicker", "colourPicker", "Grid" );
+};
+
+void
+Zezlup::displaySelectedColour()
+{
+  print( std::string( "Selector" ), 730, 18 );
+  renderer->draw( "selectedColour", selectedColour );
 };
 
 void
@@ -658,7 +678,7 @@ Zezlup::print( std::string s, u32 x, u32 y )
       st = font->getStringChar( *c );
       renderer->setQuadPosition( st, x, y - font->getBitmapTop( *c ) );
 
-      renderer->draw( st, st, "Text", WHITE );
+      renderer->draw( st, st, "Text", YELLOW );
 
       x += font->getAdvanceX( *c );
     }
@@ -668,19 +688,19 @@ Zezlup::print( std::string s, u32 x, u32 y )
 void
 Zezlup::displayFPS( f32& start, f32& end )
 {
-  print( std::string( "FPS: " ), 650, 18 );
-  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 685, 18 );
+  print( std::string( "FPS: " ), 30, 868 );
+  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 65, 868 );
 };
 
 void
 Zezlup::run()
 {
-  f32 startSeconds = glfwGetTime();
+  f32 startSeconds = renderer->getTime();
   f32 endSeconds = 0.0f;
 
   do {
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glClear( GL_COLOR_BUFFER_BIT );
+    renderer->clearColor( BLUE );
+    renderer->clear();
 
     key = renderer->getKey();
     renderer->getMouseState();
@@ -689,11 +709,11 @@ Zezlup::run()
     if ( !mouse->isRightPressed )
       rightMouseAlreadyClicked = false;
 
-    renderer->setQuadPosition( "top_bar", 0, 0 );
-    renderer->draw( "top_bar", BLUE );
+    displayControls();
 
     if ( menuMode ) {
       processMenuInput();
+      displaySelectedColour();
       menu();
     } else {
       displayStats();
@@ -709,10 +729,10 @@ Zezlup::run()
       }
     }
 
-    endSeconds = glfwGetTime();
+    endSeconds = renderer->getTime();
 
     displayFPS( startSeconds, endSeconds );
-    startSeconds = glfwGetTime();
+    startSeconds = renderer->getTime();
 
     renderer->swapBuffers();
     renderer->pollEvents();
