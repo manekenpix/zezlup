@@ -237,6 +237,45 @@ Renderer::getMouse()
   return &mouse;
 };
 
+void
+Renderer::loadFont( const std::string& id, const std::string& fontPath )
+{
+  fonts.insert( { id, new Font( fontPath ) } );
+  Font* font = fonts.at( id );
+
+  for ( u8 c = '!'; c < '}'; ++c ) {
+    createQuad(
+      std::string( 1, c ) + id, font->getWidth( c ), font->getHeight( c ) );
+
+    setQuadPosition( std::string( 1, c ) + id, 0, 0 );
+
+    loadTexture( std::string( 1, c ) + id,
+                 font->getBuffer( c ),
+                 font->getWidth( c ),
+                 font->getHeight( c ) );
+  }
+};
+
+void
+Renderer::print( const std::string s, u32 x, u32 y, const std::string id )
+{
+  std::string st;
+  Font* font = fonts.at( id );
+
+  for ( auto c = s.begin(); c != s.end(); ++c ) {
+    if ( *c == 32 )
+      x += 10;
+    else {
+      st = font->getStringChar( *c );
+      setQuadPosition( st + id, x, y - font->getBitmapTop( *c ) );
+
+      draw( st + id, st + id, "Text", WHITE );
+
+      x += font->getAdvanceX( *c );
+    }
+  }
+};
+
 Renderer::~Renderer()
 {
   for ( const auto& [key, v] : shaders ) {
@@ -248,6 +287,10 @@ Renderer::~Renderer()
   }
 
   for ( const auto& [key, v] : quads ) {
+    delete v;
+  }
+
+  for ( const auto& [key, v] : fonts ) {
     delete v;
   }
 

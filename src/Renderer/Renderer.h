@@ -4,6 +4,7 @@
 #include "../Image/Image.h"
 #include "../Logger/Logger.h"
 #include "../types.h"
+#include "Font/Font.h"
 #include "Quad/Quad.h"
 #include "Shader.h"
 #include "Texture/Texture.h"
@@ -74,6 +75,8 @@ public:
   Keys getKey();
   Mouse* getMouse();
   void getMouseState();
+  void loadFont( const std::string& id, const std::string& fontPath );
+  void print( const std::string s, u32 x, u32 y, const std::string id );
 
 private:
   typedef struct KeyPair
@@ -88,6 +91,8 @@ private:
   } KeyPair;
 
   Logger logger;
+  std::unordered_map<std::string, Font*> fonts;
+  const std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
 
   bool isKeyPressed;
   int pressedKey = -1;

@@ -116,21 +116,14 @@ void
 Zezlup::loadFont()
 {
   logger.info( "s", "Loading fonts..." );
+  std::vector<string> fontPaths = parser->getSectionData( FONTS );
 
-  vector<string> fonts = parser->getSectionData( FONTS );
-  font = new Font( fonts[0].c_str() );
-
-  for ( u8 c = '!'; c < '}'; ++c ) {
-    renderer->createQuad(
-      std::string( 1, c ), font->getWidth( c ), font->getHeight( c ) );
-
-    renderer->setQuadPosition( std::string( 1, c ), 0, 0 );
-
-    renderer->loadTexture( std::string( 1, c ),
-                           font->getBuffer( c ),
-                           font->getWidth( c ),
-                           font->getHeight( c ) );
+  std::vector<std::string> font;
+  for ( std::string& fontPath : fontPaths ) {
+    font = splitString( fontPath, ',' );
+    renderer->loadFont( font[0], font[1] );
   }
+
   logger.info( "s", "Loading fonts: done" );
 };
 
@@ -503,32 +496,40 @@ Zezlup::displayHelp()
 {
   renderer->draw( "helpPanel", BLUE );
 
-  print( std::string( "Help" ), headerOffsetX, 190 );
-  print( std::string( "----" ), headerOffsetX, 200 );
+  renderer->print( std::string( "Help" ), headerOffsetX, 190, "tinos" );
+  renderer->print( std::string( "----" ), headerOffsetX, 200, "tinos" );
 
   // Menu
-  print( std::string( "Menu" ), bodyOffsetX, 250 );
-  print( std::string( "----" ), bodyOffsetX, 260 );
-  print( std::string( "Use the arrow keys to move through images" ),
-         bodyOffsetX,
-         300 );
-  print( std::string( "Enter: Select an image and start the game" ),
-         bodyOffsetX,
-         350 );
+  renderer->print( std::string( "Menu" ), bodyOffsetX, 250, "tinos" );
+  renderer->print( std::string( "----" ), bodyOffsetX, 260, "tinos" );
+  renderer->print( std::string( "Use the arrow keys to move through images" ),
+                   bodyOffsetX,
+                   300,
+                   "tinos" );
+  renderer->print( std::string( "Enter: Select an image and start the game" ),
+                   bodyOffsetX,
+                   350,
+                   "tinos" );
 
   // Game
-  print( std::string( "Game" ), bodyOffsetX, 400 );
-  print( std::string( "----" ), bodyOffsetX, 410 );
-  print( std::string( "Use the arrow keys to move the selector" ),
-         bodyOffsetX,
-         450 );
-  print( std::string( "m: Shift the selected tile to the empty space" ),
-         bodyOffsetX,
-         500 );
-  print( std::string( "c: Display solution" ), bodyOffsetX, 550 );
-  print( std::string( "Delete: Go back to the menu" ), bodyOffsetX, 600 );
+  renderer->print( std::string( "Game" ), bodyOffsetX, 400, "tinos" );
+  renderer->print( std::string( "----" ), bodyOffsetX, 410, "tinos" );
+  renderer->print( std::string( "Use the arrow keys to move the selector" ),
+                   bodyOffsetX,
+                   450,
+                   "tinos" );
+  renderer->print(
+    std::string( "m: Shift the selected tile to the empty space" ),
+    bodyOffsetX,
+    500,
+    "tinos" );
+  renderer->print(
+    std::string( "c: Display solution" ), bodyOffsetX, 550, "tinos" );
+  renderer->print(
+    std::string( "Delete: Go back to the menu" ), bodyOffsetX, 600, "tinos" );
 
-  print( std::string( "Press h to close this" ), footerOffsetX, 675 );
+  renderer->print(
+    std::string( "Press h to close this" ), footerOffsetX, 675, "tinos" );
 };
 
 void
@@ -559,8 +560,8 @@ Zezlup::menu()
   if ( isDisplayingPicker )
     renderer->draw( "colourPicker", "colourPicker", "Grid" );
 
-  print( std::string( "[ Help: h ]" ), 10, 18 );
-  print( std::string( "v0.0.1" ), 735, 18 );
+  renderer->print( std::string( "[ Help: h ]" ), 10, 18, "tinos" );
+  renderer->print( std::string( "v0.0.1" ), 735, 18, "tinos" );
 
   if ( isDisplayingHelp )
     displayHelp();
@@ -604,12 +605,15 @@ Zezlup::renderInactiveCells()
 void
 Zezlup::displayStats()
 {
-  print( std::string( "Moves: " ), 10, 18 );
-  print( std::to_string( moves ), 80, 18 );
+  renderer->print( std::string( "Moves: " ), 10, 18, "tinos" );
+  renderer->print( std::to_string( moves ), 80, 18, "tinos" );
 
-  print( std::string( "Time: " ), 150, 18 );
-  print(
-    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ), 205, 18 );
+  renderer->print( std::string( "Time: " ), 150, 18, "tinos" );
+  renderer->print(
+    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ),
+    205,
+    18,
+    "tinos" );
 };
 
 void
@@ -648,28 +652,13 @@ Zezlup::shiftCell()
 };
 
 void
-Zezlup::print( std::string s, u32 x, u32 y )
-{
-  std::string st;
-  for ( auto c = s.begin(); c != s.end(); ++c ) {
-    if ( *c == 32 )
-      x += 10;
-    else {
-      st = font->getStringChar( *c );
-      renderer->setQuadPosition( st, x, y - font->getBitmapTop( *c ) );
-
-      renderer->draw( st, st, "Text", WHITE );
-
-      x += font->getAdvanceX( *c );
-    }
-  }
-};
-
-void
 Zezlup::displayFPS( f32& start, f32& end )
 {
-  print( std::string( "FPS: " ), 650, 18 );
-  print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ), 685, 18 );
+  renderer->print( std::string( "FPS: " ), 650, 18, "tinos" );
+  renderer->print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ),
+                   685,
+                   18,
+                   "tinos" );
 };
 
 void
