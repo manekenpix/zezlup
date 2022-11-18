@@ -2,7 +2,6 @@
 #define ZEZLUP_H
 
 #include "ColourPicker/ColourPicker.h"
-#include "Font/Font.h"
 #include "Grid/Grid.h"
 #include "Image/Image.h"
 #include "Logger/Logger.h"
@@ -124,7 +123,6 @@ class Zezlup
   void removeGrid();
 
   void shiftCell();
-  void print( std::string s, u32 x, u32 y );
 
   bool getOptionSelectedWithMouse();
   void selectOptionWithMouseClick();
