@@ -95,7 +95,7 @@ class Zezlup
   bool isKeyPressed;
   Renderer::Keys key;
   Vec2* emptyCell = nullptr;
-  const u8 initialMoves = 20;
+  const u8 initialMoves = 100;
 
   bool isDisplayingHelp;
   const std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };

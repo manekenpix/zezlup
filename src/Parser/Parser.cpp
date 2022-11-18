@@ -29,7 +29,6 @@ Parser::parse()
 
   while ( pos != string::npos ) {
     pos = fileBuffer.find( sectionMarker, pos );
-
     if ( pos != string::npos ) {
       nextSectionMarker = fileBuffer.find( sectionMarker, pos + 1 );
 
@@ -61,8 +60,9 @@ Parser::parseSection( const size_t start, const size_t end )
 
     } else {
       endParagr = fileBuffer.find( NEXT_LINE, position );
-      mappedSections[sectionName].push_back(
-        fileBuffer.substr( position, endParagr - position ) );
+      if ( endParagr != string::npos )
+        mappedSections[sectionName].push_back(
+          fileBuffer.substr( position, endParagr - position ) );
 
       position = endParagr + 1;
     }
