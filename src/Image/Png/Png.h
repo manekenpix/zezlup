@@ -2,7 +2,7 @@
 #define PNG_H
 
 #include "../../Logger/Logger.h"
-#include "../../types.h"
+#include "../../Renderer/types.h"
 #include "../Image.h"
 #include <fstream>
 #include <iostream>

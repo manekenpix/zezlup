@@ -2,9 +2,9 @@
 #define GRID_H
 
 #include "../Image/Image.h"
-#include "../Renderer/Quad/Quad.h"
+#include "../Renderer/Renderer.h"
+#include "../Renderer/types.h"
 #include "../Shuffle.h"
-#include "../types.h"
 #include <algorithm>
 
 class Grid

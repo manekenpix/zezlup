@@ -12,11 +12,11 @@ DEBUG = -g
 SOURCES = $(shell find $(SRCDIR) -type f -name *.$(SRCEXT))
 OBJECTS = $(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SOURCES:.$(SRCEXT)=.o))
 
-release: export CMODE := -O3
+release: export CMODE := $(RELEASE)
 release: $(OBJECTS)
 	$(CC) $(RELEASE) $^ -o $(TARGET) $(CFLAGS_RELEASE)
 
-debug: export CMODE := -g
+debug: export CMODE := $(DEBUG)
 debug: $(OBJECTS)
 	$(CC) $(DEBUG) $^ -o $(TARGET) $(CFLAGS_DEBUG)
 

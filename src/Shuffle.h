@@ -1,7 +1,7 @@
 #ifndef SHUFFLE_H
 #define SHUFFLE_H
 
-#include "types.h"
+#include "Renderer/types.h"
 #include <algorithm>
 #include <ctime>
 #include <vector>

@@ -8,8 +8,6 @@
 #include "Parser/Parser.h"
 #include "Renderer/Renderer.h"
 #include "Shuffle.h"
-#include <algorithm>
-#include <charconv>
 #include <ft2build.h>
 #include <string>
 #include FT_FREETYPE_H
@@ -27,7 +25,7 @@ class Zezlup
   Logger logger;
   Parser* parser;
   Renderer* renderer;
-  Renderer::Mouse* mouse;
+  Mouse* mouse;
   bool leftMouseAlreadyClicked;
   bool rightMouseAlreadyClicked;
 
@@ -58,11 +56,6 @@ class Zezlup
   const f32 backgroundWidth = 800.0f;
   const f32 backgroundHeight = 800.0f;
 
-  // Help
-  const u32 headerOffsetX = 375;
-  const u32 bodyOffsetX = 225;
-  const u32 footerOffsetX = 310;
-
   // Options
   const string COORDS = "Coords";
   const f32 optionWidth = 200.0f;
@@ -78,12 +71,20 @@ class Zezlup
   std::vector<Image*> images;
 
   // Colour picker
-  u32 selectedColourHeight, selectedColourWidth, selectedColourX,
-    selectedColourY;
-  u32 pickerHeight, pickerWidth, pickerX, pickerY;
+  const u32 selectedColourHeight = 15;
+  const u32 selectedColourWidth = 25;
+  const u32 selectedColourX = 600;
+  const u32 selectedColourY = 6;
+  const u32 pickerHeight = 127 * 5;
+  const u32 pickerWidth = 25;
+  const u32 pickerX = 600;
+  const u32 pickerY = 21;
+  const Colour GAME_BLUE = Colour( 0.07f, 0.12f, 0.23f );
+  const Colour YELLOW = Colour( 0.98f, 0.63f, 0.06f );
+
   bool isDisplayingPicker;
   ColourPicker* picker;
-  std::array<f32, 3> selectedColour;
+  Colour selectedColour;
 
   // Gameplay
   u8 selected;
@@ -93,14 +94,9 @@ class Zezlup
   u8 optionSelected;
   bool menuMode;
   bool isKeyPressed;
-  Renderer::Keys key;
+  Keys key;
   Vec2* emptyCell = nullptr;
   const u8 initialMoves = 100;
-
-  bool isDisplayingHelp;
-  const std::array<f32, 3> PURPLE = { 0.55f, 0.0f, 0.55f };
-  const std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
-  const std::array<f32, 3> BLUE = { 0.07f, 0.12f, 0.23f };
 
   // Animation
   u8 shiftOffset = 60;
@@ -138,11 +134,11 @@ class Zezlup
   void initializeGameplay();
   void shiftSelectedCell();
 
-  void displayHelp();
   void displayPreview();
   void displayFPS( f32& start, f32& end );
   void displayStats();
   void createColourPicker();
+  void displayColourPicker();
 
 public:
   Zezlup();

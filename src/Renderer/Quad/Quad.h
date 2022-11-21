@@ -1,7 +1,7 @@
 #ifndef QUAD_H
 #define QUAD_H
 
-#include "../../types.h"
+#include "../types.h"
 
 #include <GL/glew.h>
 #include <glm/glm.hpp>
@@ -41,7 +41,7 @@ public:
   void bind();
   ~Quad();
 
-  void setPosition( f32 x, f32 y );
+  void setPosition( Vec2 position );
 };
 
 #endif

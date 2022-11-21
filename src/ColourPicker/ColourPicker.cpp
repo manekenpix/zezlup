@@ -41,14 +41,14 @@ ColourPicker::getBuffer()
   return buffer.data();
 };
 
-std::array<f32, 3>
-ColourPicker::getColour( u32 x, u32 y )
+Colour
+ColourPicker::getColour( Vec2 position )
 {
-  f32 positionInBuffer = ( y * width * 3 ) + ( x * 3 );
+  f32 positionInBuffer = ( position.y * width * 3 ) + ( position.x * 3 );
 
   f32 red = buffer[positionInBuffer] / 256.0;
   f32 green = buffer[positionInBuffer + 1] / 256.0;
   f32 blue = buffer[positionInBuffer + 2] / 256.0;
 
-  return std::array<f32, 3>( { red, green, blue } );
+  return Colour( red, green, blue );
 };

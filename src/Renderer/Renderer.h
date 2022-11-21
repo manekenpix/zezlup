@@ -3,11 +3,11 @@
 
 #include "../Image/Image.h"
 #include "../Logger/Logger.h"
-#include "../types.h"
 #include "Font/Font.h"
 #include "Quad/Quad.h"
 #include "Shader.h"
 #include "Texture/Texture.h"
+#include "types.h"
 
 #include <array>
 #include <glm/glm.hpp>
@@ -18,29 +18,11 @@
 class Renderer
 {
 public:
-  enum class Keys
-  {
-    left,
-    right,
-    up,
-    down,
-    enter,
-    esc,
-    backspace,
-    help,
-    c,
-    m,
-    blank
-  };
-
-  typedef struct Mouse
-  {
-    double x, y;
-    bool isLeftPressed;
-    bool isRightPressed;
-    bool isCoordsChanged;
-
-  } Mouse;
+  const static Colour WHITE;
+  const static Colour BLACK;
+  const static Colour RED;
+  const static Colour GREEN;
+  const static Colour BLUE;
 
   Mouse mouse;
 
@@ -52,13 +34,16 @@ public:
   void draw( std::string quad,
              std::string texture,
              std::string shader,
-             std::array<f32, 3> colour );
+             Colour colour );
   void draw( std::string quad, std::string texture, std::string shader );
-  void draw( std::string quad, std::array<f32, 3> colour );
+  void draw( std::string quad, Colour colour );
 
+  void clearColor( const Colour colour ) const;
+  void clear() const;
   void swapBuffers();
-  void pollEvents();
-  bool windowShouldClose();
+  void pollEvents() const;
+  f32 getTime() const;
+  bool windowShouldClose() const;
 
   void loadShader( std::string key, std::string vShader, std::string fShader );
   void loadTexture( std::string name,
@@ -71,12 +56,12 @@ public:
   void deleteTexture( std::string texture );
   void createQuad( std::string name, f32 width, f32 height );
   void deleteQuad( std::string name );
-  void setQuadPosition( std::string quad, f32 x, f32 y );
+  void setQuadPosition( const std::string quad, const Vec2 position );
   Keys getKey();
   Mouse* getMouse();
   void getMouseState();
   void loadFont( const std::string& id, const std::string& fontPath );
-  void print( const std::string s, u32 x, u32 y, const std::string id );
+  void print( const std::string s, Vec2 position, const std::string id );
 
 private:
   typedef struct KeyPair
@@ -92,7 +77,6 @@ private:
 
   Logger logger;
   std::unordered_map<std::string, Font*> fonts;
-  const std::array<f32, 3> WHITE = { 1.0f, 1.0f, 1.0f };
 
   bool isKeyPressed;
   int pressedKey = -1;
@@ -104,8 +88,8 @@ private:
     KeyPair( Keys::up, GLFW_KEY_UP ),
     KeyPair( Keys::down, GLFW_KEY_DOWN ),
     KeyPair( Keys::enter, GLFW_KEY_ENTER ),
-    KeyPair( Keys::m, GLFW_KEY_M ),
-    KeyPair( Keys::c, GLFW_KEY_C ),
+    KeyPair( Keys::x, GLFW_KEY_X ),
+    KeyPair( Keys::z, GLFW_KEY_Z ),
     KeyPair( Keys::help, GLFW_KEY_H ),
     KeyPair( Keys::esc, GLFW_KEY_ESCAPE ),
     KeyPair( Keys::backspace, GLFW_KEY_BACKSPACE ),

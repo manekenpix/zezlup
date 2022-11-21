@@ -1,7 +1,7 @@
 #ifndef IMAGE_H
 #define IMAGE_H
 
-#include "../types.h"
+#include "../Renderer/types.h"
 
 class Image
 {
