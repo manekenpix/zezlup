@@ -1,21 +1,21 @@
 #include "Zezlup.h"
 
 Zezlup::Zezlup()
-  : preview{ nullptr }
-  , background{ nullptr }
-  , gridHeight{ 4 }
+  : leftMouseAlreadyClicked{ false }
+  , rightMouseAlreadyClicked{ false }
   , gridWidth{ 4 }
+  , gridHeight{ 4 }
+  , framerate{ 0 }
+  , preview{ nullptr }
+  , isDisplayingPreview{ false }
+  , background{ nullptr }
+  , isDisplayingPicker{ false }
+  , selectedColour{ YELLOW }
   , selected{ 0 }
   , optionSelected{ 0 }
-  , framerate{ 0 }
   , menuMode{ true }
   , isKeyPressed{ false }
-  , key{ Renderer::Keys::blank }
-  , isDisplayingPreview{ false }
-  , isDisplayingHelp{ false }
-  , isDisplayingPicker{ false }
-  , leftMouseAlreadyClicked{ false }
-  , rightMouseAlreadyClicked{ false }
+  , key{ Keys::blank }
 {
   logger.info( "s", "Zezlup!" );
 
@@ -37,29 +37,21 @@ Zezlup::Zezlup()
   loadShaders();
   createColourPicker();
 
+  // selectedColour = YELLOW;
   // TODO(Josue): This shouldn't be here. Move this to a place where all the
   // game stuff is created/loaded
   renderer->createQuad(
     "blank", previewWidth / gridWidth, previewHeight / gridHeight );
-  renderer->setQuadPosition( "blank", previewX, previewY );
+  renderer->setQuadPosition( "blank", Vec2( previewX, previewY ) );
 
   renderer->createQuad(
     "gameBlank", backgroundWidth / gridWidth, backgroundHeight / gridHeight );
 
-  // Top bar
-  renderer->createQuad( "top_bar", 800, 25 );
-  renderer->setQuadPosition( "top_bar", 0, 0 );
-  std::copy( PURPLE.cbegin(), PURPLE.cend(), selectedColour.begin() );
-
-  // Help panel
-  renderer->createQuad( "helpPanel", previewWidth, previewHeight );
-  renderer->setQuadPosition( "helpPanel", previewX, previewY );
-
   // Selected Colour
   renderer->createQuad(
     "selectedColour", selectedColourWidth, selectedColourHeight );
-  renderer->setQuadPosition(
-    "selectedColour", selectedColourX, selectedColourY );
+  renderer->setQuadPosition( "selectedColour",
+                             Vec2( selectedColourX, selectedColourY ) );
 };
 
 void
@@ -93,11 +85,11 @@ Zezlup::loadMenuAssets()
 
   // Create a background
   renderer->createQuad( "background", backgroundWidth, backgroundHeight );
-  renderer->setQuadPosition( "background", 0, 25 );
+  renderer->setQuadPosition( "background", Vec2( 0, 25 ) );
 
   // Preview
   renderer->createQuad( "preview", previewWidth, previewHeight );
-  renderer->setQuadPosition( "preview", previewX, previewY );
+  renderer->setQuadPosition( "preview", Vec2( previewX, previewY ) );
   logger.info( "s", "Loading menu assets: done" );
 };
 
@@ -223,19 +215,10 @@ Zezlup::removeGridTextures()
 void
 Zezlup::createColourPicker()
 {
-  pickerHeight = 127 * 5;
-  pickerWidth = 25;
-  pickerX = 600;
-  pickerY = 20;
-  selectedColourWidth = 25;
-  selectedColourHeight = 15;
-  selectedColourX = 600;
-  selectedColourY = 5;
-
   picker = new ColourPicker( pickerWidth, pickerHeight );
 
   renderer->createQuad( "colourPicker", pickerWidth, pickerHeight );
-  renderer->setQuadPosition( "colourPicker", pickerX, pickerY );
+  renderer->setQuadPosition( "colourPicker", Vec2( pickerX, pickerY ) );
 
   renderer->loadTexture(
     "colourPicker", picker->getBuffer(), pickerWidth, pickerHeight, 0 );
@@ -247,13 +230,14 @@ Zezlup::getOptionSelectedWithMouse()
   s8 xPos = -1, yPos = -1;
   u8 index = 0;
   for ( auto it = optionsCoords.cbegin(); index < optionColumns; ++index, ++it )
-    if ( mouse->x >= it->x && mouse->x < it->x + optionWidth )
+    if ( mouse->position.x >= it->x && mouse->position.x < it->x + optionWidth )
       xPos = index;
 
   index = 0;
   for ( auto it = optionsCoords.cbegin(); index < optionRows * optionColumns;
         index += optionColumns, it += optionColumns )
-    if ( mouse->y >= it->y && mouse->y < it->y + optionHeight )
+    if ( mouse->position.y >= it->y &&
+         mouse->position.y < it->y + optionHeight )
       yPos = index;
 
   if ( xPos != -1 && yPos != -1 ) {
@@ -286,52 +270,50 @@ Zezlup::initializeGameplay()
 bool
 Zezlup::isSelectedColourClicked()
 {
-  return mouse->x >= selectedColourX &&
-         mouse->x <= ( selectedColourX + selectedColourWidth ) &&
-         mouse->y >= selectedColourY &&
-         mouse->y <= ( selectedColourY + selectedColourHeight );
+  return mouse->position.x >= selectedColourX &&
+         mouse->position.x <= ( selectedColourX + selectedColourWidth ) &&
+         mouse->position.y >= selectedColourY &&
+         mouse->position.y <= ( selectedColourY + selectedColourHeight );
 };
 
 bool
 Zezlup::isColourPickerClicked()
 {
-  return mouse->x >= pickerX && mouse->x <= ( pickerX + pickerWidth ) &&
-         mouse->y >= pickerY && mouse->y <= ( pickerY + pickerHeight );
+  return mouse->position.x >= pickerX &&
+         mouse->position.x <= ( pickerX + pickerWidth ) &&
+         mouse->position.y >= pickerY &&
+         mouse->position.y <= ( pickerY + pickerHeight );
 };
 
 void
 Zezlup::processMenuInput()
 {
-  if ( key == Renderer::Keys::help )
-    isDisplayingHelp = !isDisplayingHelp;
+  // TODO(Josue): Use a map here
+  switch ( key ) {
+    case Keys::right:
+      if ( optionSelected < assets.size() - 1 )
+        ++optionSelected;
+      break;
 
-  if ( !isDisplayingHelp )
-    // TODO(Josue): Use a map here
-    switch ( key ) {
-      case Renderer::Keys::right:
-        if ( optionSelected < assets.size() - 1 )
-          ++optionSelected;
-        break;
+    case Keys::left:
+      if ( optionSelected > 0 )
+        --optionSelected;
+      break;
 
-      case Renderer::Keys::left:
-        if ( optionSelected > 0 )
-          --optionSelected;
-        break;
+    case Keys::down:
+      if ( optionSelected < 3 )
+        optionSelected += 3;
+      break;
 
-      case Renderer::Keys::down:
-        if ( optionSelected < 3 )
-          optionSelected += 3;
-        break;
+    case Keys::up:
+      if ( optionSelected > 2 )
+        optionSelected -= 3;
+      break;
 
-      case Renderer::Keys::up:
-        if ( optionSelected > 2 )
-          optionSelected -= 3;
-        break;
-
-      case Renderer::Keys::enter:
-        initializeGameplay();
-        break;
-    }
+    case Keys::enter:
+      initializeGameplay();
+      break;
+  }
 
   if ( mouse->isCoordsChanged )
     getOptionSelectedWithMouse();
@@ -342,9 +324,9 @@ Zezlup::processMenuInput()
       isDisplayingPicker = true;
     } else if ( isDisplayingPicker && isColourPickerClicked() ) {
       isDisplayingPicker = false;
-      std::array<f32, 3> newColour =
-        picker->getColour( mouse->x - pickerX, mouse->y - pickerY );
-      std::copy( newColour.cbegin(), newColour.cend(), selectedColour.begin() );
+      Colour newColour = picker->getColour(
+        Vec2( mouse->position.x - pickerX, mouse->position.y - pickerY ) );
+      selectedColour = newColour;
     } else {
       isDisplayingPicker = false;
       selectOptionWithMouseClick();
@@ -368,13 +350,15 @@ Zezlup::getCellSelectedWithMouse()
 
   u8 index = 0;
   for ( auto it = cellsCoords.cbegin(); index < gridWidth; ++index, ++it )
-    if ( mouse->x >= ( *it )->x && mouse->x < ( *it )->x + cellWidth )
+    if ( mouse->position.x >= ( *it )->x &&
+         mouse->position.x < ( *it )->x + cellWidth )
       xPos = index;
 
   index = 0;
   for ( auto it = cellsCoords.cbegin(); index < gridWidth * gridHeight;
         index += gridWidth, it += gridWidth )
-    if ( mouse->y >= ( *it )->y && mouse->y < ( *it )->y + cellHeight )
+    if ( mouse->position.y >= ( *it )->y &&
+         mouse->position.y < ( *it )->y + cellHeight )
       yPos = index;
 
   if ( xPos != -1 && yPos != -1 ) {
@@ -432,38 +416,38 @@ Zezlup::processGameInput()
   }
 
   switch ( key ) {
-    case Renderer::Keys::right:
+    case Keys::right:
       if ( selected < gridWidth * gridHeight - 1 )
         ++selected;
       break;
 
-    case Renderer::Keys::left:
+    case Keys::left:
       if ( selected > 0 )
         --selected;
       break;
 
-    case Renderer::Keys::down:
+    case Keys::down:
       if ( selected < gridWidth * ( gridHeight - 1 ) )
         selected += gridWidth;
       break;
 
-    case Renderer::Keys::up:
+    case Keys::up:
       if ( selected > gridWidth - 1 )
         selected -= gridWidth;
       break;
 
-    case Renderer::Keys::c:
+    case Keys::z:
       isDisplayingPreview = !isDisplayingPreview;
       break;
 
-    case Renderer::Keys::backspace:
+    case Keys::backspace:
       removeGridTextures();
       removeGrid();
       isDisplayingPreview = false;
       menuMode = true;
       break;
 
-    case Renderer::Keys::m:
+    case Keys::x:
       if ( !isDisplayingPreview )
         shiftSelectedCell();
       break;
@@ -492,47 +476,6 @@ Zezlup::isPuzzleCompleted()
 }
 
 void
-Zezlup::displayHelp()
-{
-  renderer->draw( "helpPanel", BLUE );
-
-  renderer->print( std::string( "Help" ), headerOffsetX, 190, "tinos" );
-  renderer->print( std::string( "----" ), headerOffsetX, 200, "tinos" );
-
-  // Menu
-  renderer->print( std::string( "Menu" ), bodyOffsetX, 250, "tinos" );
-  renderer->print( std::string( "----" ), bodyOffsetX, 260, "tinos" );
-  renderer->print( std::string( "Use the arrow keys to move through images" ),
-                   bodyOffsetX,
-                   300,
-                   "tinos" );
-  renderer->print( std::string( "Enter: Select an image and start the game" ),
-                   bodyOffsetX,
-                   350,
-                   "tinos" );
-
-  // Game
-  renderer->print( std::string( "Game" ), bodyOffsetX, 400, "tinos" );
-  renderer->print( std::string( "----" ), bodyOffsetX, 410, "tinos" );
-  renderer->print( std::string( "Use the arrow keys to move the selector" ),
-                   bodyOffsetX,
-                   450,
-                   "tinos" );
-  renderer->print(
-    std::string( "m: Shift the selected tile to the empty space" ),
-    bodyOffsetX,
-    500,
-    "tinos" );
-  renderer->print(
-    std::string( "c: Display solution" ), bodyOffsetX, 550, "tinos" );
-  renderer->print(
-    std::string( "Delete: Go back to the menu" ), bodyOffsetX, 600, "tinos" );
-
-  renderer->print(
-    std::string( "Press h to close this" ), footerOffsetX, 675, "tinos" );
-};
-
-void
 Zezlup::displayPreview()
 {
   renderer->draw( "preview", assets[optionSelected], "Grid" );
@@ -547,7 +490,7 @@ Zezlup::menu()
 
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
     renderer->setQuadPosition(
-      "optionQuad", optionsCoords[index].x, optionsCoords[index].y );
+      "optionQuad", Vec2( optionsCoords[index].x, optionsCoords[index].y ) );
 
     if ( index == optionSelected )
       renderer->draw( "optionQuad", *asset, "Grid", selectedColour );
@@ -558,13 +501,9 @@ Zezlup::menu()
   renderer->draw( "selectedColour", selectedColour );
 
   if ( isDisplayingPicker )
-    renderer->draw( "colourPicker", "colourPicker", "Grid" );
+    displayColourPicker();
 
-  renderer->print( std::string( "[ Help: h ]" ), 10, 18, "tinos" );
-  renderer->print( std::string( "v0.0.1" ), 735, 18, "tinos" );
-
-  if ( isDisplayingHelp )
-    displayHelp();
+  renderer->print( std::string( "v0.0.1" ), Vec2( 735, 18 ), "tinos" );
 };
 
 void
@@ -572,7 +511,7 @@ Zezlup::renderActiveCell()
 {
   std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
   renderer->setQuadPosition(
-    "cellQuad", grid->cells[selected]->x, grid->cells[selected]->y );
+    "cellQuad", Vec2( grid->cells[selected]->x, grid->cells[selected]->y ) );
 
   // TODO(Josue): We should create a static member in Grid to define the empty
   // state, like string has npos
@@ -591,7 +530,7 @@ Zezlup::renderInactiveCells()
 
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end();
         ++cell, ++index ) {
-    renderer->setQuadPosition( "cellQuad", ( *cell )->x, ( *cell )->y );
+    renderer->setQuadPosition( "cellQuad", Vec2( ( *cell )->x, ( *cell )->y ) );
 
     if ( index != selected || isDisplayingPreview ) {
       if ( index == empty )
@@ -605,15 +544,34 @@ Zezlup::renderInactiveCells()
 void
 Zezlup::displayStats()
 {
-  renderer->print( std::string( "Moves: " ), 10, 18, "tinos" );
-  renderer->print( std::to_string( moves ), 80, 18, "tinos" );
+  renderer->print( std::string( "Moves" ), Vec2( 10, 18 ), "tinos" );
+  renderer->print( std::to_string( moves ), Vec2( 60, 18 ), "tinos" );
 
-  renderer->print( std::string( "Time: " ), 150, 18, "tinos" );
-  renderer->print(
-    std::to_string( static_cast<u32>( glfwGetTime() - startTime ) ),
-    205,
-    18,
-    "tinos" );
+  u32 time = static_cast<u32>( renderer->getTime() - startTime );
+  u8 seconds = time % 60;
+  u8 minutes = time / 60;
+
+  if ( minutes < 10 ) {
+    renderer->print( std::string( "Time" ), Vec2( 150, 18 ), "tinos" );
+    renderer->print( std::string( "0" ), Vec2( 188, 18 ), "tinos" );
+    renderer->print( std::to_string( minutes ), Vec2( 197, 18 ), "tinos" );
+  } else {
+    renderer->print( std::string( "Time" ), Vec2( 150, 18 ), "tinos" );
+    renderer->print( std::to_string( minutes ), Vec2( 188, 18 ), "tinos" );
+  }
+  renderer->print( ":", Vec2( 208, 18 ), "tinos" );
+  if ( seconds < 10 ) {
+    renderer->print( std::string( "0" ), Vec2( 215, 18 ), "tinos" );
+    renderer->print( std::to_string( seconds ), Vec2( 224, 18 ), "tinos" );
+  } else {
+    renderer->print( std::to_string( seconds ), Vec2( 215, 18 ), "tinos" );
+  }
+};
+
+void
+Zezlup::displayColourPicker()
+{
+  renderer->draw( "colourPicker", "colourPicker", "Grid" );
 };
 
 void
@@ -642,10 +600,11 @@ Zezlup::shiftCell()
   }
 
   if ( inProgress )
-    renderer->setQuadPosition(
-      "cellQuad", startCoordinates.x, startCoordinates.y );
+    renderer->setQuadPosition( "cellQuad",
+                               Vec2( startCoordinates.x, startCoordinates.y ) );
   else
-    renderer->setQuadPosition( "cellQuad", endCoordinates.x, endCoordinates.y );
+    renderer->setQuadPosition( "cellQuad",
+                               Vec2( endCoordinates.x, endCoordinates.y ) );
 
   renderer->draw(
     "cellQuad", grid->cells[selected]->id, "Grid", selectedColour );
@@ -654,22 +613,21 @@ Zezlup::shiftCell()
 void
 Zezlup::displayFPS( f32& start, f32& end )
 {
-  renderer->print( std::string( "FPS: " ), 650, 18, "tinos" );
+  renderer->print( std::string( "FPS: " ), Vec2( 650, 18 ), "tinos" );
   renderer->print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ),
-                   685,
-                   18,
+                   Vec2( 685, 18 ),
                    "tinos" );
 };
 
 void
 Zezlup::run()
 {
-  f32 startSeconds = glfwGetTime();
+  f32 startSeconds = renderer->getTime();
   f32 endSeconds = 0.0f;
 
   do {
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glClear( GL_COLOR_BUFFER_BIT );
+    renderer->clearColor( GAME_BLUE );
+    renderer->clear();
 
     key = renderer->getKey();
     renderer->getMouseState();
@@ -677,9 +635,6 @@ Zezlup::run()
       leftMouseAlreadyClicked = false;
     if ( !mouse->isRightPressed )
       rightMouseAlreadyClicked = false;
-
-    renderer->setQuadPosition( "top_bar", 0, 0 );
-    renderer->draw( "top_bar", BLUE );
 
     if ( menuMode ) {
       processMenuInput();
@@ -698,15 +653,15 @@ Zezlup::run()
       }
     }
 
-    endSeconds = glfwGetTime();
+    endSeconds = renderer->getTime();
 
     displayFPS( startSeconds, endSeconds );
-    startSeconds = glfwGetTime();
+    startSeconds = renderer->getTime();
 
     renderer->swapBuffers();
     renderer->pollEvents();
 
-  } while ( key != Renderer::Keys::esc && !renderer->windowShouldClose() );
+  } while ( key != Keys::esc && !renderer->windowShouldClose() );
 };
 
 Zezlup::~Zezlup()

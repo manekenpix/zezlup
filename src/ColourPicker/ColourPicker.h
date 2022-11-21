@@ -1,7 +1,7 @@
 #ifndef COLOUR_PICKER_H
 #define COLOUR_PICKER_H
 
-#include "../types.h"
+#include "../Renderer/types.h"
 #include <vector>
 
 class ColourPicker
@@ -15,7 +15,7 @@ public:
   ~ColourPicker(){};
 
   u8* getBuffer();
-  std::array<f32, 3> getColour( u32 x, u32 y );
+  Colour getColour( Vec2 position );
 };
 
 #endif

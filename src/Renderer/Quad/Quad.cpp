@@ -19,10 +19,10 @@ Quad::Quad( f32 w, f32 h )
 };
 
 void
-Quad::setPosition( f32 positionX, f32 positionY )
+Quad::setPosition( Vec2 position )
 {
-  x = positionX;
-  y = positionY;
+  x = position.x;
+  y = position.y;
 
   vertices[0] = x + width;  // Bottom Right X
   vertices[1] = y + height; // Bottom Right Y

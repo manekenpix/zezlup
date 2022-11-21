@@ -1,4 +1,12 @@
 #include "Renderer.h"
+#include "types.h"
+
+// Predefined colours
+const Colour Renderer::WHITE = Colour( 1.0f, 1.0f, 1.0f );
+const Colour Renderer::BLACK = Colour( 0.0f, 0.0f, 0.0f );
+const Colour Renderer::RED = Colour( 1.0f, 0.0f, 0.0f );
+const Colour Renderer::GREEN = Colour( 0.0f, 1.0f, 0.0f );
+const Colour Renderer::BLUE = Colour( 0.0f, 0.0f, 1.0f );
 
 Renderer::Renderer()
   : isKeyPressed{ false }
@@ -81,7 +89,7 @@ Renderer::createWindow( f32 windowW, f32 windowH )
 };
 
 bool
-Renderer::windowShouldClose()
+Renderer::windowShouldClose() const
 {
   return glfwWindowShouldClose( window );
 };
@@ -90,7 +98,7 @@ void
 Renderer::draw( std::string quad,
                 std::string texture,
                 std::string shader,
-                std::array<f32, 3> colour )
+                Colour colour )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
@@ -123,7 +131,7 @@ Renderer::draw( std::string quad, std::string texture, std::string shader )
 };
 
 void
-Renderer::draw( std::string quad, std::array<f32, 3> colour )
+Renderer::draw( std::string quad, Colour colour )
 {
   shaders["Solid"]->use();
   shaders["Solid"]->setMatrix4fv( "projection", projectionMatrix );
@@ -133,15 +141,33 @@ Renderer::draw( std::string quad, std::array<f32, 3> colour )
 };
 
 void
+Renderer::clearColor( const Colour colour ) const
+{
+  glClearColor( colour.r, colour.g, colour.b, 1.0f );
+};
+
+void
+Renderer::clear() const
+{
+  glClear( GL_COLOR_BUFFER_BIT );
+};
+
+void
 Renderer::swapBuffers()
 {
   glfwSwapBuffers( window );
 };
 
 void
-Renderer::pollEvents()
+Renderer::pollEvents() const
 {
   glfwPollEvents();
+};
+
+f32
+Renderer::getTime() const
+{
+  return glfwGetTime();
 };
 
 void
@@ -189,12 +215,12 @@ Renderer::deleteQuad( std::string name )
 };
 
 void
-Renderer::setQuadPosition( std::string key, f32 x, f32 y )
+Renderer::setQuadPosition( const std::string key, const Vec2 position )
 {
-  quads[key]->setPosition( x, y );
+  quads[key]->setPosition( position );
 };
 
-Renderer::Keys
+Keys
 Renderer::getKey()
 {
   u8 index = 0;
@@ -219,19 +245,19 @@ Renderer::getMouseState()
   double x, y;
   glfwGetCursorPos( window, &x, &y );
 
-  mouse.isCoordsChanged = !( mouse.x == x && mouse.y == y );
+  mouse.isCoordsChanged = !( mouse.position.x == x && mouse.position.y == y );
   mouse.isLeftPressed =
     glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_LEFT ) == GLFW_PRESS;
   mouse.isRightPressed =
     glfwGetMouseButton( window, GLFW_MOUSE_BUTTON_RIGHT ) == GLFW_PRESS;
 
   if ( mouse.isCoordsChanged ) {
-    mouse.x = x;
-    mouse.y = y;
+    mouse.position.x = x;
+    mouse.position.y = y;
   }
 };
 
-Renderer::Mouse*
+Mouse*
 Renderer::getMouse()
 {
   return &mouse;
@@ -247,7 +273,7 @@ Renderer::loadFont( const std::string& id, const std::string& fontPath )
     createQuad(
       std::string( 1, c ) + id, font->getWidth( c ), font->getHeight( c ) );
 
-    setQuadPosition( std::string( 1, c ) + id, 0, 0 );
+    setQuadPosition( std::string( 1, c ) + id, Vec2( 0, 0 ) );
 
     loadTexture( std::string( 1, c ) + id,
                  font->getBuffer( c ),
@@ -257,21 +283,22 @@ Renderer::loadFont( const std::string& id, const std::string& fontPath )
 };
 
 void
-Renderer::print( const std::string s, u32 x, u32 y, const std::string id )
+Renderer::print( const std::string s, Vec2 position, const std::string id )
 {
   std::string st;
   Font* font = fonts.at( id );
 
   for ( auto c = s.begin(); c != s.end(); ++c ) {
     if ( *c == 32 )
-      x += 10;
+      position.x += 10;
     else {
       st = font->getStringChar( *c );
-      setQuadPosition( st + id, x, y - font->getBitmapTop( *c ) );
+      setQuadPosition(
+        st + id, Vec2( position.x, position.y - font->getBitmapTop( *c ) ) );
 
-      draw( st + id, st + id, "Text", WHITE );
+      draw( st + id, st + id, "Text", Renderer::WHITE );
 
-      x += font->getAdvanceX( *c );
+      position.x += font->getAdvanceX( *c );
     }
   }
 };

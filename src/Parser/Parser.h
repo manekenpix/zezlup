@@ -2,7 +2,7 @@
 #define PARSER_H
 
 #include "../Logger/Logger.h"
-#include "../types.h"
+#include "../Renderer/types.h"
 #include <fstream>
 #include <string>
 #include <unordered_map>

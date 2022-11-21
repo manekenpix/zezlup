@@ -1,7 +1,7 @@
 #ifndef LOGGER_H
 #define LOGGER_H
 
-#include "../types.h"
+#include "../Renderer/types.h"
 #include <algorithm>
 #include <ctime>
 #include <iostream>

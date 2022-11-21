@@ -2,7 +2,7 @@
 #define SHADER_H
 
 #include "../Logger/Logger.h"
-#include "../types.h"
+#include "types.h"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -95,9 +95,10 @@ public:
     glUniform1f( glGetUniformLocation( id, name.c_str() ), value );
   };
 
-  void set3vf( const std::string& name, std::array<f32, 3> value ) const
+  void set3vf( const std::string& name, Colour value ) const
   {
-    glUniform3fv( glGetUniformLocation( id, name.c_str() ), 1, value.data() );
+    std::array<f32, 3> v = { value.r, value.g, value.b };
+    glUniform3fv( glGetUniformLocation( id, name.c_str() ), 1, v.data() );
   };
 
   void setMatrix4fv( const std::string& name, glm::mat4 value ) const
