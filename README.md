@@ -43,8 +43,9 @@ Select the puzzle you want to solve (use your mouse or arrows and enter keys)
 **Controls:**
 
 - `Arrow keys`: move selector.
-- `m`: slide the selected cell.
-- `c` (toggle): display the solution of the puzzle.
+- `x`: slide the selected cell.
+- `z` (toggle): display the solution of the puzzle.
+- `Backspace`: back to menu.
 - `Esc`: exit zezlup.
 
 ![Image](data/images/zezlup_gameplay.png)
