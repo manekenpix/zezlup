@@ -50,6 +50,7 @@ class Zezlup
   // Fonts
   const string FONTS = "Fonts";
   Font* font;
+  std::vector<std::string> fontIds;
 
   // Menu
   Quad* background;
@@ -73,11 +74,11 @@ class Zezlup
   // Colour picker
   const u32 selectedColourHeight = 15;
   const u32 selectedColourWidth = 25;
-  const u32 selectedColourX = 600;
+  const u32 selectedColourX = 710;
   const u32 selectedColourY = 6;
   const u32 pickerHeight = 127 * 5;
   const u32 pickerWidth = 25;
-  const u32 pickerX = 600;
+  const u32 pickerX = 710;
   const u32 pickerY = 21;
   const Colour GAME_BLUE = Colour( 0.07f, 0.12f, 0.23f );
   const Colour YELLOW = Colour( 0.98f, 0.63f, 0.06f );
@@ -136,7 +137,7 @@ class Zezlup
 
   void displayPreview();
   void displayFPS( f32& start, f32& end );
-  void displayStats();
+  void displayStaticInfo();
   void createColourPicker();
   void displayColourPicker();
 

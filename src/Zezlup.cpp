@@ -37,7 +37,6 @@ Zezlup::Zezlup()
   loadShaders();
   createColourPicker();
 
-  // selectedColour = YELLOW;
   // TODO(Josue): This shouldn't be here. Move this to a place where all the
   // game stuff is created/loaded
   renderer->createQuad(
@@ -114,6 +113,7 @@ Zezlup::loadFont()
   for ( std::string& fontPath : fontPaths ) {
     font = splitString( fontPath, ',' );
     renderer->loadFont( font[0], font[1] );
+    fontIds.push_back( font[0] );
   }
 
   logger.info( "s", "Loading fonts: done" );
@@ -498,12 +498,8 @@ Zezlup::menu()
       renderer->draw( "optionQuad", *asset, "Grid" );
   }
 
-  renderer->draw( "selectedColour", selectedColour );
-
   if ( isDisplayingPicker )
     displayColourPicker();
-
-  renderer->print( std::string( "v0.0.1" ), Vec2( 735, 18 ), "tinos" );
 };
 
 void
@@ -538,33 +534,6 @@ Zezlup::renderInactiveCells()
       else
         renderer->draw( "cellQuad", ( *cell )->id, selectedShader );
     }
-  }
-};
-
-void
-Zezlup::displayStats()
-{
-  renderer->print( std::string( "Moves" ), Vec2( 10, 18 ), "tinos" );
-  renderer->print( std::to_string( moves ), Vec2( 60, 18 ), "tinos" );
-
-  u32 time = static_cast<u32>( renderer->getTime() - startTime );
-  u8 seconds = time % 60;
-  u8 minutes = time / 60;
-
-  if ( minutes < 10 ) {
-    renderer->print( std::string( "Time" ), Vec2( 150, 18 ), "tinos" );
-    renderer->print( std::string( "0" ), Vec2( 188, 18 ), "tinos" );
-    renderer->print( std::to_string( minutes ), Vec2( 197, 18 ), "tinos" );
-  } else {
-    renderer->print( std::string( "Time" ), Vec2( 150, 18 ), "tinos" );
-    renderer->print( std::to_string( minutes ), Vec2( 188, 18 ), "tinos" );
-  }
-  renderer->print( ":", Vec2( 208, 18 ), "tinos" );
-  if ( seconds < 10 ) {
-    renderer->print( std::string( "0" ), Vec2( 215, 18 ), "tinos" );
-    renderer->print( std::to_string( seconds ), Vec2( 224, 18 ), "tinos" );
-  } else {
-    renderer->print( std::to_string( seconds ), Vec2( 215, 18 ), "tinos" );
   }
 };
 
@@ -613,10 +582,48 @@ Zezlup::shiftCell()
 void
 Zezlup::displayFPS( f32& start, f32& end )
 {
-  renderer->print( std::string( "FPS: " ), Vec2( 650, 18 ), "tinos" );
+  renderer->print( std::string( "FPS: " ), Vec2( 650, 18 ), fontIds[0] );
   renderer->print( std::to_string( static_cast<u8>( 1 / ( end - start ) ) ),
                    Vec2( 685, 18 ),
-                   "tinos" );
+                   fontIds[0] );
+};
+
+void
+Zezlup::displayStaticInfo()
+{
+  if ( menuMode )
+    renderer->print( std::string( "Zezlup!" ), Vec2( 10, 18 ), fontIds[0] );
+  else {
+    renderer->print( std::string( "Moves" ), Vec2( 10, 18 ), fontIds[0] );
+    renderer->print( std::to_string( moves ), Vec2( 60, 18 ), fontIds[0] );
+
+    u32 time = static_cast<u32>( renderer->getTime() - startTime );
+    u8 seconds = time % 60;
+    u8 minutes = time / 60;
+
+    renderer->print( std::string( "| Time" ), Vec2( 100, 18 ), fontIds[0] );
+    if ( minutes < 10 ) {
+      renderer->print( std::string( "0" ), Vec2( 153, 18 ), fontIds[0] );
+      renderer->print( std::to_string( minutes ), Vec2( 162, 18 ), fontIds[0] );
+    } else {
+      renderer->print( std::to_string( minutes ), Vec2( 188, 18 ), fontIds[0] );
+    }
+
+    renderer->print( ":", Vec2( 173, 18 ), fontIds[0] );
+    if ( seconds < 10 ) {
+      renderer->print( std::string( "0" ), Vec2( 180, 18 ), fontIds[0] );
+      renderer->print( std::to_string( seconds ), Vec2( 189, 18 ), fontIds[0] );
+    } else {
+      renderer->print( std::to_string( seconds ), Vec2( 180, 18 ), fontIds[0] );
+    }
+    renderer->print(
+      std::string( "x or left click: slide | z or right click: solution" ),
+      Vec2( 250, 18 ),
+      fontIds[0] );
+  }
+
+  renderer->draw( "selectedColour", selectedColour );
+  renderer->print( std::string( "v0.0.1" ), Vec2( 750, 18 ), fontIds[0] );
 };
 
 void
@@ -636,11 +643,12 @@ Zezlup::run()
     if ( !mouse->isRightPressed )
       rightMouseAlreadyClicked = false;
 
+    displayStaticInfo();
+
     if ( menuMode ) {
       processMenuInput();
       menu();
     } else {
-      displayStats();
       renderInactiveCells();
       if ( inProgress ) {
         shiftCell();
@@ -655,7 +663,6 @@ Zezlup::run()
 
     endSeconds = renderer->getTime();
 
-    displayFPS( startSeconds, endSeconds );
     startSeconds = renderer->getTime();
 
     renderer->swapBuffers();
