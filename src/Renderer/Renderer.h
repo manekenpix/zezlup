@@ -34,8 +34,12 @@ public:
   void draw( std::string quad,
              std::string texture,
              std::string shader,
-             Colour colour );
-  void draw( std::string quad, std::string texture, std::string shader );
+             Colour colour,
+             f32 alpha = 1.0f );
+  void draw( std::string quad,
+             std::string texture,
+             std::string shader,
+             f32 alpha = 1.0f );
   void draw( std::string quad, Colour colour );
 
   void clearColor( const Colour colour ) const;
