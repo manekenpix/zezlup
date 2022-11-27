@@ -252,7 +252,7 @@ void
 Zezlup::selectOptionWithMouseClick()
 {
   if ( getOptionSelectedWithMouse() )
-    initializeGameplay();
+    isFadeOut = true;
 
   mouse->isLeftPressed = false;
 };
@@ -311,7 +311,8 @@ Zezlup::processMenuInput()
       break;
 
     case Keys::enter:
-      initializeGameplay();
+      isFadeOut = true;
+
       break;
   }
 
@@ -503,6 +504,31 @@ Zezlup::menu()
 };
 
 void
+Zezlup::fadeOut()
+{
+  renderer->draw( "background", assets[optionSelected], "Blur" );
+  u8 index = 0;
+
+  if ( fadeAlpha > 0.0 )
+    fadeAlpha -= 0.018;
+  if ( fadeAlpha <= 0.0 ) {
+    isFadeOut = false;
+    initializeGameplay();
+    fadeAlpha = 1.0f;
+  }
+
+  for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
+    renderer->setQuadPosition(
+      "optionQuad", Vec2( optionsCoords[index].x, optionsCoords[index].y ) );
+
+    if ( index == optionSelected )
+      renderer->draw( "optionQuad", *asset, "Grid", selectedColour, fadeAlpha );
+    else
+      renderer->draw( "optionQuad", *asset, "Grid", fadeAlpha );
+  }
+};
+
+void
 Zezlup::renderActiveCell()
 {
   std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
@@ -647,7 +673,10 @@ Zezlup::run()
 
     if ( menuMode ) {
       processMenuInput();
-      menu();
+      if ( isFadeOut )
+        fadeOut();
+      else
+        menu();
     } else {
       renderInactiveCells();
       if ( inProgress ) {

@@ -98,12 +98,14 @@ void
 Renderer::draw( std::string quad,
                 std::string texture,
                 std::string shader,
-                Colour colour )
+                Colour colour,
+                f32 alpha )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
   shaders[shader]->set3vf( "passed_colour", colour );
   shaders[shader]->setBool( "has_border", true );
+  shaders[shader]->setFloat( "alpha", alpha );
 
   if ( texture != "Blank" ) {
     shaders[shader]->setBool( "has_texture", true );
@@ -115,11 +117,15 @@ Renderer::draw( std::string quad,
 };
 
 void
-Renderer::draw( std::string quad, std::string texture, std::string shader )
+Renderer::draw( std::string quad,
+                std::string texture,
+                std::string shader,
+                f32 alpha )
 {
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
   shaders[shader]->setBool( "has_border", false );
+  shaders[shader]->setFloat( "alpha", alpha );
 
   if ( texture != "Blank" ) {
     shaders[shader]->setBool( "has_texture", true );

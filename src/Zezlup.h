@@ -105,6 +105,8 @@ class Zezlup
   Grid::Cell startCoordinates;
   Grid::Cell endCoordinates;
   bool inProgress = false;
+  f32 fadeAlpha = 1.0f;
+  bool isFadeOut = false;
 
   void processMenuInput();
   void processGameInput();
@@ -120,7 +122,7 @@ class Zezlup
   void removeGrid();
 
   void shiftCell();
-
+  void fadeOut();
   bool getOptionSelectedWithMouse();
   void selectOptionWithMouseClick();
   bool getCellSelectedWithMouse();
