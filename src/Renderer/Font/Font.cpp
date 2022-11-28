@@ -13,7 +13,7 @@ Font::Font( const std::string& fontFile )
   }
 
   logger.info( "ss", "Font: ", fontFile.c_str() );
-  FT_Set_Pixel_Sizes( face, 0, 16 );
+  FT_Set_Pixel_Sizes( face, 0, 13 );
 
   for ( u8 c = FIRST_CHAR; c < LAST_CHAR; ++c ) {
     if ( FT_Load_Char( face, c, FT_LOAD_RENDER ) ) {

@@ -96,7 +96,7 @@ void
 Zezlup::removeGrid()
 {
   for ( const auto& cell : grid->cells ) {
-    if ( cell->id != grid->Empty )
+    if ( cell->id != Grid::Empty )
       renderer->deleteQuad( cell->id );
   }
 
@@ -469,7 +469,7 @@ Zezlup::isPuzzleCompleted()
 {
   for ( u8 i = 1; i < gridWidth * gridHeight; ++i ) {
     std::string s = grid->getId( i );
-    if ( s == grid->Empty || s.substr( 4 ) != std::to_string( i ) )
+    if ( s == Grid::Empty || s.substr( 4 ) != std::to_string( i ) )
       return false;
   }
 
@@ -479,14 +479,14 @@ Zezlup::isPuzzleCompleted()
 void
 Zezlup::displayPreview()
 {
-  renderer->draw( "preview", assets[optionSelected], "Grid" );
-  renderer->draw( "blank", "Blank", "Grid" );
+  renderer->draw( "preview", assets[optionSelected], ROUNDED );
+  renderer->draw( "blank", "Blank", GRID );
 };
 
 void
 Zezlup::menu()
 {
-  renderer->draw( "background", assets[optionSelected], "Blur" );
+  renderer->draw( "background", assets[optionSelected], BLUR );
   u8 index = 0;
 
   for ( auto asset = assets.begin(); asset != assets.end(); ++asset, ++index ) {
@@ -494,9 +494,9 @@ Zezlup::menu()
       "optionQuad", Vec2( optionsCoords[index].x, optionsCoords[index].y ) );
 
     if ( index == optionSelected )
-      renderer->draw( "optionQuad", *asset, "Grid", selectedColour );
+      renderer->draw( "optionQuad", *asset, ROUNDED, selectedColour );
     else
-      renderer->draw( "optionQuad", *asset, "Grid" );
+      renderer->draw( "optionQuad", *asset, ROUNDED );
   }
 
   if ( isDisplayingPicker )
@@ -506,7 +506,7 @@ Zezlup::menu()
 void
 Zezlup::fadeOut()
 {
-  renderer->draw( "background", assets[optionSelected], "Blur" );
+  renderer->draw( "background", assets[optionSelected], BLUR );
   u8 index = 0;
 
   if ( fadeAlpha > 0.0 )
@@ -522,33 +522,32 @@ Zezlup::fadeOut()
       "optionQuad", Vec2( optionsCoords[index].x, optionsCoords[index].y ) );
 
     if ( index == optionSelected )
-      renderer->draw( "optionQuad", *asset, "Grid", selectedColour, fadeAlpha );
+      renderer->draw(
+        "optionQuad", *asset, ROUNDED, selectedColour, fadeAlpha );
     else
-      renderer->draw( "optionQuad", *asset, "Grid", fadeAlpha );
+      renderer->draw( "optionQuad", *asset, ROUNDED, fadeAlpha );
   }
 };
 
 void
 Zezlup::renderActiveCell()
 {
-  std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
+  std::string selectedShader = isDisplayingPreview ? BLUR : GRID;
   renderer->setQuadPosition(
     "cellQuad", Vec2( grid->cells[selected]->x, grid->cells[selected]->y ) );
 
-  // TODO(Josue): We should create a static member in Grid to define the empty
-  // state, like string has npos
-  if ( grid->cells[selected]->id != grid->Empty )
+  if ( grid->cells[selected]->id != Grid::Empty )
     renderer->draw(
       "cellQuad", grid->cells[selected]->id, selectedShader, selectedColour );
   else
-    renderer->draw( "cellQuad", "Blank", "Grid", selectedColour );
+    renderer->draw( "cellQuad", "Blank", GRID, selectedColour );
 };
 
 void
 Zezlup::renderInactiveCells()
 {
   u8 index = 0;
-  std::string selectedShader = isDisplayingPreview ? "Blur" : "Grid";
+  std::string selectedShader = isDisplayingPreview ? BLUR : GRID;
 
   for ( auto cell = grid->cells.begin(); cell != grid->cells.end();
         ++cell, ++index ) {
@@ -556,7 +555,7 @@ Zezlup::renderInactiveCells()
 
     if ( index != selected || isDisplayingPreview ) {
       if ( index == empty )
-        renderer->draw( "cellQuad", "Blank", "Grid" );
+        renderer->draw( "cellQuad", "Blank", GRID );
       else
         renderer->draw( "cellQuad", ( *cell )->id, selectedShader );
     }
@@ -566,7 +565,7 @@ Zezlup::renderInactiveCells()
 void
 Zezlup::displayColourPicker()
 {
-  renderer->draw( "colourPicker", "colourPicker", "Grid" );
+  renderer->draw( "colourPicker", "colourPicker", GRID );
 };
 
 void
@@ -601,8 +600,7 @@ Zezlup::shiftCell()
     renderer->setQuadPosition( "cellQuad",
                                Vec2( endCoordinates.x, endCoordinates.y ) );
 
-  renderer->draw(
-    "cellQuad", grid->cells[selected]->id, "Grid", selectedColour );
+  renderer->draw( "cellQuad", grid->cells[selected]->id, GRID, selectedColour );
 };
 
 void
@@ -644,7 +642,7 @@ Zezlup::displayStaticInfo()
     }
     renderer->print(
       std::string( "x or left click: slide | z or right click: solution" ),
-      Vec2( 250, 18 ),
+      Vec2( 275, 18 ),
       fontIds[0] );
   }
 
@@ -709,6 +707,5 @@ Zezlup::~Zezlup()
   delete preview;
   delete background;
   delete renderer;
-  delete font;
   delete picker;
 };
