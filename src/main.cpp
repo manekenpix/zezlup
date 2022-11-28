@@ -1,4 +1,4 @@
-#include "Zezlup.h"
+#include "Zezlup/Zezlup.h"
 
 int
 main( int argc, char* argv[] )

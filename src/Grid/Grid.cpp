@@ -1,5 +1,7 @@
 #include "Grid.h"
 
+const std::string Grid::Empty = "-1";
+
 Grid::Grid( u8 cellsRow,
             u8 cellsColumn,
             f32 windowW,

@@ -1,13 +1,13 @@
 #ifndef ZEZLUP_H
 #define ZEZLUP_H
 
-#include "ColourPicker/ColourPicker.h"
-#include "Grid/Grid.h"
-#include "Image/Image.h"
-#include "Logger/Logger.h"
-#include "Parser/Parser.h"
-#include "Renderer/Renderer.h"
-#include "Shuffle.h"
+#include "../ColourPicker/ColourPicker.h"
+#include "../Grid/Grid.h"
+#include "../Image/Image.h"
+#include "../Logger/Logger.h"
+#include "../Parser/Parser.h"
+#include "../Renderer/Renderer.h"
+#include "../Shuffle.h"
 #include <ft2build.h>
 #include <string>
 #include FT_FREETYPE_H
@@ -49,7 +49,6 @@ class Zezlup
 
   // Fonts
   const string FONTS = "Fonts";
-  Font* font;
   std::vector<std::string> fontIds;
 
   // Menu
@@ -70,6 +69,13 @@ class Zezlup
   const string SHADERS = "Shaders";
   std::vector<std::string> assets;
   std::vector<Image*> images;
+
+  // Shaders
+  const std::string GRID = "grid";
+  const std::string ROUNDED = "rounded";
+  const std::string SOLID = "solid";
+  const std::string TEXT = "text";
+  const std::string BLUR = "blur";
 
   // Colour picker
   const u32 selectedColourHeight = 15;

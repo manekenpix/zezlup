@@ -105,7 +105,7 @@ Renderer::draw( std::string quad,
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
   shaders[shader]->set3vf( "passed_colour", colour );
   shaders[shader]->setBool( "has_border", true );
-  shaders[shader]->setFloat( "alpha", alpha );
+  shaders[shader]->setFloat( "fadeAlpha", alpha );
 
   if ( texture != "Blank" ) {
     shaders[shader]->setBool( "has_texture", true );
@@ -125,7 +125,7 @@ Renderer::draw( std::string quad,
   shaders[shader]->use();
   shaders[shader]->setMatrix4fv( "projection", projectionMatrix );
   shaders[shader]->setBool( "has_border", false );
-  shaders[shader]->setFloat( "alpha", alpha );
+  shaders[shader]->setFloat( "fadeAlpha", alpha );
 
   if ( texture != "Blank" ) {
     shaders[shader]->setBool( "has_texture", true );
@@ -139,9 +139,9 @@ Renderer::draw( std::string quad,
 void
 Renderer::draw( std::string quad, Colour colour )
 {
-  shaders["Solid"]->use();
-  shaders["Solid"]->setMatrix4fv( "projection", projectionMatrix );
-  shaders["Solid"]->set3vf( "passed_colour", colour );
+  shaders["solid"]->use();
+  shaders["solid"]->setMatrix4fv( "projection", projectionMatrix );
+  shaders["solid"]->set3vf( "passed_colour", colour );
 
   quads[quad]->bind();
 };
@@ -302,7 +302,7 @@ Renderer::print( const std::string s, Vec2 position, const std::string id )
       setQuadPosition(
         st + id, Vec2( position.x, position.y - font->getBitmapTop( *c ) ) );
 
-      draw( st + id, st + id, "Text", Renderer::WHITE );
+      draw( st + id, st + id, "text", Renderer::WHITE );
 
       position.x += font->getAdvanceX( *c );
     }

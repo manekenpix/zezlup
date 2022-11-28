@@ -2,7 +2,6 @@
 #define GRID_H
 
 #include "../Image/Image.h"
-#include "../Renderer/Renderer.h"
 #include "../Renderer/types.h"
 #include "../Shuffle.h"
 #include <algorithm>
@@ -13,14 +12,14 @@ class Grid
   u8 cellsPerColumn;
   f32 xOffset;
   f32 yOffset;
+  const std::string CELL = "cell";
 
   std::vector<Vec2*> coords;
 
   void setPositions();
 
 public:
-  const std::string Empty = "-1";
-  const std::string CELL = "cell";
+  const static std::string Empty;
 
   struct Cell
   {

@@ -2,8 +2,8 @@
 #define FONT_H
 
 #include "../../Logger/Logger.h"
-#include "../../Renderer/types.h"
-#include <freetype2/ft2build.h>
+#include "../types.h"
+#include <ft2build.h>
 #include <string>
 #include <vector>
 
