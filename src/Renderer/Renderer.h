@@ -65,7 +65,7 @@ public:
   Mouse* getMouse();
   void getMouseState();
   void loadFont( const std::string& id, const std::string& fontPath );
-  void print( const std::string s, Vec2 position, const std::string id );
+  void print( const std::string s, Vec2 position, const std::string fontId );
 
 private:
   typedef struct KeyPair

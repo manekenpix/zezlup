@@ -5,17 +5,17 @@ Quad::Quad( f32 w, f32 h )
   , height{ h }
 {
   glGenVertexArrays( 1, &vertexArray );
-  glGenBuffers( 1, &vertexBuffer );
-
   glBindVertexArray( vertexArray );
 
-  // Position
+  glGenBuffers( 1, &vertexBuffer );
   glBindBuffer( GL_ARRAY_BUFFER, vertexBuffer );
   glBufferData( GL_ARRAY_BUFFER, sizeof( f32 ) * 6 * 4, NULL, GL_STATIC_DRAW );
 
-  // position attribute
+  glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 0, 0 );
   glEnableVertexAttribArray( 0 );
-  glVertexAttribPointer( 0, 4, GL_FLOAT, GL_FALSE, 4 * sizeof( f32 ), 0 );
+
+  glBindBuffer( GL_ARRAY_BUFFER, 0 );
+  glBindVertexArray( 0 );
 };
 
 void
@@ -47,6 +47,9 @@ Quad::bind()
   glBufferData(
     GL_ARRAY_BUFFER, sizeof( vertices ), vertices.data(), GL_STATIC_DRAW );
   glDrawArrays( GL_TRIANGLES, 0, 6 );
+
+  glBindBuffer( GL_ARRAY_BUFFER, 0 );
+  glBindVertexArray( 0 );
 };
 
 void

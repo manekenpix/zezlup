@@ -289,10 +289,10 @@ Renderer::loadFont( const std::string& id, const std::string& fontPath )
 };
 
 void
-Renderer::print( const std::string s, Vec2 position, const std::string id )
+Renderer::print( const std::string s, Vec2 position, const std::string fontId )
 {
   std::string st;
-  Font* font = fonts.at( id );
+  Font* font = fonts.at( fontId );
 
   for ( auto c = s.begin(); c != s.end(); ++c ) {
     if ( *c == 32 )
@@ -300,9 +300,10 @@ Renderer::print( const std::string s, Vec2 position, const std::string id )
     else {
       st = font->getStringChar( *c );
       setQuadPosition(
-        st + id, Vec2( position.x, position.y - font->getBitmapTop( *c ) ) );
+        st + fontId,
+        Vec2( position.x, position.y - font->getBitmapTop( *c ) ) );
 
-      draw( st + id, st + id, "text", Renderer::WHITE );
+      draw( st + fontId, st + fontId, "text", Renderer::WHITE );
 
       position.x += font->getAdvanceX( *c );
     }

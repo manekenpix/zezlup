@@ -12,14 +12,13 @@ vec4 blank = vec4(0.0f, 0.0f, 0.0f, 1.0f);
 vec4 colour = vec4( vec3(passed_colour), fadeAlpha );
 float radius = 35.0f;
 float cornerAlpha = 1.0;
+float border_width = 0.02f;
+float maxX = 1.0f - border_width;
+float minX = border_width;
 
 void
 main()
 {
-  float border_width = 0.02f;
-  float maxX = 1.0f - border_width;
-  float minX = border_width;
-
   bool is_not_border = texCoord.x < maxX && texCoord.x > minX && texCoord.y < maxX &&
     texCoord.y > minX;
 

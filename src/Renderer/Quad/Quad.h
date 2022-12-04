@@ -26,7 +26,7 @@ public:
 
   Vertices vertices = {
 
-    // positions texture coords
+    // positions
     0.0f, 0.0f, 1.0f, 1.0f, // bottom right
     0.0f, 0.0f, 1.0f, 0.0f, // Top right
     0.0f, 0.0f, 0.0f, 0.0f, // top left
