@@ -1,6 +1,7 @@
 #ifndef ZEZLUP_H
 #define ZEZLUP_H
 
+#include "../Button/Button.h"
 #include "../ColourPicker/ColourPicker.h"
 #include "../Grid/Grid.h"
 #include "../Image/Image.h"
@@ -77,7 +78,12 @@ class Zezlup
   const std::string TEXT = "text";
   const std::string BLUR = "blur";
 
+  // Top bar
+  Button* backToMenu;
+  Button* controls;
+
   // Colour picker
+  const std::string PALETTE = "Palette";
   const u32 selectedColourHeight = 15;
   const u32 selectedColourWidth = 25;
   const u32 selectedColourX = 710;
@@ -86,8 +92,12 @@ class Zezlup
   const u32 pickerWidth = 25;
   const u32 pickerX = 710;
   const u32 pickerY = 21;
-  const Colour GAME_BLUE = Colour( 0.07f, 0.12f, 0.23f );
-  const Colour YELLOW = Colour( 0.98f, 0.63f, 0.06f );
+  // potential palette
+  // https://coolors.co/palette/f72585-7209b7-3a0ca3-4361ee-4cc9f0
+  // const Colour GAME_BLUE = Colour( 0.26f, 0.38f, 0.92f );
+  Colour GAME_BLUE;
+  // const Colour YELLOW = Colour( 0.22f, 0.04f, 0.63f );
+  Colour YELLOW;
 
   bool isDisplayingPicker;
   ColourPicker* picker;

@@ -10,7 +10,6 @@ Zezlup::Zezlup()
   , isDisplayingPreview{ false }
   , background{ nullptr }
   , isDisplayingPicker{ false }
-  , selectedColour{ YELLOW }
   , selected{ 0 }
   , optionSelected{ 0 }
   , menuMode{ true }
@@ -29,6 +28,18 @@ Zezlup::Zezlup()
   renderer->createWindow( windowWidth, windowHeight );
 
   mouse = renderer->getMouse();
+
+  vector<string> palette = parser->getSectionData( PALETTE );
+  std::vector<std::string> rgb;
+  rgb = splitString( palette[0], ',' );
+  GAME_BLUE =
+    Colour( std::stof( rgb[0] ), std::stof( rgb[1] ), std::stof( rgb[2] ) );
+
+  rgb = splitString( palette[1], ',' );
+  YELLOW =
+    Colour( std::stof( rgb[0] ), std::stof( rgb[1] ), std::stof( rgb[2] ) );
+
+  selectedColour = YELLOW;
 
   loadMenuAssets();
   loadFont();
@@ -51,6 +62,7 @@ Zezlup::Zezlup()
     "selectedColour", selectedColourWidth, selectedColourHeight );
   renderer->setQuadPosition( "selectedColour",
                              Vec2( selectedColourX, selectedColourY ) );
+  controls = new Button( renderer, "Controls", 65, 18, Vec2( 500, 4 ), YELLOW );
 };
 
 void
@@ -641,13 +653,12 @@ Zezlup::displayStaticInfo()
       renderer->print( std::to_string( seconds ), Vec2( 180, 18 ), fontIds[0] );
     }
     renderer->print(
-      std::string( "x or left click: slide | z or right click: solution" ),
-      Vec2( 275, 18 ),
-      fontIds[0] );
+      std::string( "Controls | Back to Menu" ), Vec2( 275, 18 ), fontIds[0] );
   }
 
   renderer->draw( "selectedColour", selectedColour );
   renderer->print( std::string( "v0.0.1" ), Vec2( 750, 18 ), fontIds[0] );
+  controls->show();
 };
 
 void
