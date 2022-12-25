@@ -5,6 +5,7 @@
 #include "../Renderer/types.h"
 #include "../Shuffle.h"
 #include <algorithm>
+#include <string>
 
 class Grid
 {
