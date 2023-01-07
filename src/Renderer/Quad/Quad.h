@@ -42,6 +42,7 @@ public:
   ~Quad();
 
   void setPosition( Vec2 position );
+  Vec2 getSize();
 };
 
 #endif

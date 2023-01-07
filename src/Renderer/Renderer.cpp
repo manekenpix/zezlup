@@ -139,9 +139,13 @@ Renderer::draw( std::string quad,
 void
 Renderer::draw( std::string quad, Colour colour )
 {
+  Vec2 size = quads[quad]->getSize();
+
   shaders["solid"]->use();
   shaders["solid"]->setMatrix4fv( "projection", projectionMatrix );
   shaders["solid"]->set3vf( "passed_colour", colour );
+  shaders["solid"]->setFloat( "width", size.x );
+  shaders["solid"]->setFloat( "height", size.y );
 
   quads[quad]->bind();
 };

@@ -24,19 +24,21 @@ Quad::setPosition( Vec2 position )
   x = position.x;
   y = position.y;
 
-  vertices[0] = x + width;  // Bottom Right X
-  vertices[1] = y + height; // Bottom Right Y
-  vertices[4] = x + width;  // Top Right X
-  vertices[5] = y;          // Top Right Y
-  vertices[8] = x;          // Top Left X
-  vertices[9] = y;          // Top Left Y
+  vertices[0] = vertices[12] = x + width;  // Bottom Right X
+  vertices[1] = vertices[13] = y + height; // Bottom Right Y
+  vertices[8] = vertices[20] = x;          // Top Left X
+  vertices[9] = vertices[21] = y;          // Top Left Y
 
-  vertices[12] = x + width;  // Bottom Right X
-  vertices[13] = y + height; // Bottom Right Y
+  vertices[4] = x + width;   // Top Right X
+  vertices[5] = y;           // Top Right Y
   vertices[16] = x;          // Bottom Left X
   vertices[17] = y + height; // Bottom Left Y
-  vertices[20] = x;          // Top Left X
-  vertices[21] = y;          // Top Left Y
+};
+
+Vec2
+Quad::getSize()
+{
+  return Vec2( width, height );
 };
 
 void
